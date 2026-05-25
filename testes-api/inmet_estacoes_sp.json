@@ -1,0 +1,35 @@
+[
+  {
+    "CD_ESTACAO": "A743",
+    "DC_NOME": "SAO BERNARDO DO CAMPO",
+    "SG_ESTADO": "SP",
+    "VL_LATITUDE": "-23.705600",
+    "VL_LONGITUDE": "-46.561400",
+    "VL_ALTITUDE": "785.0",
+    "DT_INICIO_OPERACAO": "2008-05-21",
+    "DT_FIM_OPERACAO": null,
+    "TP_ESTACAO": "Automática"
+  },
+  {
+    "CD_ESTACAO": "A771",
+    "DC_NOME": "SANTO ANDRE",
+    "SG_ESTADO": "SP",
+    "VL_LATITUDE": "-23.654200",
+    "VL_LONGITUDE": "-46.533800",
+    "VL_ALTITUDE": "752.0",
+    "DT_INICIO_OPERACAO": "2010-11-10",
+    "DT_FIM_OPERACAO": null,
+    "TP_ESTACAO": "Automática"
+  },
+  {
+    "CD_ESTACAO": "A701",
+    "DC_NOME": "SAO PAULO - MIRANTE",
+    "SG_ESTADO": "SP",
+    "VL_LATITUDE": "-23.496300",
+    "VL_LONGITUDE": "-46.619800",
+    "VL_ALTITUDE": "786.0",
+    "DT_INICIO_OPERACAO": "2001-02-12",
+    "DT_FIM_OPERACAO": null,
+    "TP_ESTACAO": "Automática"
+  }
+]
