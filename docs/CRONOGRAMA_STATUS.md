@@ -2,7 +2,7 @@
 
 **Sistema de Monitoramento Colaborativo de Áreas com Risco de Alagamento**
 Período: 01/07/2026 a 30/10/2026 (17 semanas)
-*Última atualização de status: 13/08/2026*
+*Última atualização de status: 17/08/2026*
 
 ## Legenda de responsáveis
 - **Henrique** — backend / tech lead
@@ -73,7 +73,7 @@ Período: 01/07/2026 a 30/10/2026 (17 semanas)
 | Responsável | Atividade | Status (João) |
 |---|---|---|
 | Henrique | Revisão de código backend e ajustes de performance inicial nas consultas | |
-| João | Documentação técnica do algoritmo de classificação de risco (fundamentação e funcionamento) — insumo para o relatório | 🔴 **Atrasada — ainda não iniciada, sem bloqueio externo** |
+| João | Documentação técnica do algoritmo de classificação de risco (fundamentação e funcionamento) — insumo para o relatório | ✅ Concluída em 17/08 — `docs/T15_algoritmo_risco_fundamentacao.md` (matriz AHP formalizada, CR=0.0038) + rascunho de seção `docs/T16_secao_algoritmo_risco.md` |
 | Marlon | Ajustes visuais e de usabilidade nas telas Android já integradas | |
 | Guilherme | Testes manuais do fluxo cadastro → listagem → mapa, registrando bugs encontrados | |
 
@@ -87,7 +87,7 @@ Período: 01/07/2026 a 30/10/2026 (17 semanas)
 | Responsável | Atividade | Status (João) |
 |---|---|---|
 | Henrique | Criação do ambiente de benchmark — geração de massa de dados simulada (1k, 10k, 100k registros geoespaciais) | |
-| João | Refinamento do algoritmo de risco com dados de múltiplas fontes ponderadas | 🔴 Não iniciada — depende parcialmente da Semana 6 (documentação) estar pronta primeiro |
+| João | Refinamento do algoritmo de risco com dados de múltiplas fontes ponderadas | ✅ Concluída em 17/08 — `fusao_climatica.py` e `algoritmo_risco.py` agora conectados (`classificar_risco()`/`obter_classificacao_risco()`); testado com ANA disponível e indisponível |
 | Marlon | Implementação de tela de detalhes da ocorrência (visualização individual) | |
 | Guilherme | Implementação de notificações locais simples (alerta visual de risco alto no app) | |
 
@@ -208,5 +208,5 @@ que alteraram o escopo original (troca de CEMADEN/INMET por ANA/CPTEC) estão de
 **Pendência crítica no caminho:** resposta da ANA ao cadastro de acesso (`hidro@ana.gov.br`),
 que bloqueia as Semanas 3 (parcialmente) e 5 (totalmente).
 
-**Item atrasado sem bloqueio externo:** documentação técnica do algoritmo de risco (Semana 6,
-encerrada em 09/08) — pode ser retomado a qualquer momento.
+**Item que estava atrasado sem bloqueio externo:** documentação técnica do algoritmo de risco
+(Semana 6, encerrada em 09/08) — concluído em 17/08 (`docs/T15_algoritmo_risco_fundamentacao.md`).

@@ -29,6 +29,8 @@ import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta
 from dataclasses import dataclass
 
+from algoritmo_risco import EntradaRisco, calcular_risco
+
 
 OPENWEATHER_API_KEY = "sua_chave_aqui"  # mesma chave usada em teste_openweather.py
 
@@ -63,7 +65,7 @@ class DadosClimaticosConsolidados:
     fonte_previsao: str
     pluviometro_local_mm_h: float | None = None
     fonte_pluviometro_local: str | None = None
-    previsao_cptec_mm_3h: float | None = None  # usado só para validação cruzada, não entra no AHP
+    validacao_cptec: str | None = None  # condição textual (ex. "Chuvoso"), só p/ validação cruzada, não entra no AHP
 
 
 # ---------- OpenWeather ----------
@@ -203,13 +205,59 @@ def obter_dados_consolidados(
         fonte_previsao="OpenWeather",
         pluviometro_local_mm_h=pluviometro_local,
         fonte_pluviometro_local=fonte_local,
-        previsao_cptec_mm_3h=cptec_validacao,
+        validacao_cptec=cptec_validacao,
     )
+
+
+# ---------- Integração com o algoritmo de risco (Semana 7) ----------
+
+def classificar_risco(
+    dados: DadosClimaticosConsolidados,
+    reportes_colaborativos_score: float = 0.0,
+) -> dict:
+    """Aplica o modelo AHP (algoritmo_risco.calcular_risco) sobre os dados já
+    consolidados de uma localização. Fecha o ciclo fusão -> classificação: até
+    aqui, os dois módulos existiam prontos e testados isoladamente, mas nada
+    ligava a saída de um à entrada do outro.
+
+    A validação qualitativa do CPTEC (dados.validacao_cptec) não entra no
+    cálculo do AHP - é apenas anexada ao resultado, como documentado em
+    docs/T15_algoritmo_risco_fundamentacao.md.
+    """
+    entrada = EntradaRisco(
+        precipitacao_atual_mm_h=dados.precipitacao_atual_mm_h,
+        pico_previsto_mm_3h=dados.pico_previsto_mm_3h,
+        pluviometro_local_mm_h=dados.pluviometro_local_mm_h,
+        reportes_colaborativos_score=reportes_colaborativos_score,
+    )
+    resultado = calcular_risco(entrada)
+    resultado["validacao_cruzada_cptec"] = dados.validacao_cptec
+    resultado["fontes"] = {
+        "precipitacao_atual": dados.fonte_precipitacao_atual,
+        "previsao": dados.fonte_previsao,
+        "pluviometro_local": dados.fonte_pluviometro_local,
+    }
+    return resultado
+
+
+def obter_classificacao_risco(
+    lat: float,
+    lon: float,
+    reportes_colaborativos_score: float = 0.0,
+    codigo_estacao_ana: str = ANA_CODIGO_ESTACAO_SANTO_ANDRE,
+    id_cidade_cptec=CPTEC_ID_CIDADE_SANTO_ANDRE,
+) -> dict:
+    """Ponto de entrada único do backend: busca dados de todas as fontes para
+    uma coordenada e devolve a classificação de risco já pronta. Encadeia
+    obter_dados_consolidados() + classificar_risco()."""
+    dados = obter_dados_consolidados(lat, lon, codigo_estacao_ana, id_cidade_cptec)
+    return classificar_risco(dados, reportes_colaborativos_score)
 
 
 if __name__ == "__main__":
     # Exemplo de uso local com os JSONs já coletados (sem chamada de rede),
-    # simulando o retorno esperado de obter_dados_consolidados().
+    # simulando o retorno esperado de obter_dados_consolidados() e já
+    # aplicando o algoritmo de risco sobre o resultado.
     import json
 
     with open("testes-api/openweather_atual.json", encoding="utf-8") as f:
@@ -224,6 +272,11 @@ if __name__ == "__main__":
         pico_previsto_mm_3h=_pico_precipitacao_3h(previsao),
         fonte_precipitacao_atual="OpenWeather",
         fonte_previsao="OpenWeather",
+        # ANA indisponível neste exemplo offline (sem credenciais/rede) -
+        # simula exatamente o cenário de fail-safe descrito na Semana 6.
     )
     print("=== DADOS CONSOLIDADOS (a partir dos JSONs já coletados) ===")
     print(dados)
+
+    print("\n=== CLASSIFICAÇÃO DE RISCO (fusão + algoritmo AHP) ===")
+    print(classificar_risco(dados))

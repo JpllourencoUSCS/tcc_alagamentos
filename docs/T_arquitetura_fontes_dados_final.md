@@ -89,8 +89,9 @@ práticos de integração com dados públicos brasileiros.
 2. Assim que a ANA responder com Identificador/Senha, rodar `testes-api/teste_ana.py` com
    `ANA_IDENTIFICADOR` e `ANA_SENHA` configurados para validar o fluxo de token de ponta a
    ponta.
-3. Atualizar a seção 3.X do relatório (`T16_secao_relatorio_apis.md`) para refletir essa
-   arquitetura final — o texto atual ainda cita CEMADEN e INMET como "descartados por
-   documentação limitada", o que precisa virar a narrativa real: CEMADEN e INMET foram
-   testados e descartados por proteção anti-bot documentada (achado metodológico), e a ANA
-   e o CPTEC assumiram os papéis de dado físico e previsão redundante, respectivamente.
+3. ~~Atualizar a seção 3.X do relatório (`T16_secao_relatorio_apis.md`)~~ — feito em 17/08/2026.
+   O texto agora reflete a narrativa real: CEMADEN e INMET foram testados e descartados por
+   proteção anti-bot documentada (achado metodológico), e a ANA e o CPTEC assumiram os papéis
+   de dado físico e previsão redundante, respectivamente. Inclui também seções novas com os
+   resultados de teste da ANA (estrutural, pendente de credencial) e do CPTEC (funcional de
+   ponta a ponta).

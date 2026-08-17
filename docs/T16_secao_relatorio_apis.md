@@ -10,33 +10,45 @@ O levantamento considerou critérios como disponibilidade de acesso gratuito, qu
 granularidade dos dados retornados, facilidade de integração com o backend em Python e
 relevância das informações para a classificação de risco de alagamento.
 
-### 3.X.1 APIs Climáticas
+### 3.X.1 APIs Climáticas — Arquitetura Final
 
-Foram avaliadas três fontes de dados meteorológicos: OpenWeather, INMET (Instituto Nacional
-de Meteorologia) e CEMADEN (Centro Nacional de Monitoramento e Alertas de Desastres
-Naturais).
+Foram avaliadas quatro fontes de dados meteorológicos: OpenWeather, INMET (Instituto Nacional
+de Meteorologia), CEMADEN (Centro Nacional de Monitoramento e Alertas de Desastres Naturais) e,
+posteriormente, ANA (Agência Nacional de Águas e Saneamento Básico) e CPTEC/INPE. A arquitetura
+final do sistema utiliza três dessas fontes, cada uma cobrindo um papel distinto no modelo de
+classificação de risco (ver seção 3.Y — Algoritmo de Classificação de Risco):
 
-O INMET disponibiliza dados históricos e em tempo real por meio de API pública, com cobertura
-de estações meteorológicas distribuídas pelo território nacional. Contudo, a integração exige
-autenticação via token e os dados retornados variam conforme a proximidade de estações
-físicas, o que pode comprometer a cobertura em áreas sem estação cadastrada próxima.
+| Fonte | Papel no sistema | Autenticação |
+|---|---|---|
+| OpenWeather | Precipitação atual (principal) + previsão principal | Chave de API (gratuita) |
+| ANA | Pluviômetro local — dado de medição física institucional | E-mail de cadastro + token OAuth (60 min) |
+| CPTEC/INPE | Previsão municipal de 4 dias — validação cruzada qualitativa | Sem token |
 
-O CEMADEN, por sua vez, é o principal órgão federal de monitoramento de riscos de desastres
-naturais no Brasil e disponibiliza dados de pluviômetros automáticos em municípios de risco.
-Embora seja uma fonte com alto valor institucional, a API apresenta documentação limitada e
-acesso menos padronizado, o que eleva a complexidade de integração dentro do escopo deste
-projeto.
+O INMET e o CEMADEN foram avaliados e **descartados** após testes de integração, não por falta
+de valor institucional, mas por proteção deliberada contra automação em seus canais de dado "ao
+vivo":
 
-A OpenWeather mostrou-se a alternativa mais viável para o protótipo. A plataforma oferece
-plano gratuito com limite de 1.000 requisições por dia e 60 por minuto, suficiente para operação
-em ambiente de testes e demonstração. A API é amplamente documentada, com suporte nativo
-a respostas em português e retorno em formato JSON padronizado.
+- **CEMADEN**: o acesso à API de pluviômetros automáticos (PED) depende de um fluxo de
+  autenticação em duas etapas — cadastro de e-mail junto ao órgão e geração de token via um
+  sistema de autenticação separado (SGAA) — cuja URL exata não é documentada publicamente e
+  depende de resposta institucional sem prazo definido.
+- **INMET**: o endpoint que alimenta o dado "ao vivo" (`apitempo.inmet.gov.br/estacao/front/`)
+  exige um token de **Google reCAPTCHA v3** gerado por página, proteção anti-bot que este
+  projeto não contorna. O endpoint histórico alternativo, sem essa proteção, foi testado com
+  dois intervalos de datas diferentes e retornou vazio (HTTP 204) em ambos os casos.
 
-Os endpoints avaliados foram o de clima atual (`/data/2.5/weather`) e o de previsão de cinco
-dias (`/data/2.5/forecast`), ambos acessados via requisição HTTP com parâmetros de latitude,
-longitude, unidade métrica e idioma. Testes foram realizados com as coordenadas de
-Santo André, SP (latitude -23.6573, longitude -46.5289), e os resultados confirmaram o
-funcionamento esperado da API.
+Esse achado é registrado aqui como resultado metodológico legítimo, não como falha do projeto:
+**múltiplos órgãos brasileiros de dados hidrometeorológicos protegem especificamente o acesso
+"ao vivo" contra automação**, mesmo disponibilizando os mesmos dados publicamente por outros
+meios com alguma defasagem — um ponto relevante para discussão sobre os desafios práticos de
+integração com dados públicos brasileiros.
+
+A remoção do INMET não deixou nenhum peso do modelo de classificação de risco sem cobertura: o
+INMET nunca teve peso próprio nesse modelo — era apenas uma fonte redundante de "precipitação
+atual", papel que o OpenWeather já cumpria sozinho desde o início do projeto. Em lugar do
+CEMADEN, o papel de "pluviômetro local" passou a ser cumprido pela ANA, cujo processo de
+cadastro, embora também exija e-mail (`hidro@ana.gov.br`), está oficialmente documentado
+(manual técnico da ANA).
 
 ### 3.X.2 Resultados dos Testes com a OpenWeather
 
@@ -57,7 +69,40 @@ Os campos selecionados para uso no sistema são: `rain.1h` (precipitação na ú
 `weather[0].description` (descrição textual do clima), `main.temp` (temperatura atual),
 `main.humidity` (umidade relativa) e `coord` (validação das coordenadas retornadas).
 
-### 3.X.3 API de Georreferenciamento
+### 3.X.3 Resultados dos Testes com a ANA
+
+A integração com a ANA (`backend/fusao_climatica.py`, `testes-api/teste_ana.py`) segue o fluxo
+oficial documentado no manual técnico do órgão: autenticação via `Identificador`/`Senha`
+cadastrados por e-mail, geração de um token OAuth com validade de 60 minutos, e consulta à
+série telemétrica adotada da estação (campo `Chuva_Adotada`, em mm) por código de estação —
+`21477000` para Santo André, SP, confirmado junto às demais estações do ABC Paulista
+(`21489000` São Caetano do Sul, `21488000` São Bernardo do Campo).
+
+Até o fechamento desta seção, a integração está implementada e testada estruturalmente (fluxo
+de token, chamada autenticada, tratamento de erro), mas a validação de ponta a ponta com dados
+reais depende da aprovação do cadastro solicitado à ANA (`hidro@ana.gov.br`), pendência externa
+ao controle da equipe. O sistema foi projetado para **não falhar** na ausência desse dado: caso
+a chamada à ANA não retorne (credenciais pendentes, token expirado ou erro de rede), o algoritmo
+de risco redistribui o peso desse componente entre precipitação atual e previsão, em vez de
+travar ou descartar o cálculo (ver seção 3.Y).
+
+### 3.X.4 Resultados dos Testes com o CPTEC/INPE
+
+O CPTEC/INPE foi integrado como segunda fonte de previsão, usada como validação cruzada
+qualitativa da previsão do OpenWeather (`backend/fusao_climatica.py`,
+`testes-api/teste_cptec.py`). O endpoint de previsão de 4 dias (`/XML/cidade/{id}/previsao.xml`)
+funciona de ponta a ponta para o identificador de cidade `4704` (Santo André, SP — existe também
+um identificador `4703` para uma Santo André no estado da Paraíba, por isso o script filtra
+explicitamente por UF=SP), retornando siglas de condição do tempo traduzidas para texto legível
+(ex.: `pn` → "Parcialmente Nublado") a partir de uma tabela de siglas oficial do CPTEC.
+
+O endpoint de condições atuais de aeroporto (METAR), inicialmente avaliado como possível fonte
+de precipitação atual redundante, foi testado e descartado: o feed retornou vazio ou com erro
+500 do servidor do CPTEC nos testes realizados. Por isso, o CPTEC entra no sistema apenas com a
+previsão de 4 dias, e apenas como validação qualitativa — o endpoint usado não retorna volume de
+chuva em mm, então não alimenta numericamente o modelo de classificação de risco.
+
+### 3.X.5 API de Georreferenciamento
 
 Para conversão de endereços em coordenadas geográficas (geocoding), foi avaliada a API
 Nominatim, mantida pelo projeto OpenStreetMap. A API é gratuita, não requer autenticação e
@@ -69,39 +114,44 @@ da região. Esses resultados validam a viabilidade de uso do Nominatim para geoc
 protótipo, especialmente em cenários onde o usuário informe um endereço textual em vez de
 coordenadas diretas via GPS.
 
-### 3.X.4 SDK de Mapas para Android
+### 3.X.6 SDK de Mapas para Android
 
 Foram comparadas duas alternativas para a camada de visualização geográfica no aplicativo
 Android: o Google Maps SDK for Android e o OSMDroid, baseado em OpenStreetMap.
 
 O OSMDroid é totalmente gratuito e de código aberto, sem necessidade de chave de API,
-com boa documentação. No entanto, sua integração com Jetpack Compose — framework adotado
-para a interface do aplicativo — é trabalhosa e menos documentada, o que representa risco de
-prazo para o projeto.
+com boa documentação. No entanto, sua integração era considerada mais trabalhosa e menos
+documentada no contexto avaliado, o que representava risco de prazo para o projeto.
 
-O Google Maps SDK, por outro lado, oferece integração nativa com Jetpack Compose por meio
-da biblioteca `maps-compose`, mantida pelo próprio Google. O plano gratuito cobre até 28.000
-requisições mensais no Dynamic Maps, volume mais do que suficiente para o protótipo.
-A documentação oficial é extensa e há ampla disponibilidade de exemplos específicos para
-Android com Kotlin.
+O Google Maps SDK, por outro lado, oferece plano gratuito que cobre até 28.000 requisições
+mensais no Dynamic Maps, volume mais do que suficiente para o protótipo, com documentação
+oficial extensa. A avaliação original (Semana 1) considerou também a integração nativa com
+Jetpack Compose via `maps-compose`; após a decisão de migrar a camada Android de Compose para
+Views em XML (ver decisão de arquitetura da Semana 1), essa vantagem específica deixou de se
+aplicar, mas não motivou reavaliação do SDK: o Google Maps SDK oferece suporte nativo e igualmente
+maduro para integração via XML (`MapView`/`SupportMapFragment`), o que preservou a decisão
+original sem necessidade de trocar de fornecedor.
 
 Diante desses critérios, o Google Maps SDK foi selecionado como solução para a camada de
-mapas do sistema.
+mapas do sistema, hoje implementada em XML (`Marlon`, Semana 3).
 
-### 3.X.5 Síntese das Decisões Tecnológicas
+### 3.X.7 Síntese das Decisões Tecnológicas
 
 | Componente | Solução Adotada | Justificativa |
 |---|---|---|
-| Dados climáticos em tempo real | OpenWeather API | Documentação, plano gratuito, JSON padronizado |
-| Previsão meteorológica | OpenWeather Forecast | Mesmo provedor, 5 dias em intervalos de 3h |
+| Precipitação atual + previsão principal | OpenWeather API | Documentação, plano gratuito, JSON padronizado |
+| Pluviômetro local (dado físico institucional) | ANA | Papel que era do CEMADEN no modelo de risco; processo de cadastro oficialmente documentado |
+| Previsão redundante (validação cruzada) | CPTEC/INPE | Sem autenticação; previsão de 4 dias funcional de ponta a ponta |
 | Geocoding | Nominatim (OpenStreetMap) | Gratuito, sem autenticação, testado com sucesso |
-| SDK de mapas (Android) | Google Maps SDK | Integração nativa com Jetpack Compose |
+| SDK de mapas (Android) | Google Maps SDK | Suporte nativo tanto a Compose quanto a XML Views; documentação extensa |
 
-As APIs descartadas nesta versão — INMET e CEMADEN — permanecem como fontes
-complementares a serem avaliadas em trabalhos futuros, especialmente para validação
-cruzada dos dados de precipitação e maior aderência a fontes institucionais brasileiras.
+O INMET e o CEMADEN foram testados e descartados por proteção documentada contra automação
+(reCAPTCHA v3 e fluxo de autenticação sem URL pública, respectivamente) — não por limitação de
+documentação, como avaliado preliminarmente. A ANA e o CPTEC assumiram, respectivamente, os
+papéis de dado físico institucional e previsão redundante que essas duas fontes ocupariam.
 
 ---
 
-*Seção redigida com base nos testes realizados em 23/05/2026.
+*Seção redigida com base nos testes realizados entre 23/05/2026 e 05/08/2026, e revisada em
+17/08/2026 para refletir a arquitetura final de fontes de dados (`docs/T_arquitetura_fontes_dados_final.md`).
 Arquivos de resultado disponíveis em `testes-api/` no repositório do projeto.*

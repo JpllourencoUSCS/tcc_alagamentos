@@ -1,8 +1,10 @@
 """
 Algoritmo de classificação de risco de alagamento (modelo AHP).
 
-Pesos definidos na Semana 1 (documento AHP, CR=0.018):
-- Precipitação atual (OpenWeather rain.1h / INMET):  35%
+Pesos definidos na Semana 1 e formalizados na Semana 6 com matriz de comparação
+pareada e teste de consistência (CR=0.0038, dentro do limite de Saaty de 0.10) —
+ver docs/T15_algoritmo_risco_fundamentacao.md para a fundamentação completa:
+- Precipitação atual (OpenWeather rain.1h):           35%
 - Pluviômetro local (ANA, estação telemétrica):       25%
 - Previsão / tendência (OpenWeather forecast):        25%
 - Dado colaborativo (usuários do app):                15%
