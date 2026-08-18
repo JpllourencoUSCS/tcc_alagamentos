@@ -18,14 +18,43 @@ de múltiplas fontes climáticas alimentando um algoritmo de classificação de 
 **Equipe:** Henrique (backend/tech lead), João (integração/full stack — usuário deste
 repositório), Marlon e Guilherme (Android).
 
+**18/08/2026:** Henrique perdeu os arquivos originais do backend (Semanas 1–7: modelagem
+PostgreSQL/PostGIS, endpoints FastAPI, ambiente de benchmark — nada disso chegou a ser
+versionado). O time decidiu reconstruir do zero em vez de tentar recuperar, e o João fez
+essa reconstrução integrando ao que já existia (`algoritmo_risco.py`, `fusao_climatica.py`).
+Por isso boa parte de `backend/` foi escrita numa sessão só, fora do padrão usual de autoria
+por responsável — ver detalhes e o que ainda falta validar no incidente registrado em
+`docs/CRONOGRAMA_STATUS.md`.
+
 ## Convenções do repositório
 
-- `backend/` — lógica de produção (`algoritmo_risco.py`, `fusao_climatica.py`)
+- `backend/` — lógica de produção:
+  - `algoritmo_risco.py`, `fusao_climatica.py` — modelo AHP e fusão de fontes climáticas
+  - `constants.py` — enums `NivelRisco`/`FonteDado`, vocabulário único reusado pelo ORM e pela API
+  - `db/` — `models.py` (SQLAlchemy + GeoAlchemy2), `schema.sql` (DDL PostgreSQL/PostGIS),
+    `session.py` (engine/`get_db`), `repository.py` (acesso a dados de `ocorrencias`)
+  - `api/` — endpoints FastAPI (`ocorrencias.py`, `schemas.py`); app principal em `backend/main.py`
+  - `servicos/` — camada de integração entre API e lógica de domínio (`classificacao.py`
+    liga o endpoint de criação à fusão climática + algoritmo de risco)
+  - `benchmark/` — geração de massa de dados sintética e medição de consultas
+    (Semanas 7–9: `gerar_dados.py`, `popular_banco.py`, `medir_consultas.py`)
+  - `tests/` — pytest; rodar com `cwd=backend/` (convenção de imports absolutos do
+    projeto, ex. `from constants import ...`, sem pacote `backend.` no caminho)
 - `testes-api/` — scripts de teste de API, um por fonte, nomeados `teste_<fonte>.py`
-- `docs/` — documentação. `T05`–`T16` são o histórico de investigação (não apagar,
+- `docs/` — documentação. `T05`–`T18` são o histórico de investigação (não apagar,
   não reescrever com conteúdo diferente do que realmente aconteceu). `T16_secao_*.md`
   são rascunhos de seções do relatório final e devem ser mantidos sincronizados com as
   decisões técnicas atuais.
+
+## Ambiente de desenvolvimento
+
+Esta máquina **não tem PostgreSQL, PostGIS, Docker nem nenhum serviço de banco
+instalado** (confirmado em 18/08/2026 — sem `psql`, sem `docker`, sem serviço no Windows).
+Todo código de banco (`backend/db/`, `backend/benchmark/`) é testado com fakes/mocks e
+validado por compilação de SQL contra o dialeto PostgreSQL, nunca contra um banco vivo.
+Antes de assumir que dá para "só rodar e ver", verifique se isso mudou; se não mudou, todo
+trabalho de banco fica com um passo de validação real pendente — deixe isso explícito no
+`CRONOGRAMA_STATUS.md`, não implícito.
 
 ## Decisões técnicas já fechadas (não propor de novo sem pedido explícito)
 
@@ -45,6 +74,10 @@ repositório), Marlon e Guilherme (Android).
   e, se for uma decisão de arquitetura, também no `docs/T_arquitetura_fontes_dados_final.md`.
 - Preferir entregar código pronto e testado a apenas explicar como fazer.
 - Validar sintaxe Python antes de considerar uma tarefa concluída.
+- `backend/` tem suíte pytest (`backend/tests/`) — rodar antes de considerar uma mudança de
+  backend concluída (`cd backend; python -m pytest tests/`). Sem Postgres disponível (ver
+  "Ambiente de desenvolvimento"), o que não pode ser testado contra banco real fica marcado
+  🟡 no cronograma, não ✅ — não arredondar isso para "concluído".
 
 ## Fechamento de sessão
 

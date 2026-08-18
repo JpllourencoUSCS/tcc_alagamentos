@@ -1,0 +1,12 @@
+requests
+
+# Backend (Semana 2+ — Henrique)
+fastapi
+uvicorn[standard]
+sqlalchemy>=2.0
+geoalchemy2
+psycopg2-binary
+
+# Testes (Semana 3+)
+pytest
+httpx
