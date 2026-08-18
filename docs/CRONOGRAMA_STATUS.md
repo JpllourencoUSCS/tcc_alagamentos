@@ -210,3 +210,11 @@ que bloqueia as Semanas 3 (parcialmente) e 5 (totalmente).
 
 **Item que estava atrasado sem bloqueio externo:** documentação técnica do algoritmo de risco
 (Semana 6, encerrada em 09/08) — concluído em 17/08 (`docs/T15_algoritmo_risco_fundamentacao.md`).
+
+**Decisão estrutural de 17/08:** mantido o componente colaborativo (15%) no algoritmo de risco
+— é o diferencial do projeto frente ao ponto do orientador sobre "não parecer colagem de APIs".
+Adicionado fail-safe de redistribuição proporcional de peso quando não há reportes suficientes
+para uma área (antes, isso zerava 15% do score silenciosamente). **Pendência nova identificada:**
+o módulo que agrega reportes brutos de usuários em um score 0–100 ainda não existe em nenhum
+repositório do time — não é bloqueio para o protótipo (o fail-safe cobre a ausência), mas é
+necessário para validar o modelo com as 4 fontes reais em produção.

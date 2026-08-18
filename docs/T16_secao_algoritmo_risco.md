@@ -63,11 +63,15 @@ escala de 0 a 100, classificada como:
 | Médio risco | 30 – 60 |
 | Alto risco | 60 – 100 |
 
-O algoritmo também trata explicitamente a indisponibilidade pontual da fonte ANA (por
-exemplo, em caso de falha de rede ou expiração do token de autenticação): nesse cenário,
-o peso do pluviômetro local é redistribuído proporcionalmente entre precipitação atual e
-previsão, em vez de descartado silenciosamente — uma decisão de projeto que evita
-distorcer o score por indisponibilidade temporária de uma única fonte externa.
+O algoritmo também trata explicitamente a indisponibilidade de duas de suas fontes. Em
+caso de falha pontual da ANA (rede ou expiração do token de autenticação, por exemplo), o
+peso do pluviômetro local é redistribuído entre precipitação atual e previsão. Em caso de
+ausência de reportes colaborativos suficientes para a área — cenário esperado em um
+piloto com poucos usuários ativos —, o peso do componente colaborativo é redistribuído
+proporcionalmente entre os demais componentes disponíveis, em vez de ser descartado
+silenciosamente. Em ambos os casos, a decisão de projeto é a mesma: evitar que a
+indisponibilidade temporária ou estrutural de uma fonte subestime artificialmente o
+score final.
 
 ### 3.Y.4 Teste com Dado Real
 
@@ -83,7 +87,11 @@ pareada foram definidos pela própria equipe do projeto, sem validação por esp
 externos em hidrologia ou defesa civil, o que é declarado aqui como limitação
 metodológica do protótipo. Os pesos são fixos e não variam por região ou sazonalidade;
 uma extensão natural do trabalho seria a recalibração dos pesos por microrregião a
-partir de histórico real de ocorrências.
+partir de histórico real de ocorrências. Por fim, a agregação dos reportes brutos de
+usuários em um score numérico 0–100 para o componente colaborativo ainda não foi
+implementada em nenhum módulo do sistema — o algoritmo já está preparado para operar sem
+esse dado (fail-safe), mas a validação com as quatro fontes em produção depende dessa
+peça ainda não construída.
 
 ---
 

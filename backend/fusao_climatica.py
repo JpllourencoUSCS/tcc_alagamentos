@@ -213,12 +213,18 @@ def obter_dados_consolidados(
 
 def classificar_risco(
     dados: DadosClimaticosConsolidados,
-    reportes_colaborativos_score: float = 0.0,
+    reportes_colaborativos_score: float | None = None,
 ) -> dict:
     """Aplica o modelo AHP (algoritmo_risco.calcular_risco) sobre os dados já
     consolidados de uma localização. Fecha o ciclo fusão -> classificação: até
     aqui, os dois módulos existiam prontos e testados isoladamente, mas nada
     ligava a saída de um à entrada do outro.
+
+    reportes_colaborativos_score é None por padrão (não 0.0): ausência de
+    reportes é diferente de reportes confirmando risco zero, e o algoritmo de
+    risco trata os dois casos de forma diferente (ver fail-safe 2 em
+    algoritmo_risco.calcular_risco). Quem chamar esta função com um score já
+    agregado dos reportes reais deve passá-lo explicitamente.
 
     A validação qualitativa do CPTEC (dados.validacao_cptec) não entra no
     cálculo do AHP - é apenas anexada ao resultado, como documentado em
@@ -243,7 +249,7 @@ def classificar_risco(
 def obter_classificacao_risco(
     lat: float,
     lon: float,
-    reportes_colaborativos_score: float = 0.0,
+    reportes_colaborativos_score: float | None = None,
     codigo_estacao_ana: str = ANA_CODIGO_ESTACAO_SANTO_ANDRE,
     id_cidade_cptec=CPTEC_ID_CIDADE_SANTO_ANDRE,
 ) -> dict:

@@ -137,15 +137,28 @@ em uma escala de 0 a 100:
 | Médio risco | 30 – 60 |
 | Alto risco | 60 – 100 |
 
-### 6.3 Tratamento de falha da fonte ANA (fail-safe)
+### 6.3 Tratamento de fontes indisponíveis (fail-safe)
 
-Como a ANA depende de credenciais externas e pode falhar pontualmente (ver
-`docs/T_arquitetura_fontes_dados_final.md`), o algoritmo trata a ausência do dado do
-pluviômetro local como um caso explícito, não como um erro: o peso de C2 (25%) é
-redistribuído proporcionalmente — 60% para C1 (precipitação atual) e 40% para C3
-(previsão) — em vez de simplesmente zerar esse componente do score. Essa decisão evita
-que uma falha pontual de uma única fonte externa distorça o score para baixo
-artificialmente.
+O algoritmo trata a ausência de dado de dois componentes como um caso explícito, não
+como um erro nem como "risco zero":
+
+- **ANA (C2) indisponível** — dependência de credenciais externas que podem falhar
+  pontualmente (ver `docs/T_arquitetura_fontes_dados_final.md`): o peso de C2 (25%) é
+  redistribuído com um split fixo 60% para C1 (precipitação atual) e 40% para C3
+  (previsão).
+- **Colaborativo (C4) indisponível** — sem reportes suficientes de usuários para a
+  área/janela de tempo (`reportes_colaborativos_score=None`, distinto de `0.0`, que
+  significa "há reportes e eles indicam risco zero"): o peso de C4 (15%) é redistribuído
+  **proporcionalmente** entre os componentes que restaram disponíveis (preservando a
+  proporção relativa entre eles), em vez do split fixo usado para a ANA. Essa correção
+  foi adicionada em 17/08/2026 — antes disso, a ausência de reportes zerava
+  silenciosamente 15% do peso do score, subestimando sistematicamente o risco em áreas
+  com baixa adoção do app (cenário provável no piloto, com poucos usuários ativos).
+
+Os dois fail-safes são independentes e compostos quando ambas as fontes faltam ao mesmo
+tempo: primeiro a redistribuição da ANA é aplicada, depois a redistribuição proporcional
+do colaborativo ocorre sobre os pesos já ajustados. Em qualquer combinação, os pesos
+somam 1,0. Ver `_redistribuir_peso_ausente()` em `backend/algoritmo_risco.py`.
 
 ## 7. Exemplo com dado real
 
@@ -172,8 +185,10 @@ alagamento).
   hidrologia/defesa civil — uma limitação a declarar explicitamente na seção de
   limitações do relatório final.
 - **Componente colaborativo ainda não instrumentado end-to-end**: `reportes_colaborativos_score`
-  é recebido pronto pelo algoritmo; a lógica de agregação dos reportes brutos do app em
-  um score 0–100 é responsabilidade de outro módulo (fora do escopo deste documento).
+  é recebido pronto pelo algoritmo (ou `None`, tratado pelo fail-safe da seção 6.3); a
+  lógica de agregação dos reportes brutos do app em um score 0–100 **ainda não existe em
+  nenhum repositório do projeto** (confirmado em 17/08/2026) — é uma dependência real e
+  não apenas hipotética para o modelo funcionar com as 4 fontes em produção.
 - **Sem análise de sensibilidade formal**: não foi medido o quanto o score final muda
   para pequenas variações nos pesos — recomendado como trabalho futuro se houver tempo
   na Fase 4.
