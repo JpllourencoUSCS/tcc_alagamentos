@@ -18,12 +18,12 @@ de múltiplas fontes climáticas alimentando um algoritmo de classificação de 
 **Equipe:** Henrique (backend/tech lead), João (integração/full stack — usuário deste
 repositório), Marlon e Guilherme (Android).
 
-**18/08/2026:** Henrique perdeu os arquivos originais do backend (Semanas 1–7: modelagem
-PostgreSQL/PostGIS, endpoints FastAPI, ambiente de benchmark — nada disso chegou a ser
-versionado). O time decidiu reconstruir do zero em vez de tentar recuperar, e o João fez
-essa reconstrução integrando ao que já existia (`algoritmo_risco.py`, `fusao_climatica.py`).
-Por isso boa parte de `backend/` foi escrita numa sessão só, fora do padrão usual de autoria
-por responsável — ver detalhes e o que ainda falta validar no incidente registrado em
+**20/08/2026:** Marlon reportou ao João as entregas Android das Semanas 1–7 (telas de mapa,
+listagem/histórico e detalhes da ocorrência em XML, com Google Maps SDK) como implementadas
+na camada de UI, porém em manutenção ativa — sujeitas a ajustes conforme novas atualizações
+e testes ao longo do projeto. Nenhuma tela está integrada com a API real ainda — a integração
+prevista para a Semana 5 não foi iniciada, todas seguem com dados mockados/estáticos. Repasse direto do relato
+do Marlon, sem validação própria do time de integração. Detalhe semana a semana no
 `docs/CRONOGRAMA_STATUS.md`.
 
 ## Convenções do repositório

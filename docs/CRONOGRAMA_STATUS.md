@@ -2,7 +2,7 @@
 
 **Sistema de Monitoramento Colaborativo de Áreas com Risco de Alagamento**
 Período: 01/07/2026 a 30/10/2026 (17 semanas)
-*Última atualização de status: 18/08/2026*
+*Última atualização de status: 20/08/2026*
 
 ## Legenda de responsáveis
 - **Henrique** — backend / tech lead
@@ -10,32 +10,23 @@ Período: 01/07/2026 a 30/10/2026 (17 semanas)
 - **Marlon** — Android / documentação
 - **Guilherme** — Android / tarefas bem delimitadas
 
-## Legenda de status (tarefas do João e do Henrique)
+## Legenda de status
 - ✅ Concluída
 - 🟡 Em andamento / parcialmente bloqueada
 - 🔴 Atrasada ou não iniciada
 
-## ⚠️ Incidente — 18/08/2026
-
-O Henrique perdeu todos os arquivos do backend que havia produzido nas Semanas 1–7
-(modelagem PostgreSQL/PostGIS, endpoints FastAPI, ambiente de benchmark — nada disso
-chegou a ser versionado neste repositório). Decisão do time: reconstruir essas entregas do
-zero, semana por semana, integrando ao que já está pronto e testado (`algoritmo_risco.py`,
-`fusao_climatica.py`, protótipo de schema em `T14_modelo_banco_de_dados.md`), em vez de
-tentar recuperar os arquivos originais. A tarefa da Semana 4 ("primeira versão do algoritmo
-de risco") não entra na reconstrução — já foi implementada pelo João e não há versão
-paralela do Henrique para recuperar.
-
----
+Aplicada a João e Henrique desde o início; passou a valer também para as atividades do
+Marlon a partir do resumo que ele enviou em 20/08/2026 (Semanas 1–7). Guilherme segue sem
+status própria reportada.
 
 ## FASE 1 — Replanejamento Técnico (01/07 a 14/07)
 
 ### Semana 1 (01/07 – 05/07)
 | Responsável | Atividade | Status |
 |---|---|---|
-| Henrique | Levantamento técnico de indexação espacial (GiST/R-tree) em PostGIS — base teórica para o benchmark futuro | ✅ Reconstruída em 18/08 — `docs/T17_indexacao_espacial_fundamentacao.md` (R-tree, GiST, comparação com Quadtree/SP-GiST/BRIN, hipótese O(log n) a validar no benchmark) |
+| Henrique | Levantamento técnico de indexação espacial (GiST/R-tree) em PostGIS — base teórica para o benchmark futuro | ✅ Concluída — `docs/T17_indexacao_espacial_fundamentacao.md` (R-tree, GiST, comparação com Quadtree/SP-GiST/BRIN, hipótese O(log n) a validar no benchmark) |
 | João | Pesquisa e definição do modelo de classificação de risco por pesos (AHP ou método similar) — base teórica | ✅ Concluída |
-| Marlon | Estudo de migração de Jetpack Compose para Android Views (XML) — telas já planejadas | |
+| Marlon | Estudo de migração de Jetpack Compose para Android Views (XML) — telas já planejadas | ✅ Concluída |
 | Guilherme | Estudo de Android Views (XML) em conjunto com Marlon — foco em componentes simples (formulários, listas) | |
 
 **Entregável da semana:** documento de decisão técnica registrando a saída do Compose e a adoção de XML Views, e o desenho inicial do algoritmo de classificação de risco.
@@ -43,9 +34,9 @@ paralela do Henrique para recuperar.
 ### Semana 2 (06/07 – 12/07)
 | Responsável | Atividade | Status |
 |---|---|---|
-| Henrique | Modelagem do banco PostgreSQL/PostGIS revisada, incluindo estrutura para suportar múltiplas fontes de dados | ✅ Reconstruída em 18/08 — `docs/T18_modelagem_postgis.md` + `backend/db/schema.sql` + `backend/db/models.py` (fonte ana/cptec, coluna `geom` com trigger de sync, índice GiST, tabela nova `reportes_colaborativos_agregado`); DDL validado por compilação contra o dialeto PostgreSQL |
+| Henrique | Modelagem do banco PostgreSQL/PostGIS revisada, incluindo estrutura para suportar múltiplas fontes de dados | ✅ Concluída — `docs/T18_modelagem_postgis.md` + `backend/db/schema.sql` + `backend/db/models.py` (fonte ana/cptec, coluna `geom` com trigger de sync, índice GiST, tabela nova `reportes_colaborativos_agregado`); DDL validado por compilação contra o dialeto PostgreSQL |
 | João | Cadastro e testes iniciais nas APIs do CEMADEN e INMET (autenticação, formato de resposta, limitações) | ✅ Concluída — escopo redesenhado: CEMADEN e INMET testados e descartados (documentado), ANA e CPTEC assumiram os papéis |
-| Marlon | Conversão dos wireframes/telas do app para layout XML (tela de mapa e tela de listagem) | |
+| Marlon | Conversão dos wireframes/telas do app para layout XML (tela de mapa e tela de listagem) | ✅ Implementada — reportada por Marlon em 20/08; em manutenção ativa, sujeita a ajustes conforme novas atualizações e testes ao longo do projeto |
 | Guilherme | Conversão de telas XML (formulário de cadastro de ocorrência e tela de login) com apoio do Marlon | |
 
 **Entregável da semana:** banco atualizado com suporte a múltiplas fontes; primeiras chamadas reais documentadas.
@@ -57,17 +48,17 @@ paralela do Henrique para recuperar.
 ### Semana 3 (13/07 – 19/07)
 | Responsável | Atividade | Status |
 |---|---|---|
-| Henrique | Implementação dos endpoints REST principais no FastAPI (ocorrências: criar, listar, filtrar) | ✅ Reconstruída em 18/08 — `backend/main.py` + `backend/api/ocorrencias.py` (POST/GET/GET-por-id, filtros de fonte/nível/período/região); `backend/db/repository.py` isola o SQLAlchemy via `OcorrenciaRepositoryProtocol`, o que permitiu testar os 3 endpoints (8 casos, `backend/tests/test_ocorrencias_api.py`) sem Postgres/PostGIS vivo neste ambiente — integração contra o banco real fica para a Semana 5 |
+| Henrique | Implementação dos endpoints REST principais no FastAPI (ocorrências: criar, listar, filtrar) | ✅ Concluída — `backend/main.py` + `backend/api/ocorrencias.py` (POST/GET/GET-por-id, filtros de fonte/nível/período/região); `backend/db/repository.py` isola o SQLAlchemy via `OcorrenciaRepositoryProtocol`, o que permitiu testar os 3 endpoints (8 casos, `backend/tests/test_ocorrencias_api.py`) sem Postgres/PostGIS vivo neste ambiente — integração contra o banco real fica para a Semana 5 |
 | João | Implementação do módulo de integração climática consolidada (OpenWeather + ANA + CPTEC) no backend | 🟡 Código pronto e testado (`fusao_climatica.py`); falta só a ANA responder o cadastro pra validar as 3 fontes juntas em produção |
-| Marlon | Implementação da tela de mapa em XML com Google Maps SDK (sem Compose) | |
+| Marlon | Implementação da tela de mapa em XML com Google Maps SDK (sem Compose) | ✅ Implementada — reportada por Marlon em 20/08; em manutenção ativa, sujeita a ajustes conforme novas atualizações e testes ao longo do projeto |
 | Guilherme | Implementação da tela de cadastro de ocorrência em XML, com validação de campos | |
 
 ### Semana 4 (20/07 – 26/07)
 | Responsável | Atividade | Status |
 |---|---|---|
-| Henrique | ~~Implementação da primeira versão do algoritmo de classificação de risco~~ | ✅ Absorvida pelo João — implementada em `algoritmo_risco.py` (Semana 4) e formalizada em `T15_algoritmo_risco_fundamentacao.md` (Semana 6); não faz parte da reconstrução |
+| Henrique | ~~Implementação da primeira versão do algoritmo de classificação de risco~~ | ✅ Absorvida pelo João — implementada em `algoritmo_risco.py` (Semana 4) e formalizada em `T15_algoritmo_risco_fundamentacao.md` (Semana 6) |
 | João | Apoio à implementação do algoritmo de risco — testes com dados reais das APIs já integradas | ✅ Concluída — `algoritmo_risco.py` testado com dado real de Santo André (score 4.2, Baixo risco) |
-| Marlon | Implementação da tela de listagem/histórico de ocorrências em XML | |
+| Marlon | Implementação da tela de listagem/histórico de ocorrências em XML | ✅ Implementada — reportada por Marlon em 20/08; em manutenção ativa, sujeita a ajustes conforme novas atualizações e testes ao longo do projeto |
 | Guilherme | Implementação de componentes de filtro (região e período) na interface XML | |
 
 **Entregável da semana:** primeira versão funcional do algoritmo de risco testável via backend.
@@ -75,17 +66,17 @@ paralela do Henrique para recuperar.
 ### Semana 5 (27/07 – 02/08)
 | Responsável | Atividade | Status |
 |---|---|---|
-| Henrique | Integração do banco de dados com os endpoints (persistência real das ocorrências e classificações) | 🟡 Reconstruída em 18/08, testada só com fakes — `POST /ocorrencias` agora calcula `nivel_risco`/`chuva_mm` automaticamente via `fusao_climatica` quando o cliente não informa (`backend/servicos/classificacao.py`, T14 "Notas de projeto"); o `OcorrenciaRepository` já grava via SQLAlchemy desde a Semana 3. **Falta**: validar de ponta a ponta contra um Postgres/PostGIS real — sem banco disponível nesta máquina (sem psql/docker/serviço); decisão de 18/08 foi seguir sem banco por agora e resolver quando o Henrique tiver o ambiente dele (ver nota abaixo) |
+| Henrique | Integração do banco de dados com os endpoints (persistência real das ocorrências e classificações) | 🟡 Testada só com fakes — `POST /ocorrencias` agora calcula `nivel_risco`/`chuva_mm` automaticamente via `fusao_climatica` quando o cliente não informa (`backend/servicos/classificacao.py`, T14 "Notas de projeto"); o `OcorrenciaRepository` já grava via SQLAlchemy desde a Semana 3. **Falta**: validar de ponta a ponta contra um Postgres/PostGIS real — sem banco disponível nesta máquina (sem psql/docker/serviço); decisão foi seguir sem banco por agora e resolver quando o Henrique tiver o ambiente dele (ver nota abaixo) |
 | João | Testes de consistência dos dados climáticos consolidados (comparação entre fontes para a mesma região/horário) | 🔴 Bloqueada — depende da ANA responder o cadastro (único item fora do controle do time) |
-| Marlon | Integração da tela de mapa com dados reais do backend (consumo da API) | |
+| Marlon | Integração da tela de mapa com dados reais do backend (consumo da API) | 🔴 Não iniciada — tela de mapa ainda não vinculada à API real, dados mockados/estáticos |
 | Guilherme | Integração da tela de cadastro com o backend (envio de ocorrências reais) | |
 
 ### Semana 6 (03/08 – 09/08)
 | Responsável | Atividade | Status |
 |---|---|---|
-| Henrique | Revisão de código backend e ajustes de performance inicial nas consultas | ✅ Reconstruída em 18/08 — 3 achados corrigidos: (1) filtro de região usava `BETWEEN` em lat/lon sem índice (full scan) → trocado para `&&`/`ST_MakeEnvelope` contra `geom`, usando o índice GiST já criado (liga direto com `T17`); (2) filtros `fonte`/`nivel_risco` da listagem aceitavam qualquer string e devolviam lista vazia em silêncio para valor inválido → tipados com os enums compartilhados, agora 422; (3) `sessionmaker(..., autocommit=False)` em `db/session.py` era parâmetro morto do SQLAlchemy 1.x (removido nas versões novas) → limpo. 11 testes passando (`backend/tests/`) |
+| Henrique | Revisão de código backend e ajustes de performance inicial nas consultas | ✅ Concluída — 3 achados corrigidos: (1) filtro de região usava `BETWEEN` em lat/lon sem índice (full scan) → trocado para `&&`/`ST_MakeEnvelope` contra `geom`, usando o índice GiST já criado (liga direto com `T17`); (2) filtros `fonte`/`nivel_risco` da listagem aceitavam qualquer string e devolviam lista vazia em silêncio para valor inválido → tipados com os enums compartilhados, agora 422; (3) `sessionmaker(..., autocommit=False)` em `db/session.py` era parâmetro morto do SQLAlchemy 1.x (removido nas versões novas) → limpo. 11 testes passando (`backend/tests/`) |
 | João | Documentação técnica do algoritmo de classificação de risco (fundamentação e funcionamento) — insumo para o relatório | ✅ Concluída em 17/08 — `docs/T15_algoritmo_risco_fundamentacao.md` (matriz AHP formalizada, CR=0.0038) + rascunho de seção `docs/T16_secao_algoritmo_risco.md` |
-| Marlon | Ajustes visuais e de usabilidade nas telas Android já integradas | |
+| Marlon | Ajustes visuais e de usabilidade nas telas Android já integradas | ✅ Implementada — reportada por Marlon em 20/08; em manutenção ativa, sujeita a ajustes conforme novas atualizações e testes ao longo do projeto |
 | Guilherme | Testes manuais do fluxo cadastro → listagem → mapa, registrando bugs encontrados | |
 
 **Entregável da fase:** protótipo com fluxo principal funcional (cadastro, listagem, mapa, classificação de risco básica).
@@ -94,18 +85,18 @@ paralela do Henrique para recuperar.
 
 ## FASE 3 — Integração Avançada e Benchmark (10/08 a 13/09)
 
-### Semana 7 (10/08 – 16/08) — atrasada, em reconstrução
+### Semana 7 (10/08 – 16/08)
 | Responsável | Atividade | Status |
 |---|---|---|
-| Henrique | Criação do ambiente de benchmark — geração de massa de dados simulada (1k, 10k, 100k registros geoespaciais) | 🟡 Reconstruída em 18/08, geração testada (11 testes), inserção não testada (sem Postgres) — `backend/benchmark/gerar_dados.py` (função pura, sementes reprodutíveis) + `backend/benchmark/popular_banco.py` (1 banco Postgres por escala: `alagamentos_bench_1000/10000/100000`, aplica `schema.sql`, insere em lotes de 5000 via SQLAlchemy Core). Achado do próprio teste: `data_hora` usava `datetime.now()` como referência recalculada a cada chamada, quebrando a promessa de "mesma semente = mesmo dataset" — corrigido com parâmetro `referencia` explícito. Pronto para rodar assim que houver `ADMIN_DATABASE_URL` |
+| Henrique | Criação do ambiente de benchmark — geração de massa de dados simulada (1k, 10k, 100k registros geoespaciais) | 🟡 Geração testada (11 testes), inserção não testada (sem Postgres) — `backend/benchmark/gerar_dados.py` (função pura, sementes reprodutíveis) + `backend/benchmark/popular_banco.py` (1 banco Postgres por escala: `alagamentos_bench_1000/10000/100000`, aplica `schema.sql`, insere em lotes de 5000 via SQLAlchemy Core). Achado do próprio teste: `data_hora` usava `datetime.now()` como referência recalculada a cada chamada, quebrando a promessa de "mesma semente = mesmo dataset" — corrigido com parâmetro `referencia` explícito. Pronto para rodar assim que houver `ADMIN_DATABASE_URL` |
 | João | Refinamento do algoritmo de risco com dados de múltiplas fontes ponderadas | ✅ Concluída em 17/08 — `fusao_climatica.py` e `algoritmo_risco.py` agora conectados (`classificar_risco()`/`obter_classificacao_risco()`); testado com ANA disponível e indisponível |
-| Marlon | Implementação de tela de detalhes da ocorrência (visualização individual) | |
+| Marlon | Implementação de tela de detalhes da ocorrência (visualização individual) | ✅ Implementada — reportada por Marlon em 20/08; em manutenção ativa, sujeita a ajustes conforme novas atualizações e testes ao longo do projeto |
 | Guilherme | Implementação de notificações locais simples (alerta visual de risco alto no app) | |
 
 ### Semana 8 (17/08 – 23/08) — **semana atual**
 | Responsável | Atividade | Status |
 |---|---|---|
-| Henrique | Execução do benchmark sem índice espacial — medição de tempo de resposta nas consultas | 🟡 Reconstruída em 18/08, lógica testada (4 testes), execução real pendente (sem Postgres) — `backend/benchmark/medir_consultas.py`: mede a mesma consulta que `db/repository.py` gera para o filtro de região (bbox → `geom && ST_MakeEnvelope`, ORDER BY + LIMIT), via `EXPLAIN (ANALYZE, FORMAT JSON)` para isolar o tempo de execução no Postgres (sem ruído de rede/driver). Reutilizável para a Semana 9 (`--indice presente`/`ausente`, mesmo script). Pronto para rodar assim que houver `ADMIN_DATABASE_URL` |
+| Henrique | Execução do benchmark sem índice espacial — medição de tempo de resposta nas consultas | 🟡 Lógica testada (4 testes), execução real pendente (sem Postgres) — `backend/benchmark/medir_consultas.py`: mede a mesma consulta que `db/repository.py` gera para o filtro de região (bbox → `geom && ST_MakeEnvelope`, ORDER BY + LIMIT), via `EXPLAIN (ANALYZE, FORMAT JSON)` para isolar o tempo de execução no Postgres (sem ruído de rede/driver). Reutilizável para a Semana 9 (`--indice presente`/`ausente`, mesmo script). Pronto para rodar assim que houver `ADMIN_DATABASE_URL` |
 | João | Apoio à análise dos resultados do benchmark — interpretação dos dados coletados | |
 | Marlon | Testes de usabilidade interna das telas (com os próprios colegas) | |
 | Guilherme | Correção de bugs identificados nos testes de usabilidade | |
@@ -222,7 +213,7 @@ que bloqueia as Semanas 3 (parcialmente) e 5 (totalmente).
 **Item que estava atrasado sem bloqueio externo:** documentação técnica do algoritmo de risco
 (Semana 6, encerrada em 09/08) — concluído em 17/08 (`docs/T15_algoritmo_risco_fundamentacao.md`).
 
-**Pendência aberta em 18/08 — validação contra banco real:** todo o backend reconstruído
+**Pendência — validação contra banco real:** todo o backend
 (Semanas 2, 3 e 5) foi testado com repositórios/serviços fake em memória, nunca contra um
 Postgres/PostGIS de verdade — esta máquina não tem `psql`, Docker nem serviço de banco
 instalado. Bloqueia a confirmação real de: `schema.sql` aplicando sem erro, trigger de
@@ -237,3 +228,12 @@ para uma área (antes, isso zerava 15% do score silenciosamente). **Pendência n
 o módulo que agrega reportes brutos de usuários em um score 0–100 ainda não existe em nenhum
 repositório do time — não é bloqueio para o protótipo (o fail-safe cobre a ausência), mas é
 necessário para validar o modelo com as 4 fontes reais em produção.
+
+**Atualização de 20/08 — status do Marlon (Semanas 1–7):** Marlon reportou ao João o
+resumo de suas entregas nas Semanas 1–7 (migração de telas para XML, mapa com Google Maps
+SDK, listagem/histórico, ajustes visuais/usabilidade e tela de detalhes da ocorrência).
+Marcadas como implementadas na camada de UI (XML), mas em estado ativo de manutenção —
+sujeitas a ajustes conforme novas atualizações e testes ao longo do projeto. Nenhuma tela
+está integrada com a API real ainda — a integração prevista para a Semana 5 não foi
+iniciada, todas seguem com dados mockados/estáticos. Sem validação própria do time de
+integração sobre esse status (repasse direto do relato do Marlon).
