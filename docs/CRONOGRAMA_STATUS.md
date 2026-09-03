@@ -66,7 +66,7 @@ status própria reportada.
 ### Semana 5 (27/07 – 02/08)
 | Responsável | Atividade | Status |
 |---|---|---|
-| Henrique | Integração do banco de dados com os endpoints (persistência real das ocorrências e classificações) | 🟡 Testada só com fakes — `POST /ocorrencias` agora calcula `nivel_risco`/`chuva_mm` automaticamente via `fusao_climatica` quando o cliente não informa (`backend/servicos/classificacao.py`, T14 "Notas de projeto"); o `OcorrenciaRepository` já grava via SQLAlchemy desde a Semana 3. **Falta**: validar de ponta a ponta contra um Postgres/PostGIS real — sem banco disponível nesta máquina (sem psql/docker/serviço); decisão foi seguir sem banco por agora e resolver quando o Henrique tiver o ambiente dele (ver nota abaixo) |
+| Henrique | Integração do banco de dados com os endpoints (persistência real das ocorrências e classificações) | 🟡 `POST /ocorrencias` calcula `nivel_risco`/`chuva_mm` automaticamente via `fusao_climatica` quando o cliente não informa (`backend/servicos/classificacao.py`, T14 "Notas de projeto"); o `OcorrenciaRepository` já grava via SQLAlchemy desde a Semana 3. **Validado em 03/09/2026 na máquina do João** contra um Postgres/PostGIS real (Docker + `docker-compose.yml`, ver nota abaixo) — `schema.sql` aplica sem erro, PostGIS 3.4 ativo, 23/23 testes passam com `DATABASE_URL` apontando pro container. Segue 🟡 e não ✅ porque isso ainda não foi confirmado no ambiente do Henrique nem em CI — falta padronizar isso pro time todo |
 | João | Testes de consistência dos dados climáticos consolidados (comparação entre fontes para a mesma região/horário) | 🔴 Bloqueada — depende da ANA responder o cadastro (único item fora do controle do time) |
 | Marlon | Integração da tela de mapa com dados reais do backend (consumo da API) | 🔴 Não iniciada — tela de mapa ainda não vinculada à API real, dados mockados/estáticos |
 | Guilherme | Integração da tela de cadastro com o backend (envio de ocorrências reais) | |
@@ -213,13 +213,15 @@ que bloqueia as Semanas 3 (parcialmente) e 5 (totalmente).
 **Item que estava atrasado sem bloqueio externo:** documentação técnica do algoritmo de risco
 (Semana 6, encerrada em 09/08) — concluído em 17/08 (`docs/T15_algoritmo_risco_fundamentacao.md`).
 
-**Pendência — validação contra banco real:** todo o backend
-(Semanas 2, 3 e 5) foi testado com repositórios/serviços fake em memória, nunca contra um
-Postgres/PostGIS de verdade — esta máquina não tem `psql`, Docker nem serviço de banco
-instalado. Bloqueia a confirmação real de: `schema.sql` aplicando sem erro, trigger de
-`geom` funcionando, filtros de `ocorrencias` batendo com os dados persistidos. Resolver
-quando o Henrique tiver seu ambiente de banco disponível, ou decidir por um Postgres
-gerenciado (ex.: Supabase, que já suporta PostGIS) para desenvolvimento.
+**Validação contra banco real — resolvida na máquina do João em 03/09/2026:** todo o
+backend (Semanas 2, 3 e 5) era testado só com repositórios/serviços fake em memória.
+Agora há Docker Desktop + `docker-compose.yml` (serviço `db`, `postgis/postgis:16-3.4`)
+nesta máquina — confirmado: `schema.sql` aplica sem erro, trigger de `geom` funciona,
+os 23 testes de `backend/tests/` passam com `DATABASE_URL` apontando pro container real
+(ver passo a passo no `CLAUDE.md`, seção "Ambiente de desenvolvimento"). **Ainda pendente:**
+replicar isso no ambiente do Henrique (ou de quem for rodar backend) e decidir se o time
+padroniza em Docker local ou um Postgres gerenciado (ex.: Supabase) — por ora isso só
+existe na máquina do João.
 
 **Decisão estrutural de 17/08:** mantido o componente colaborativo (15%) no algoritmo de risco
 — é o diferencial do projeto frente ao ponto do orientador sobre "não parecer colagem de APIs".

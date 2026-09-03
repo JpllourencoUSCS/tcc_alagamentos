@@ -1,0 +1,33 @@
+# Banco de desenvolvimento local — PostgreSQL + PostGIS.
+# Sobe um banco descartável em localhost:5432 para testar backend/db/ e
+# backend/benchmark/ contra um Postgres real (Semana 5 do cronograma).
+#
+# Uso:
+#   docker compose up -d
+#   $env:DATABASE_URL = "postgresql+psycopg2://alagamentos:alagamentos@localhost:5432/alagamentos"
+#   psql -h localhost -U alagamentos -d alagamentos -f backend/db/schema.sql
+#
+# Dados ficam no volume "pgdata" (sobrevive a "docker compose down"; para
+# apagar de vez, "docker compose down -v").
+
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    container_name: alagamentos_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: alagamentos
+      POSTGRES_PASSWORD: alagamentos
+      POSTGRES_DB: alagamentos
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U alagamentos -d alagamentos"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  pgdata:

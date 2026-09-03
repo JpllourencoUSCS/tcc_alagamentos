@@ -48,13 +48,26 @@ do Marlon, sem validação própria do time de integração. Detalhe semana a se
 
 ## Ambiente de desenvolvimento
 
-Esta máquina **não tem PostgreSQL, PostGIS, Docker nem nenhum serviço de banco
-instalado** (confirmado em 18/08/2026 — sem `psql`, sem `docker`, sem serviço no Windows).
-Todo código de banco (`backend/db/`, `backend/benchmark/`) é testado com fakes/mocks e
-validado por compilação de SQL contra o dialeto PostgreSQL, nunca contra um banco vivo.
-Antes de assumir que dá para "só rodar e ver", verifique se isso mudou; se não mudou, todo
-trabalho de banco fica com um passo de validação real pendente — deixe isso explícito no
-`CRONOGRAMA_STATUS.md`, não implícito.
+**Atualizado em 03/09/2026:** esta máquina (a do João, usuário deste repositório) agora
+tem Docker Desktop instalado e um Postgres/PostGIS real disponível via
+`docker-compose.yml` (serviço `db`, imagem `postgis/postgis:16-3.4`, porta 5432,
+credenciais `alagamentos`/`alagamentos`). `.venv/` criado e populado a partir de
+`requirements.txt`. Fluxo para subir e validar:
+
+```
+docker compose up -d
+docker exec -i alagamentos_db psql -U alagamentos -d alagamentos < backend/db/schema.sql
+$env:DATABASE_URL = "postgresql+psycopg2://alagamentos:alagamentos@localhost:5432/alagamentos"
+cd backend; ..\.venv\Scripts\python.exe -m pytest tests/
+```
+
+Validado nesta data: `schema.sql` aplica sem erro, PostGIS 3.4 ativo, as 23 suítes de
+`backend/tests/` passam tanto sem `DATABASE_URL` (fakes/mocks) quanto contra o container
+real. Isso destrava o passo de validação real da Semana 5 mencionado no
+`CRONOGRAMA_STATUS.md` — mas **isso é local ao ambiente do João**: Henrique, Marlon e
+Guilherme não têm Docker confirmado nas máquinas deles, então não assuma banco vivo
+disponível ao planejar tarefas do time sem confirmar antes. `docker-compose.yml` está no
+repo para replicar em qualquer máquina com Docker instalado.
 
 ## Decisões técnicas já fechadas (não propor de novo sem pedido explícito)
 
