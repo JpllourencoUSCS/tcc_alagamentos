@@ -218,10 +218,18 @@ backend (Semanas 2, 3 e 5) era testado só com repositórios/serviços fake em m
 Agora há Docker Desktop + `docker-compose.yml` (serviço `db`, `postgis/postgis:16-3.4`)
 nesta máquina — confirmado: `schema.sql` aplica sem erro, trigger de `geom` funciona,
 os 23 testes de `backend/tests/` passam com `DATABASE_URL` apontando pro container real
-(ver passo a passo no `CLAUDE.md`, seção "Ambiente de desenvolvimento"). **Ainda pendente:**
-replicar isso no ambiente do Henrique (ou de quem for rodar backend) e decidir se o time
-padroniza em Docker local ou um Postgres gerenciado (ex.: Supabase) — por ora isso só
-existe na máquina do João.
+(ver passo a passo no `CLAUDE.md`, seção "Ambiente de desenvolvimento").
+
+**Banco compartilhado com o time via Tailscale (03/09/2026):** em vez de cada um instalar
+Docker/Postgres/PostGIS na própria máquina, o banco do João foi exposto ao time por uma
+VPN privada (Tailscale) — porta 5432 liberada só pra essa interface, nunca pra internet
+aberta. Henrique é o primeiro a testar o acesso remoto (em andamento); Marlon e Guilherme
+ainda não. Guia de acesso e teste em `docs/ACESSO_BANCO_DEV.md`. Isso destrava o time pra
+testar/implementar contra um banco real **sem esperar** a decisão de hospedagem definitiva.
+**Ainda pendente:** confirmar que Henrique, Marlon e Guilherme conseguem de fato conectar
+e rodar os testes das próprias máquinas, e decidir se o time padroniza em Docker local
+(cada um) ou um Postgres gerenciado (ex.: Supabase) pra produção — por ora o único banco
+vivo é o da máquina do João, ligado via Tailscale.
 
 **Decisão estrutural de 17/08:** mantido o componente colaborativo (15%) no algoritmo de risco
 — é o diferencial do projeto frente ao ponto do orientador sobre "não parecer colagem de APIs".

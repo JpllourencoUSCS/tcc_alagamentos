@@ -50,21 +50,39 @@ do Marlon, sem validação própria do time de integração. Detalhe semana a se
 
 **Atualizado em 03/09/2026:** esta máquina (a do João, usuário deste repositório) agora
 tem Docker Desktop instalado e um Postgres/PostGIS real disponível via
-`docker-compose.yml` (serviço `db`, imagem `postgis/postgis:16-3.4`, porta 5432,
-credenciais `alagamentos`/`alagamentos`). `.venv/` criado e populado a partir de
+`docker-compose.yml` (serviço `db`, imagem `postgis/postgis:16-3.4`, porta 5432).
+Credenciais **não** ficam no `docker-compose.yml` — vêm de um `.env` local (copiado de
+`.env.example`, no `.gitignore`, nunca commitado). `.venv/` criado e populado a partir de
 `requirements.txt`. Fluxo para subir e validar:
 
 ```
+cp .env.example .env   # editar a senha antes de usar de verdade
 docker compose up -d
 docker exec -i alagamentos_db psql -U alagamentos -d alagamentos < backend/db/schema.sql
-$env:DATABASE_URL = "postgresql+psycopg2://alagamentos:alagamentos@localhost:5432/alagamentos"
+$env:DATABASE_URL = "postgresql+psycopg2://alagamentos:<senha-do-.env>@localhost:5432/alagamentos"
 cd backend; ..\.venv\Scripts\python.exe -m pytest tests/
 ```
 
 Validado nesta data: `schema.sql` aplica sem erro, PostGIS 3.4 ativo, as 23 suítes de
 `backend/tests/` passam tanto sem `DATABASE_URL` (fakes/mocks) quanto contra o container
 real. Isso destrava o passo de validação real da Semana 5 mencionado no
-`CRONOGRAMA_STATUS.md` — mas **isso é local ao ambiente do João**: Henrique, Marlon e
+`CRONOGRAMA_STATUS.md`.
+
+**Banco compartilhado com o time via Tailscale (03/09/2026):** o banco desta máquina foi
+exposto ao time via [Tailscale](https://tailscale.com) (VPN privada) em vez de exposto na
+internet aberta — porta 5432 liberada só para a interface Tailscale (regra de Firewall do
+Windows "TCC Alagamentos - PostgreSQL (Tailscale)"). IP Tailscale desta máquina:
+`100.114.69.115` (pode mudar se o Tailscale for reinstalado/reconfigurado — conferir com
+`tailscale ip -4`). Cada colega recebe um link de "Share" gerado no console do Tailscale
+(https://login.tailscale.com/admin/machines, no dispositivo `tcc-alagamentos-joao`) — isso
+dá acesso só a esta máquina, sem juntar ninguém na tailnet pessoal do João. A
+`DATABASE_URL` completa (com a senha real) é repassada ao time por canal privado (Discord/
+WhatsApp), nunca pelo Git. **Isso só funciona enquanto o notebook do João estiver ligado,
+com Docker Desktop aberto e conectado à internet** — não é solução de produção, é só para
+o time conseguir testar/desenvolver contra um banco real até decidirem hospedagem
+definitiva (Supabase ou outro, ver `docs/CRONOGRAMA_STATUS.md`).
+
+Isso é **local ao ambiente do João**: Henrique, Marlon e
 Guilherme não têm Docker confirmado nas máquinas deles, então não assuma banco vivo
 disponível ao planejar tarefas do time sem confirmar antes. `docker-compose.yml` está no
 repo para replicar em qualquer máquina com Docker instalado.
