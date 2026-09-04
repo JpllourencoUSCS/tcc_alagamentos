@@ -191,7 +191,7 @@ status própria reportada.
 
 | Ponto observado | Onde é endereçado |
 |---|---|
-| Latência na resposta | Semanas 7–11 (benchmark + medição formal de latência) |
+| Latência na resposta | Semanas 7–11 (benchmark + medição formal de latência do banco); paralelização das chamadas às APIs climáticas externas corrigida em 03/09 (ver notas de status) |
 | Mais fontes de dados | Semanas 1–2 (levantamento e testes) e Semana 3 (integração consolidada: OpenWeather + ANA + CPTEC) |
 | Complexidade computacional do BD georreferenciado | Semanas 1, 7, 9 (estudo teórico + benchmark com/sem índice GiST) |
 | Remoção do Jetpack Compose / uso de XML | Semanas 1–6 (toda a camada Android replanejada em XML) |
@@ -255,6 +255,24 @@ substituir a ANA no papel de "pluviômetro local" do modelo AHP. Também definid
 que o escopo do monitoramento é especificamente a cidade de São Caetano do Sul. Não altera
 a pendência crítica da ANA registrada acima (ela continua sendo a fonte ativa até essa
 investigação concluir) — detalhes em `docs/T_arquitetura_fontes_dados_final.md`.
+
+**Achado de revisão — latência das chamadas climáticas externas (03/09/2026):** ao
+levantar como o projeto trata "latência na resposta" (ponto do orientador), identificado
+que `fusao_climatica.obter_dados_consolidados()` chamava as 4 fontes externas (OpenWeather
+atual, OpenWeather previsão, ANA, CPTEC) **sequencialmente**, cada uma com timeout de 10s —
+no pior caso (uma fonte lenta ou fora do ar), o `POST /ocorrencias` sem `nivel_risco`
+explícito podia levar até ~40-50s pra responder ao usuário. Essa frente não estava coberta
+pelo benchmark (que mede só a consulta ao banco) nem atribuída a ninguém no cronograma.
+**Corrigido no mesmo dia:** as 4 chamadas agora rodam em paralelo via `ThreadPoolExecutor`
+(`backend/fusao_climatica.py`) — o tempo total passa a ser limitado ao ramo mais lento
+(~10-20s no pior caso, não a soma de todos), sem alterar os fail-safes existentes (ANA/CPTEC
+devolvem `None` em erro; falha do OpenWeather continua propagando). Testado em
+`backend/tests/test_fusao_climatica_latencia.py` (3 casos, sem rede real) — prova o
+paralelismo por tempo de parede e confirma que os fail-safes continuam intactos. Suíte
+completa: 29 testes (26 passam, 3 pulados sem `DATABASE_URL`). **Ainda em aberto** (não
+implementado, ficou como possível trabalho futuro): cache de dados climáticos por
+localização/janela de tempo, orçamento de tempo total por requisição, e migração do
+endpoint para `async def`/`httpx` se o volume de requisições concorrentes crescer.
 
 **Atualização de 20/08 — status do Marlon (Semanas 1–7):** Marlon reportou ao João o
 resumo de suas entregas nas Semanas 1–7 (migração de telas para XML, mapa com Google Maps

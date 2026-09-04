@@ -26,6 +26,7 @@ alternativo não respondeu em nenhum dos testes realizados.
 import os
 import requests
 import xml.etree.ElementTree as ET
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta
 from dataclasses import dataclass
 
@@ -183,18 +184,32 @@ def obter_dados_consolidados(
     codigo_estacao_ana: str = ANA_CODIGO_ESTACAO_SANTO_ANDRE,
     id_cidade_cptec=CPTEC_ID_CIDADE_SANTO_ANDRE,
 ) -> DadosClimaticosConsolidados:
-    atual = _buscar_openweather_atual(lat, lon)
-    previsao = _buscar_openweather_previsao(lat, lon)
+    # As 4 chamadas são independentes entre si (nenhuma usa o resultado da
+    # outra) — rodar em paralelo em vez de sequencial evita que o pior caso
+    # (uma fonte lenta ou fora do ar) some até a soma dos 4 timeouts de 10s
+    # (mais o da autenticação da ANA) no tempo de resposta ao usuário; em
+    # paralelo, o tempo total fica limitado ao ramo mais lento, não à soma de
+    # todos (achado de revisão de latência, 03/09/2026 — ver
+    # docs/CRONOGRAMA_STATUS.md). O comportamento de fail-safe de cada fonte
+    # (ANA/CPTEC devolvem None em erro; OpenWeather propaga a exceção) não
+    # muda — só o agendamento das chamadas.
+    with ThreadPoolExecutor(max_workers=4) as executor:
+        futuro_atual = executor.submit(_buscar_openweather_atual, lat, lon)
+        futuro_previsao = executor.submit(_buscar_openweather_previsao, lat, lon)
+        futuro_ana = executor.submit(_buscar_ana, codigo_estacao_ana)
+        futuro_cptec = executor.submit(_buscar_cptec_previsao, id_cidade_cptec)
+
+        atual = futuro_atual.result()
+        previsao = futuro_previsao.result()
+        pluviometro_local = futuro_ana.result()
+        cptec_validacao = futuro_cptec.result()
 
     precipitacao_atual = atual.get("rain", {}).get("1h", 0.0)
     fonte_precip_atual = "OpenWeather"
 
     pico_previsto = _pico_precipitacao_3h(previsao)
 
-    pluviometro_local = _buscar_ana(codigo_estacao_ana)
     fonte_local = "ANA" if pluviometro_local is not None else None
-
-    cptec_validacao = _buscar_cptec_previsao(id_cidade_cptec)
 
     return DadosClimaticosConsolidados(
         lat=lat,
