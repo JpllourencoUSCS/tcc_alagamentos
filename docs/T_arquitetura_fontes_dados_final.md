@@ -82,6 +82,25 @@ práticos de integração com dados públicos brasileiros.
   evidência de consistência entre modelos.
 - **Colaborativo (15%):** inalterado, agregação dos reportes de usuários do app.
 
+## Em investigação (03/09/2026) — estação meteorológica do campus da USCS
+
+Descoberta de que o campus da USCS possui uma **estação meteorológica própria**. O time
+está investigando junto aos responsáveis pelo equipamento a possibilidade de acesso aos
+dados. Se viável, ela poderia **substituir a ANA** no papel de "pluviômetro local" do
+modelo AHP (25% do peso) — motivo: o escopo do monitoramento passou a ser especificamente
+a cidade de **São Caetano do Sul**, e uma estação dentro do próprio município (ou até do
+próprio campus) tende a ser uma medição mais local e direta do que a rede hidrometeorológica
+nacional da ANA (cujo código mais próximo, `21489000`, já é de São Caetano do Sul — ver
+tabela acima — mas ainda depende de cadastro por e-mail sem resposta até esta data).
+
+**Isto não é uma decisão fechada.** A ANA continua sendo a fonte ativa para esse papel
+(ver "Decisão" acima e `CLAUDE.md`) até que: (1) o acesso aos dados da estação do campus
+seja confirmado pelos responsáveis; e (2) o formato/frequência dos dados dela seja avaliado
+como adequado para o AHP (ex.: precisa de um endpoint HTTP consultável programaticamente,
+não só um mostrador físico ou relatório manual). Atualizar esta seção assim que o time de
+integração tiver uma resposta, para qualquer um dos dois sentidos (substitui a ANA, complementa
+a ANA, ou inviável).
+
 ## Próximos passos
 
 1. Aguardar resposta da ANA ao e-mail já enviado (`docs/T_email_solicitacao_ana.md`) — este

@@ -2,7 +2,7 @@
 
 **Sistema de Monitoramento Colaborativo de Áreas com Risco de Alagamento**
 Período: 01/07/2026 a 30/10/2026 (17 semanas)
-*Última atualização de status: 20/08/2026*
+*Última atualização de status: 03/09/2026*
 
 ## Legenda de responsáveis
 - **Henrique** — backend / tech lead
@@ -93,31 +93,31 @@ status própria reportada.
 | Marlon | Implementação de tela de detalhes da ocorrência (visualização individual) | ✅ Implementada — reportada por Marlon em 20/08; em manutenção ativa, sujeita a ajustes conforme novas atualizações e testes ao longo do projeto |
 | Guilherme | Implementação de notificações locais simples (alerta visual de risco alto no app) | |
 
-### Semana 8 (17/08 – 23/08) — **semana atual**
+### Semana 8 (17/08 – 23/08)
 | Responsável | Atividade | Status |
 |---|---|---|
-| Henrique | Execução do benchmark sem índice espacial — medição de tempo de resposta nas consultas | 🟡 Lógica testada (4 testes), execução real pendente (sem Postgres) — `backend/benchmark/medir_consultas.py`: mede a mesma consulta que `db/repository.py` gera para o filtro de região (bbox → `geom && ST_MakeEnvelope`, ORDER BY + LIMIT), via `EXPLAIN (ANALYZE, FORMAT JSON)` para isolar o tempo de execução no Postgres (sem ruído de rede/driver). Reutilizável para a Semana 9 (`--indice presente`/`ausente`, mesmo script). Pronto para rodar assim que houver `ADMIN_DATABASE_URL` |
-| João | Apoio à análise dos resultados do benchmark — interpretação dos dados coletados | |
-| Marlon | Testes de usabilidade interna das telas (com os próprios colegas) | |
-| Guilherme | Correção de bugs identificados nos testes de usabilidade | |
+| Henrique | Execução do benchmark sem índice espacial — medição de tempo de resposta nas consultas | 🟡 Lógica testada (4 testes), execução real pendente — `backend/benchmark/medir_consultas.py`: mede a mesma consulta que `db/repository.py` gera para o filtro de região (bbox → `geom && ST_MakeEnvelope`, ORDER BY + LIMIT), via `EXPLAIN (ANALYZE, FORMAT JSON)` para isolar o tempo de execução no Postgres (sem ruído de rede/driver). Reutilizável para a Semana 9 (`--indice presente`/`ausente`, mesmo script). O bloqueio de "sem Postgres" foi removido em 03/09 (banco real disponível via Docker + Tailscale, ver notas), mas a execução em si ainda não foi confirmada — segue 🟡, não ✅ |
+| João | Apoio à análise dos resultados do benchmark — interpretação dos dados coletados | 🔴 Bloqueada — depende da execução do benchmark pelo Henrique (item acima); nada a analisar enquanto não houver números |
+| Marlon | Testes de usabilidade interna das telas (com os próprios colegas) | ⬜ Sem status reportado — o resumo do Marlon em 20/08 cobriu só as Semanas 1–7 |
+| Guilherme | Correção de bugs identificados nos testes de usabilidade | ⬜ Sem status reportado |
 
 ### Semana 9 (24/08 – 30/08)
-| Responsável | Atividade |
-|---|---|
-| Henrique | Implementação de índice GiST no PostGIS e execução do benchmark comparativo |
-| João | Documentação científica do benchmark (fundamentação teórica de R-tree/GiST, conforme literatura) |
-| Marlon | Revisão e padronização visual de todas as telas (consistência de cores, fontes, espaçamento) |
-| Guilherme | Testes de integração entre todas as telas do app |
+| Responsável | Atividade | Status |
+|---|---|---|
+| Henrique | Implementação de índice GiST no PostGIS e execução do benchmark comparativo | 🔴 Não iniciada — depende da Semana 8 (benchmark sem índice) estar concluída primeiro |
+| João | Documentação científica do benchmark (fundamentação teórica de R-tree/GiST, conforme literatura) | 🔴 Não iniciada — sem resultados de benchmark ainda para documentar (depende do Henrique); a base teórica de `T17_indexacao_espacial_fundamentacao.md` (Semana 1) já existe e pode ser reaproveitada |
+| Marlon | Revisão e padronização visual de todas as telas (consistência de cores, fontes, espaçamento) | ⬜ Sem status reportado |
+| Guilherme | Testes de integração entre todas as telas do app | ⬜ Sem status reportado |
 
 **Entregável da semana:** gráfico comparativo de latência antes/depois da indexação espacial — peça central da resposta sobre "complexidade computacional".
 
-### Semana 10 (31/08 – 06/09)
-| Responsável | Atividade |
-|---|---|
-| Henrique | Otimizações adicionais identificadas pelo benchmark (ex: paginação de resultados, cache simples) |
-| João | Implementação de testes automatizados básicos da API (principais endpoints) |
-| Marlon | Implementação de tela de configurações/perfil simples do usuário |
-| Guilherme | Apoio aos testes automatizados — casos de teste manuais documentados |
+### Semana 10 (31/08 – 06/09) — **semana atual**
+| Responsável | Atividade | Status |
+|---|---|---|
+| Henrique | Otimizações adicionais identificadas pelo benchmark (ex: paginação de resultados, cache simples) | 🔴 Não iniciada — depende dos resultados das Semanas 8–9 |
+| João | Implementação de testes automatizados básicos da API (principais endpoints) | ✅ Concluída em 03/09 — camada de contrato já existia (`test_ocorrencias_api.py`, repositório fake); adicionada a camada de integração contra Postgres/PostGIS real: `backend/tests/conftest.py` (fixture `db_session`, sessão isolada por teste via SAVEPOINT + rollback — padrão recomendado pelo SQLAlchemy para suítes de teste, cobre inclusive os `db.commit()` internos do repositório) e `backend/tests/test_ocorrencias_integracao.py` (3 casos, incluindo o filtro geoespacial via `db/repository.py` real). Isolamento validado na prática: `SELECT count(*) FROM ocorrencias` no banco compartilhado por Tailscale ficou em 0 após a suíte rodar. Sem `DATABASE_URL`, os 3 testes de integração são pulados (skip), não falham — 26/26 testes passam com Postgres disponível, 23/26 sem (3 skipped) |
+| Marlon | Implementação de tela de configurações/perfil simples do usuário | ⬜ Sem status reportado |
+| Guilherme | Apoio aos testes automatizados — casos de teste manuais documentados | ⬜ Sem status reportado |
 
 ### Semana 11 (07/09 – 13/09)
 | Responsável | Atividade |
@@ -238,6 +238,23 @@ para uma área (antes, isso zerava 15% do score silenciosamente). **Pendência n
 o módulo que agrega reportes brutos de usuários em um score 0–100 ainda não existe em nenhum
 repositório do time — não é bloqueio para o protótipo (o fail-safe cobre a ausência), mas é
 necessário para validar o modelo com as 4 fontes reais em produção.
+
+**Correção de data (03/09/2026):** o cronograma estava com o marcador de "semana atual"
+parado na Semana 8 (17/08–23/08) desde a última atualização de conteúdo (20/08), embora o
+calendário já estivesse na Semana 10 (31/08–06/09). Marcador movido para a Semana 10.
+Semanas 8 e 9 tiveram suas células de status (antes em branco) preenchidas com o que
+realmente é sabido hoje — nenhum trabalho novo foi inventado ou dado como concluído, só
+documentado o que estava faltando e por quê (a maioria depende da execução do benchmark
+pelo Henrique, agora destravada tecnicamente pelo Docker/Tailscale de 03/09, mas ainda não
+confirmada).
+
+**Possível fonte alternativa/complementar à ANA — em investigação (03/09/2026):**
+descoberta de que o campus da USCS possui uma estação meteorológica própria. Time está
+investigando junto aos responsáveis a possibilidade de acesso aos dados; se viável, poderia
+substituir a ANA no papel de "pluviômetro local" do modelo AHP. Também definido nesta data
+que o escopo do monitoramento é especificamente a cidade de São Caetano do Sul. Não altera
+a pendência crítica da ANA registrada acima (ela continua sendo a fonte ativa até essa
+investigação concluir) — detalhes em `docs/T_arquitetura_fontes_dados_final.md`.
 
 **Atualização de 20/08 — status do Marlon (Semanas 1–7):** Marlon reportou ao João o
 resumo de suas entregas nas Semanas 1–7 (migração de telas para XML, mapa com Google Maps

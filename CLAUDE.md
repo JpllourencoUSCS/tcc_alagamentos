@@ -26,6 +26,14 @@ prevista para a Semana 5 não foi iniciada, todas seguem com dados mockados/est�
 do Marlon, sem validação própria do time de integração. Detalhe semana a semana no
 `docs/CRONOGRAMA_STATUS.md`.
 
+**03/09/2026:** descoberta de que o campus da USCS possui uma estação meteorológica
+própria. Time está investigando junto aos responsáveis a possibilidade de acesso aos
+dados — se viável, poderia "substituir" a ANA no papel de pluviômetro local do modelo AHP.
+Também nesta data, o escopo do monitoramento foi definido especificamente como a cidade de
+São Caetano do Sul (antes tratado de forma mais genérica/regional). Ainda em investigação,
+não é decisão fechada — ver `docs/T_arquitetura_fontes_dados_final.md`, seção "Em
+investigação (03/09/2026)".
+
 ## Convenções do repositório
 
 - `backend/` — lógica de produção:
@@ -39,7 +47,21 @@ do Marlon, sem validação própria do time de integração. Detalhe semana a se
   - `benchmark/` — geração de massa de dados sintética e medição de consultas
     (Semanas 7–9: `gerar_dados.py`, `popular_banco.py`, `medir_consultas.py`)
   - `tests/` — pytest; rodar com `cwd=backend/` (convenção de imports absolutos do
-    projeto, ex. `from constants import ...`, sem pacote `backend.` no caminho)
+    projeto, ex. `from constants import ...`, sem pacote `backend.` no caminho).
+    Dois tipos de teste convivem no mesmo diretório: testes de **contrato** (ex.
+    `test_ocorrencias_api.py`), que trocam a implementação real por um fake em
+    memória via `dependency_overrides` do FastAPI e não tocam banco nenhum; e
+    testes de **integração** (ex. `test_ocorrencias_integracao.py`), que usam a
+    fixture `db_session` de `conftest.py` para rodar contra um Postgres/PostGIS
+    real. Essa fixture isola cada teste numa transação com SAVEPOINT e dá
+    rollback no final (padrão recomendado pelo próprio SQLAlchemy para suítes de
+    teste) — nenhum dado criado pelo teste sobrevive, então não importa se o
+    banco está vazio ou tem dado de outra pessoa (relevante com o banco
+    compartilhado por Tailscale, ver "Ambiente de desenvolvimento"). Sem
+    `DATABASE_URL` definida, os testes de integração são pulados (skip), não
+    falham — mesmo critério do resto do projeto para "sem Postgres disponível".
+    Ao criar um teste novo que precisa de banco real, reusar `db_session` em vez
+    de inventar outro padrão de setup/teardown.
 - `testes-api/` — scripts de teste de API, um por fonte, nomeados `teste_<fonte>.py`
 - `docs/` — documentação. `T05`–`T18` são o histórico de investigação (não apagar,
   não reescrever com conteúdo diferente do que realmente aconteceu). `T16_secao_*.md`
@@ -68,6 +90,14 @@ Validado nesta data: `schema.sql` aplica sem erro, PostGIS 3.4 ativo, as 23 suí
 real. Isso destrava o passo de validação real da Semana 5 mencionado no
 `CRONOGRAMA_STATUS.md`.
 
+**Atualizado em 03/09/2026 (Semana 10):** adicionada a camada de testes de integração
+(`backend/tests/conftest.py` + `test_ocorrencias_integracao.py`, ver "Convenções do
+repositório") — total agora é 26 testes: 23 passam sempre, 3 são de integração e só
+rodam com `DATABASE_URL` definida (skip, não falha, sem ela). Validado contra o
+container desta máquina: os 3 passam, e `SELECT count(*) FROM ocorrencias` depois da
+suíte confirma 0 linhas — o rollback por SAVEPOINT não deixa dado nenhum no banco
+compartilhado por Tailscale.
+
 **Banco compartilhado com o time via Tailscale (03/09/2026):** o banco desta máquina foi
 exposto ao time via [Tailscale](https://tailscale.com) (VPN privada) em vez de exposto na
 internet aberta — porta 5432 liberada só para a interface Tailscale (regra de Firewall do
@@ -94,6 +124,8 @@ repo para replicar em qualquer máquina com Docker instalado.
   endpoint histórico alternativo testado e sem retorno de dados.
 - **ANA**: fonte ativa para o papel de "pluviômetro local" no modelo AHP. Exige
   cadastro por e-mail (`hidro@ana.gov.br`) — aguardando resposta. Ver `teste_ana.py`.
+  Possível fonte alternativa/complementar em investigação desde 03/09/2026 (estação
+  meteorológica do campus da USCS) — ainda não decidido, ver `docs/T_arquitetura_fontes_dados_final.md`.
 - **CPTEC/INPE**: fonte ativa só para previsão de 4 dias (validação cruzada qualitativa).
   Condições atuais de aeroporto (METAR) foram testadas e descartadas.
 - **Modelo AHP**: pesos fixos — precipitação atual 35%, pluviômetro local 25%,
