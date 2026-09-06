@@ -70,8 +70,18 @@ investigação (03/09/2026)".
 
 ## Ambiente de desenvolvimento
 
-**Atualizado em 03/09/2026:** esta máquina (a do João, usuário deste repositório) agora
-tem Docker Desktop instalado e um Postgres/PostGIS real disponível via
+**Atenção — identidade de máquina (nota adicionada em 06/09/2026):** o João usa mais de
+um notebook para este repositório (sincronizado via OneDrive). O notebook com Docker/
+Postgres descrito logo abaixo (configurado em 03/09/2026, dispositivo Tailscale
+`tcc-alagamentos-joao`) **não é necessariamente** o notebook rodando a sessão atual — é
+um notebook específico do João. Confirmado em 06/09/2026, numa sessão rodando no notebook
+"original" (o mesmo descrito em 18/08/2026): sem `docker`, sem `psql`, nenhum dos dois
+comandos encontrado no PATH. Nunca assumir Docker/Postgres disponível só porque este
+arquivo os descreve — confirmar (`Get-Command docker`/`psql`) na máquina da sessão atual
+antes de depender deles.
+
+**Atualizado em 03/09/2026:** o notebook do João usado naquela sessão passou a ter
+Docker Desktop instalado e um Postgres/PostGIS real disponível via
 `docker-compose.yml` (serviço `db`, imagem `postgis/postgis:16-3.4`, porta 5432).
 Credenciais **não** ficam no `docker-compose.yml` — vêm de um `.env` local (copiado de
 `.env.example`, no `.gitignore`, nunca commitado). `.venv/` criado e populado a partir de
@@ -112,10 +122,11 @@ com Docker Desktop aberto e conectado à internet** — não é solução de pro
 o time conseguir testar/desenvolver contra um banco real até decidirem hospedagem
 definitiva (Supabase ou outro, ver `docs/CRONOGRAMA_STATUS.md`).
 
-Isso é **local ao ambiente do João**: Henrique, Marlon e
-Guilherme não têm Docker confirmado nas máquinas deles, então não assuma banco vivo
-disponível ao planejar tarefas do time sem confirmar antes. `docker-compose.yml` está no
-repo para replicar em qualquer máquina com Docker instalado.
+Isso é **local a um notebook específico do João** (o usado em 03/09/2026, não
+necessariamente o desta sessão — ver nota no início desta seção): Henrique, Marlon,
+Guilherme e o próprio João em outras máquinas não têm Docker confirmado, então não assuma
+banco vivo disponível ao planejar tarefas do time sem confirmar antes. `docker-compose.yml`
+está no repo para replicar em qualquer máquina com Docker instalado.
 
 ## Decisões técnicas já fechadas (não propor de novo sem pedido explícito)
 

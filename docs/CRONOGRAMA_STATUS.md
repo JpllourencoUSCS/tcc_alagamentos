@@ -2,7 +2,7 @@
 
 **Sistema de Monitoramento Colaborativo de Áreas com Risco de Alagamento**
 Período: 01/07/2026 a 30/10/2026 (17 semanas)
-*Última atualização de status: 03/09/2026*
+*Última atualização de status: 06/09/2026*
 
 ## Legenda de responsáveis
 - **Henrique** — backend / tech lead
@@ -16,8 +16,10 @@ Período: 01/07/2026 a 30/10/2026 (17 semanas)
 - 🔴 Atrasada ou não iniciada
 
 Aplicada a João e Henrique desde o início; passou a valer também para as atividades do
-Marlon a partir do resumo que ele enviou em 20/08/2026 (Semanas 1–7). Guilherme segue sem
-status própria reportada.
+Marlon a partir do resumo que ele enviou em 20/08/2026 (Semanas 1–7), com atualização
+enviada em 06/09/2026 (Semanas 5, 8, 9 e 10); e para as do Guilherme a partir do resumo
+que ele enviou em 06/09/2026 (Semanas 1–10). Ambos os resumos são repasse direto, sem
+validação própria do time de integração.
 
 ## FASE 1 — Replanejamento Técnico (01/07 a 14/07)
 
@@ -27,7 +29,7 @@ status própria reportada.
 | Henrique | Levantamento técnico de indexação espacial (GiST/R-tree) em PostGIS — base teórica para o benchmark futuro | ✅ Concluída — `docs/T17_indexacao_espacial_fundamentacao.md` (R-tree, GiST, comparação com Quadtree/SP-GiST/BRIN, hipótese O(log n) a validar no benchmark) |
 | João | Pesquisa e definição do modelo de classificação de risco por pesos (AHP ou método similar) — base teórica | ✅ Concluída |
 | Marlon | Estudo de migração de Jetpack Compose para Android Views (XML) — telas já planejadas | ✅ Concluída |
-| Guilherme | Estudo de Android Views (XML) em conjunto com Marlon — foco em componentes simples (formulários, listas) | |
+| Guilherme | Estudo de Android Views (XML) em conjunto com Marlon — foco em componentes simples (formulários, listas) | ✅ Concluída — estudo realizado com foco nos componentes básicos necessários para a migração das telas para XML. |
 
 **Entregável da semana:** documento de decisão técnica registrando a saída do Compose e a adoção de XML Views, e o desenho inicial do algoritmo de classificação de risco.
 
@@ -37,7 +39,7 @@ status própria reportada.
 | Henrique | Modelagem do banco PostgreSQL/PostGIS revisada, incluindo estrutura para suportar múltiplas fontes de dados | ✅ Concluída — `docs/T18_modelagem_postgis.md` + `backend/db/schema.sql` + `backend/db/models.py` (fonte ana/cptec, coluna `geom` com trigger de sync, índice GiST, tabela nova `reportes_colaborativos_agregado`); DDL validado por compilação contra o dialeto PostgreSQL |
 | João | Cadastro e testes iniciais nas APIs do CEMADEN e INMET (autenticação, formato de resposta, limitações) | ✅ Concluída — escopo redesenhado: CEMADEN e INMET testados e descartados (documentado), ANA e CPTEC assumiram os papéis |
 | Marlon | Conversão dos wireframes/telas do app para layout XML (tela de mapa e tela de listagem) | ✅ Implementada — reportada por Marlon em 20/08; em manutenção ativa, sujeita a ajustes conforme novas atualizações e testes ao longo do projeto |
-| Guilherme | Conversão de telas XML (formulário de cadastro de ocorrência e tela de login) com apoio do Marlon | |
+| Guilherme | Conversão de telas XML (formulário de cadastro de ocorrência e tela de login) com apoio do Marlon | ✅ Concluída — telas adaptadas para Android Views utilizando layouts XML, preparando a base para as implementações seguintes. |
 
 **Entregável da semana:** banco atualizado com suporte a múltiplas fontes; primeiras chamadas reais documentadas.
 
@@ -51,7 +53,7 @@ status própria reportada.
 | Henrique | Implementação dos endpoints REST principais no FastAPI (ocorrências: criar, listar, filtrar) | ✅ Concluída — `backend/main.py` + `backend/api/ocorrencias.py` (POST/GET/GET-por-id, filtros de fonte/nível/período/região); `backend/db/repository.py` isola o SQLAlchemy via `OcorrenciaRepositoryProtocol`, o que permitiu testar os 3 endpoints (8 casos, `backend/tests/test_ocorrencias_api.py`) sem Postgres/PostGIS vivo neste ambiente — integração contra o banco real fica para a Semana 5 |
 | João | Implementação do módulo de integração climática consolidada (OpenWeather + ANA + CPTEC) no backend | 🟡 Código pronto e testado (`fusao_climatica.py`); falta só a ANA responder o cadastro pra validar as 3 fontes juntas em produção |
 | Marlon | Implementação da tela de mapa em XML com Google Maps SDK (sem Compose) | ✅ Implementada — reportada por Marlon em 20/08; em manutenção ativa, sujeita a ajustes conforme novas atualizações e testes ao longo do projeto |
-| Guilherme | Implementação da tela de cadastro de ocorrência em XML, com validação de campos | |
+| Guilherme | Implementação da tela de cadastro de ocorrência em XML, com validação de campos | ✅ Concluída — tela de cadastro implementada em XML com validações dos campos necessários para o registro de ocorrências. |
 
 ### Semana 4 (20/07 – 26/07)
 | Responsável | Atividade | Status |
@@ -59,17 +61,17 @@ status própria reportada.
 | Henrique | ~~Implementação da primeira versão do algoritmo de classificação de risco~~ | ✅ Absorvida pelo João — implementada em `algoritmo_risco.py` (Semana 4) e formalizada em `T15_algoritmo_risco_fundamentacao.md` (Semana 6) |
 | João | Apoio à implementação do algoritmo de risco — testes com dados reais das APIs já integradas | ✅ Concluída — `algoritmo_risco.py` testado com dado real de Santo André (score 4.2, Baixo risco) |
 | Marlon | Implementação da tela de listagem/histórico de ocorrências em XML | ✅ Implementada — reportada por Marlon em 20/08; em manutenção ativa, sujeita a ajustes conforme novas atualizações e testes ao longo do projeto |
-| Guilherme | Implementação de componentes de filtro (região e período) na interface XML | |
+| Guilherme | Implementação de componentes de filtro (região e período) na interface XML | ✅ Concluída — componentes de filtragem por região e período implementados na interface para facilitar a consulta das ocorrências. |
 
 **Entregável da semana:** primeira versão funcional do algoritmo de risco testável via backend.
 
 ### Semana 5 (27/07 – 02/08)
 | Responsável | Atividade | Status |
 |---|---|---|
-| Henrique | Integração do banco de dados com os endpoints (persistência real das ocorrências e classificações) | 🟡 `POST /ocorrencias` calcula `nivel_risco`/`chuva_mm` automaticamente via `fusao_climatica` quando o cliente não informa (`backend/servicos/classificacao.py`, T14 "Notas de projeto"); o `OcorrenciaRepository` já grava via SQLAlchemy desde a Semana 3. **Validado em 03/09/2026 na máquina do João** contra um Postgres/PostGIS real (Docker + `docker-compose.yml`, ver nota abaixo) — `schema.sql` aplica sem erro, PostGIS 3.4 ativo, 23/23 testes passam com `DATABASE_URL` apontando pro container. Segue 🟡 e não ✅ porque isso ainda não foi confirmado no ambiente do Henrique nem em CI — falta padronizar isso pro time todo |
+| Henrique | Integração do banco de dados com os endpoints (persistência real das ocorrências e classificações) | 🟡 `POST /ocorrencias` calcula `nivel_risco`/`chuva_mm` automaticamente via `fusao_climatica` quando o cliente não informa (`backend/servicos/classificacao.py`, T14 "Notas de projeto"); o `OcorrenciaRepository` já grava via SQLAlchemy desde a Semana 3. **Validado em 03/09/2026 num notebook específico do João** (com Docker, diferente do notebook usado no dia a dia das sessões — ver nota de 06/09 abaixo e `CLAUDE.md`) contra um Postgres/PostGIS real (Docker + `docker-compose.yml`, ver nota abaixo) — `schema.sql` aplica sem erro, PostGIS 3.4 ativo, 23/23 testes passam com `DATABASE_URL` apontando pro container. Segue 🟡 e não ✅ porque isso ainda não foi confirmado no ambiente do Henrique nem em CI — falta padronizar isso pro time todo |
 | João | Testes de consistência dos dados climáticos consolidados (comparação entre fontes para a mesma região/horário) | 🔴 Bloqueada — depende da ANA responder o cadastro (único item fora do controle do time) |
-| Marlon | Integração da tela de mapa com dados reais do backend (consumo da API) | 🔴 Não iniciada — tela de mapa ainda não vinculada à API real, dados mockados/estáticos |
-| Guilherme | Integração da tela de cadastro com o backend (envio de ocorrências reais) | |
+| Marlon | Integração da tela de mapa com dados reais do backend (consumo da API) | 🔴 Aguardando realização de teste com banco de dados contendo os dados reais |
+| Guilherme | Integração da tela de cadastro com o backend (envio de ocorrências reais) | 🟡 Em andamento — estrutura de integração preparada com o endpoint de ocorrências, mas a validação completa do fluxo com backend e banco reais depende do ambiente integrado do projeto. |
 
 ### Semana 6 (03/08 – 09/08)
 | Responsável | Atividade | Status |
@@ -77,7 +79,7 @@ status própria reportada.
 | Henrique | Revisão de código backend e ajustes de performance inicial nas consultas | ✅ Concluída — 3 achados corrigidos: (1) filtro de região usava `BETWEEN` em lat/lon sem índice (full scan) → trocado para `&&`/`ST_MakeEnvelope` contra `geom`, usando o índice GiST já criado (liga direto com `T17`); (2) filtros `fonte`/`nivel_risco` da listagem aceitavam qualquer string e devolviam lista vazia em silêncio para valor inválido → tipados com os enums compartilhados, agora 422; (3) `sessionmaker(..., autocommit=False)` em `db/session.py` era parâmetro morto do SQLAlchemy 1.x (removido nas versões novas) → limpo. 11 testes passando (`backend/tests/`) |
 | João | Documentação técnica do algoritmo de classificação de risco (fundamentação e funcionamento) — insumo para o relatório | ✅ Concluída em 17/08 — `docs/T15_algoritmo_risco_fundamentacao.md` (matriz AHP formalizada, CR=0.0038) + rascunho de seção `docs/T16_secao_algoritmo_risco.md` |
 | Marlon | Ajustes visuais e de usabilidade nas telas Android já integradas | ✅ Implementada — reportada por Marlon em 20/08; em manutenção ativa, sujeita a ajustes conforme novas atualizações e testes ao longo do projeto |
-| Guilherme | Testes manuais do fluxo cadastro → listagem → mapa, registrando bugs encontrados | |
+| Guilherme | Testes manuais do fluxo cadastro → listagem → mapa, registrando bugs encontrados | 🟡 Parcialmente bloqueada — testes do cadastro e das telas disponíveis realizados, porém o fluxo completo ainda depende da integração da listagem e principalmente do mapa com os dados reais do backend. |
 
 **Entregável da fase:** protótipo com fluxo principal funcional (cadastro, listagem, mapa, classificação de risco básica).
 
@@ -88,26 +90,26 @@ status própria reportada.
 ### Semana 7 (10/08 – 16/08)
 | Responsável | Atividade | Status |
 |---|---|---|
-| Henrique | Criação do ambiente de benchmark — geração de massa de dados simulada (1k, 10k, 100k registros geoespaciais) | 🟡 Geração testada (11 testes), inserção não testada (sem Postgres) — `backend/benchmark/gerar_dados.py` (função pura, sementes reprodutíveis) + `backend/benchmark/popular_banco.py` (1 banco Postgres por escala: `alagamentos_bench_1000/10000/100000`, aplica `schema.sql`, insere em lotes de 5000 via SQLAlchemy Core). Achado do próprio teste: `data_hora` usava `datetime.now()` como referência recalculada a cada chamada, quebrando a promessa de "mesma semente = mesmo dataset" — corrigido com parâmetro `referencia` explícito. Pronto para rodar assim que houver `ADMIN_DATABASE_URL` |
+| Henrique | Criação do ambiente de benchmark — geração de massa de dados simulada (1k, 10k, 100k registros geoespaciais) | 🟡 Geração testada (8 testes), inserção não testada (sem Postgres) — `backend/benchmark/gerar_dados.py` (função pura, sementes reprodutíveis) + `backend/benchmark/popular_banco.py` (1 banco Postgres por escala: `alagamentos_bench_1000/10000/100000`, aplica `schema.sql`, insere em lotes de 5000 via SQLAlchemy Core). Achado do próprio teste: `data_hora` usava `datetime.now()` como referência recalculada a cada chamada, quebrando a promessa de "mesma semente = mesmo dataset" — corrigido com parâmetro `referencia` explícito. Pronto para rodar assim que houver `ADMIN_DATABASE_URL` |
 | João | Refinamento do algoritmo de risco com dados de múltiplas fontes ponderadas | ✅ Concluída em 17/08 — `fusao_climatica.py` e `algoritmo_risco.py` agora conectados (`classificar_risco()`/`obter_classificacao_risco()`); testado com ANA disponível e indisponível |
 | Marlon | Implementação de tela de detalhes da ocorrência (visualização individual) | ✅ Implementada — reportada por Marlon em 20/08; em manutenção ativa, sujeita a ajustes conforme novas atualizações e testes ao longo do projeto |
-| Guilherme | Implementação de notificações locais simples (alerta visual de risco alto no app) | |
+| Guilherme | Implementação de notificações locais simples (alerta visual de risco alto no app) | 🟡 Em andamento — estrutura do alerta local preparada, dependendo da disponibilização do nível de risco integrado aos dados reais do aplicativo para validação completa. |
 
 ### Semana 8 (17/08 – 23/08)
 | Responsável | Atividade | Status |
 |---|---|---|
 | Henrique | Execução do benchmark sem índice espacial — medição de tempo de resposta nas consultas | 🟡 Lógica testada (4 testes), execução real pendente — `backend/benchmark/medir_consultas.py`: mede a mesma consulta que `db/repository.py` gera para o filtro de região (bbox → `geom && ST_MakeEnvelope`, ORDER BY + LIMIT), via `EXPLAIN (ANALYZE, FORMAT JSON)` para isolar o tempo de execução no Postgres (sem ruído de rede/driver). Reutilizável para a Semana 9 (`--indice presente`/`ausente`, mesmo script). O bloqueio de "sem Postgres" foi removido em 03/09 (banco real disponível via Docker + Tailscale, ver notas), mas a execução em si ainda não foi confirmada — segue 🟡, não ✅ |
 | João | Apoio à análise dos resultados do benchmark — interpretação dos dados coletados | 🔴 Bloqueada — depende da execução do benchmark pelo Henrique (item acima); nada a analisar enquanto não houver números |
-| Marlon | Testes de usabilidade interna das telas (com os próprios colegas) | ⬜ Sem status reportado — o resumo do Marlon em 20/08 cobriu só as Semanas 1–7 |
-| Guilherme | Correção de bugs identificados nos testes de usabilidade | ⬜ Sem status reportado |
+| Marlon | Testes de usabilidade interna das telas (com os próprios colegas) | ✅ Concluído e sofrendo ajustes de acordo com o desenvolvimento das demais etapas e definição do design visual do projeto |
+| Guilherme | Correção de bugs identificados nos testes de usabilidade | 🔴 Não iniciada — os testes em si já foram concluídos pelo Marlon nesta semana (ver linha dele acima), mas o levantamento consolidado dos problemas encontrados ainda não foi repassado ao Guilherme; correção pendente desse repasse. |
 
 ### Semana 9 (24/08 – 30/08)
 | Responsável | Atividade | Status |
 |---|---|---|
 | Henrique | Implementação de índice GiST no PostGIS e execução do benchmark comparativo | 🔴 Não iniciada — depende da Semana 8 (benchmark sem índice) estar concluída primeiro |
 | João | Documentação científica do benchmark (fundamentação teórica de R-tree/GiST, conforme literatura) | 🔴 Não iniciada — sem resultados de benchmark ainda para documentar (depende do Henrique); a base teórica de `T17_indexacao_espacial_fundamentacao.md` (Semana 1) já existe e pode ser reaproveitada |
-| Marlon | Revisão e padronização visual de todas as telas (consistência de cores, fontes, espaçamento) | ⬜ Sem status reportado |
-| Guilherme | Testes de integração entre todas as telas do app | ⬜ Sem status reportado |
+| Marlon | Revisão e padronização visual de todas as telas (consistência de cores, fontes, espaçamento) | ✅ Concluído e sofrendo ajustes de acordo com o desenvolvimento das demais etapas e definição do design visual do projeto |
+| Guilherme | Testes de integração entre todas as telas do app | 🟡 Parcialmente bloqueada — testes de integração iniciados, porém a validação completa depende da integração das telas com os dados reais do backend. |
 
 **Entregável da semana:** gráfico comparativo de latência antes/depois da indexação espacial — peça central da resposta sobre "complexidade computacional".
 
@@ -115,9 +117,9 @@ status própria reportada.
 | Responsável | Atividade | Status |
 |---|---|---|
 | Henrique | Otimizações adicionais identificadas pelo benchmark (ex: paginação de resultados, cache simples) | 🔴 Não iniciada — depende dos resultados das Semanas 8–9 |
-| João | Implementação de testes automatizados básicos da API (principais endpoints) | ✅ Concluída em 03/09 — camada de contrato já existia (`test_ocorrencias_api.py`, repositório fake); adicionada a camada de integração contra Postgres/PostGIS real: `backend/tests/conftest.py` (fixture `db_session`, sessão isolada por teste via SAVEPOINT + rollback — padrão recomendado pelo SQLAlchemy para suítes de teste, cobre inclusive os `db.commit()` internos do repositório) e `backend/tests/test_ocorrencias_integracao.py` (3 casos, incluindo o filtro geoespacial via `db/repository.py` real). Isolamento validado na prática: `SELECT count(*) FROM ocorrencias` no banco compartilhado por Tailscale ficou em 0 após a suíte rodar. Sem `DATABASE_URL`, os 3 testes de integração são pulados (skip), não falham — 26/26 testes passam com Postgres disponível, 23/26 sem (3 skipped) |
-| Marlon | Implementação de tela de configurações/perfil simples do usuário | ⬜ Sem status reportado |
-| Guilherme | Apoio aos testes automatizados — casos de teste manuais documentados | ⬜ Sem status reportado |
+| João | Implementação de testes automatizados básicos da API (principais endpoints) | ✅ Concluída em 03/09 — camada de contrato já existia (`test_ocorrencias_api.py`, repositório fake); adicionada a camada de integração contra Postgres/PostGIS real: `backend/tests/conftest.py` (fixture `db_session`, sessão isolada por teste via SAVEPOINT + rollback — padrão recomendado pelo SQLAlchemy para suítes de teste, cobre inclusive os `db.commit()` internos do repositório) e `backend/tests/test_ocorrencias_integracao.py` (3 casos, incluindo o filtro geoespacial via `db/repository.py` real). Isolamento validado na prática: `SELECT count(*) FROM ocorrencias` no banco compartilhado por Tailscale ficou em 0 após a suíte rodar. Sem `DATABASE_URL`, os 3 testes de integração são pulados (skip), não falham — 26 testes desta frente (23 já existentes antes de 03/09, entre contrato e benchmark do Henrique + 3 novos de integração) passam com Postgres disponível, 23 sem (3 skipped). **Nota de reconciliação (06/09/2026):** o total combinado de `backend/tests/` no fim do dia 03/09 é 29, não 26 — a diferença são 3 testes de latência (`test_fusao_climatica_latencia.py`) adicionados no mesmo dia por outra frente de trabalho (ver nota "Achado de revisão — latência das chamadas climáticas externas" abaixo), que não são cobertos por esta linha. Contagem por arquivo conferida em 06/09/2026 contra o repositório: 11 (`test_ocorrencias_api.py`) + 8 (`test_gerar_dados.py`) + 4 (`test_medir_consultas.py`) + 3 (`test_ocorrencias_integracao.py`) + 3 (`test_fusao_climatica_latencia.py`) = 29 |
+| Marlon | Implementação de tela de configurações/perfil simples do usuário | 🟡 Em implementação e desenvolvimento |
+| Guilherme | Apoio aos testes automatizados — casos de teste manuais documentados | 🟡 Em andamento — casos de teste manuais estão sendo organizados e documentados para servir de base ao apoio dos testes automatizados. |
 
 ### Semana 11 (07/09 – 13/09)
 | Responsável | Atividade |
@@ -213,12 +215,13 @@ que bloqueia as Semanas 3 (parcialmente) e 5 (totalmente).
 **Item que estava atrasado sem bloqueio externo:** documentação técnica do algoritmo de risco
 (Semana 6, encerrada em 09/08) — concluído em 17/08 (`docs/T15_algoritmo_risco_fundamentacao.md`).
 
-**Validação contra banco real — resolvida na máquina do João em 03/09/2026:** todo o
-backend (Semanas 2, 3 e 5) era testado só com repositórios/serviços fake em memória.
-Agora há Docker Desktop + `docker-compose.yml` (serviço `db`, `postgis/postgis:16-3.4`)
-nesta máquina — confirmado: `schema.sql` aplica sem erro, trigger de `geom` funciona,
-os 23 testes de `backend/tests/` passam com `DATABASE_URL` apontando pro container real
-(ver passo a passo no `CLAUDE.md`, seção "Ambiente de desenvolvimento").
+**Validação contra banco real — resolvida em 03/09/2026 num notebook específico do João:**
+todo o backend (Semanas 2, 3 e 5) era testado só com repositórios/serviços fake em memória.
+Esse notebook (diferente do usado normalmente nas sessões de trabalho — ver nota de 06/09
+abaixo) passou a ter Docker Desktop + `docker-compose.yml` (serviço `db`,
+`postgis/postgis:16-3.4`) — confirmado: `schema.sql` aplica sem erro, trigger de `geom`
+funciona, os 23 testes de `backend/tests/` passam com `DATABASE_URL` apontando pro
+container real (ver passo a passo no `CLAUDE.md`, seção "Ambiente de desenvolvimento").
 
 **Banco compartilhado com o time via Tailscale (03/09/2026):** em vez de cada um instalar
 Docker/Postgres/PostGIS na própria máquina, o banco do João foi exposto ao time por uma
@@ -273,6 +276,40 @@ completa: 29 testes (26 passam, 3 pulados sem `DATABASE_URL`). **Ainda em aberto
 implementado, ficou como possível trabalho futuro): cache de dados climáticos por
 localização/janela de tempo, orçamento de tempo total por requisição, e migração do
 endpoint para `async def`/`httpx` se o volume de requisições concorrentes crescer.
+
+**Nota de máquina + revisão das tarefas do Henrique (06/09/2026):** o João usa mais de um
+notebook para este repositório (sincronizado via OneDrive). O notebook com Docker/Postgres
+das notas de 03/09 acima é um notebook específico — **não** o usado nesta sessão de
+06/09/2026, que segue sem Docker/PostgreSQL/psql (confirmado hoje, `docker`/`psql` não
+encontrados no PATH), igual ao estado descrito originalmente em 18/08/2026. Revisado se o
+trabalho de 03/09 completou alguma tarefa do Henrique além de remover o bloqueio de
+"sem Postgres": **não completou nenhuma** — `backend/benchmark/` (Semanas 7–9, dele) não
+foi tocado nesse commit, só `backend/fusao_climatica.py` e a camada de testes do João
+(Semana 10). As células de status do Henrique nas Semanas 5, 7, 8 e 9 já refletiam
+corretamente esse estado (🟡, não ✅) e permanecem como estavam — a diferença prática de
+03/09 pra ele é que o bloqueio técnico "sem Postgres disponível" deixou de existir (banco
+real acessível via Tailscale, ver nota acima), mas rodar `popular_banco.py` e
+`medir_consultas.py` de fato continua pendente e é tarefa dele.
+
+**Revisão geral de consistência (06/09/2026):** após incorporar os resumos de status do
+Marlon e do Guilherme enviados nesta data, revisado o documento inteiro em busca de
+contradições entre linhas e contagens desatualizadas. Achados e correções:
+1. Semana 8 — Marlon reportava os testes de usabilidade como ✅ concluídos, enquanto a
+   linha do Guilherme (correção de bugs) dizia depender da "execução dos testes", tratando
+   o mesmo evento como não-feito. Corrigido priorizando o registro concluído do Marlon como
+   fato: a linha do Guilherme passou a citar como pendência real o repasse da lista de bugs
+   levantados, não a execução dos testes.
+2. Semana 7 — Henrique: contagem "11 testes" para a geração de dados sintéticos não batia
+   com `backend/tests/test_gerar_dados.py` (conferido: 8 testes). Corrigido para 8; o total
+   agregado de 23 testes citado na Semana 5 já estava certo (11+8+4).
+3. Semana 10 — João: a célula citava 26 testes como total da suíte, enquanto a nota
+   "Achado de revisão" mais abaixo (mesmo dia) citava 29. Ambas eram fotografias parciais
+   corretas de momentos diferentes do mesmo dia (26 antes de somar os 3 testes de latência
+   adicionados horas depois); reconciliado citando os dois números e a diferença entre eles,
+   com a contagem por arquivo conferida contra o repositório.
+4. Legenda de status — ainda dizia "Guilherme segue sem status própria reportada", o que
+   deixou de ser verdade nesta data. Atualizada.
+Nenhuma outra contradição entre responsáveis foi encontrada nas semanas restantes.
 
 **Atualização de 20/08 — status do Marlon (Semanas 1–7):** Marlon reportou ao João o
 resumo de suas entregas nas Semanas 1–7 (migração de telas para XML, mapa com Google Maps
