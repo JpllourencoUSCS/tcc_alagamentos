@@ -26,6 +26,15 @@ prevista para a Semana 5 não foi iniciada, todas seguem com dados mockados/est�
 do Marlon, sem validação própria do time de integração. Detalhe semana a semana no
 `docs/CRONOGRAMA_STATUS.md`.
 
+**29/09/2026:** o código Android passou a estar versionado no repositório (pasta `android/`,
+ver "Convenções do repositório") — antes disso as entregas do Marlon e do Guilherme eram
+conhecidas só pelos resumos repassados. Continua **sem integração com a API** (dados
+mockados). O `android/` não tem as telas de cadastro, login e filtros por região/período
+relatadas pelo Guilherme; ainda não confirmado se as cópias locais do Marlon e do Guilherme
+são a mesma base. Nesta data o cronograma estava na Semana 14 (28/09–04/10), com as
+pendências de todos consolidadas na seção "Situação em 29/09/2026" do
+`docs/CRONOGRAMA_STATUS.md`.
+
 **03/09/2026:** descoberta de que o campus da USCS possui uma estação meteorológica
 própria. Time está investigando junto aos responsáveis a possibilidade de acesso aos
 dados — se viável, poderia "substituir" a ANA no papel de pluviômetro local do modelo AHP.
@@ -62,11 +71,23 @@ investigação (03/09/2026)".
     falham — mesmo critério do resto do projeto para "sem Postgres disponível".
     Ao criar um teste novo que precisa de banco real, reusar `db_session` em vez
     de inventar outro padrão de setup/teardown.
+- `android/` — app Android (projeto Android Studio, Kotlin + XML Views, sem Compose;
+  pacote `com.example.alagamentos`), versionado desde 29/09/2026. Navegação por abas
+  inferiores em `MainActivity.kt` com um `Fragment` por tela (Mapa, Alertas, Previsão,
+  Ajustes; Detalhes e Perfil abrem por cima). Dados vêm de `OcorrenciaRepository.kt` e
+  `PrevisaoRepository.kt`, hoje **100% mockados** — é onde a integração com a API vai
+  entrar. Preferências e perfil ficam só no aparelho (SharedPreferences, `Preferencias.kt`/
+  `Perfil.kt`). A chave do Google Maps vem de `android/local.properties`
+  (`MAPS_API_KEY=...`), arquivo não versionado e repassado por canal privado. Build pelo
+  Gradle (`android/gradlew assembleDebug`) exige JDK — confirmar `JAVA_HOME` na máquina da
+  sessão antes de contar com isso.
 - `testes-api/` — scripts de teste de API, um por fonte, nomeados `teste_<fonte>.py`
 - `docs/` — documentação. `T05`–`T18` são o histórico de investigação (não apagar,
   não reescrever com conteúdo diferente do que realmente aconteceu). `T16_secao_*.md`
   são rascunhos de seções do relatório final e devem ser mantidos sincronizados com as
-  decisões técnicas atuais.
+  decisões técnicas atuais. Material de teste (13/09/2026): `plano_e_fluxo_de_testes_TCC.xlsx`
+  (plano PT-001 + casos de teste), `questionario_teste_usabilidade.md` e
+  `tcle_teste_usabilidade.md`.
 
 ## Ambiente de desenvolvimento
 

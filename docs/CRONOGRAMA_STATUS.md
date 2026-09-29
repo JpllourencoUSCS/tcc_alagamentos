@@ -2,7 +2,7 @@
 
 **Sistema de Monitoramento Colaborativo de Áreas com Risco de Alagamento**
 Período: 01/07/2026 a 30/10/2026 (17 semanas)
-*Última atualização de status: 30/09/2026*
+*Última atualização de status: 29/09/2026 — Semana 14 (28/09 – 04/10)*
 
 ## Legenda de responsáveis
 - **Henrique** — backend / tech lead
@@ -14,12 +14,58 @@ Período: 01/07/2026 a 30/10/2026 (17 semanas)
 - ✅ Concluída
 - 🟡 Em andamento / parcialmente bloqueada
 - 🔴 Atrasada ou não iniciada
+- ⚪ Sem status reportado — nada no repositório e nenhum relato do responsável; confirmar
+  com ele (não significa necessariamente "não feito")
 
 Aplicada a João e Henrique desde o início; passou a valer também para as atividades do
 Marlon a partir do resumo que ele enviou em 20/08/2026 (Semanas 1–7), com atualização
 enviada em 06/09/2026 (Semanas 5, 8, 9 e 10); e para as do Guilherme a partir do resumo
 que ele enviou em 06/09/2026 (Semanas 1–10). Ambos os resumos são repasse direto, sem
 validação própria do time de integração.
+
+## Situação em 29/09/2026 — resumo para colocar o time em dia
+
+**Onde estamos:** Semana 14 de 17 (Fase 4, redação). Faltam ~4,5 semanas para a banca
+(30/10) e ~2,5 semanas para o rascunho completo do relatório ir ao orientador (Semana 16,
+12–18/10). As Semanas 11–13 não tiveram status reportado por ninguém; o que está marcado
+nelas abaixo vem do que existe no repositório.
+
+**O que está pronto:** backend (API de ocorrências, banco PostGIS, algoritmo AHP + fusão
+climática em paralelo, 29 testes); app Android versionado em `android/` com Mapa, Detalhes,
+Alertas, Previsão, Ajustes e Perfil (compila, dados mockados); material de teste de
+usabilidade (plano PT-001, questionário e TCLE, 13/09); rascunhos de seção do relatório
+sobre APIs e algoritmo de risco (`T16_secao_*.md`).
+
+**Os três gargalos que travam quase todo o resto:**
+1. **App não está integrado ao backend** (Semana 5, 🔴 desde 02/08). Sem isso não há teste
+   de usabilidade (Semana 12), correções (Semana 13), latência end-to-end (Semana 11) nem
+   capturas de tela reais (Semana 14). Além do código, falta decidir **onde a API roda**
+   para o app acessar — hoje só o banco está exposto (Tailscale, notebook do João), a API
+   FastAPI não está hospedada em lugar nenhum.
+2. **Benchmark não foi executado** (Semanas 7–9). O gráfico com/sem índice GiST é o
+   entregável central do ponto "complexidade computacional", e a Semana 15 (05–11/10) já
+   prevê a redação dos resultados. Não depende de nada além de o Henrique rodar os scripts.
+3. **Duas bases do app Android.** O `android/` do repositório não tem as telas de cadastro,
+   login e filtros por região/período do Guilherme; não se sabe se as cópias locais do
+   Marlon e do Guilherme são a mesma base. Precisa ser unificado antes de integrar.
+
+**Pendências por integrante** (inclui as atrasadas de semanas anteriores):
+
+| Integrante | Pendências |
+|---|---|
+| Henrique | Rodar `popular_banco.py` (S7) e `medir_consultas.py` sem índice (S8) e com índice GiST (S9) — **prioridade da semana**; confirmar acesso ao banco via Tailscale e persistência no ambiente dele (S5); otimizações pós-benchmark (S10); latência end-to-end (S11, depende da integração do app); seção do relatório sobre arquitetura final e algoritmo de risco (S14, atual — pode reaproveitar `T15`/`T16_secao_algoritmo_risco.md`) |
+| João | Retorno da ANA e da estação da USCS — sem novidade registrada desde 03/09 (S3/S5); análise e documentação científica do benchmark (S8/S9, dependem do Henrique); critérios de desempenho / RNF de latência (S11, ⚪); testes de usabilidade (S12) e seção de metodologia de testes (S13, ⚪); seção sobre integração de múltiplas fontes (S14, atual — base em `T16_secao_relatorio_apis*.md`); apoiar a integração app ↔ API e a decisão de hospedagem |
+| Marlon | Unificar a base Android com o Guilherme no `android/` do repositório; integrar mapa/listagem/detalhes com a API real e trocar coordenadas mockadas de São Paulo por São Caetano do Sul (S5); repassar ao Guilherme a lista de bugs dos testes internos (S8); ajustar o roteiro de usabilidade à base final do app (S11); conduzir testes de usabilidade e corrigir a interface (S12/S13); seção do relatório sobre o app Android (S14, atual) |
+| Guilherme | Subir para o `android/` as telas de cadastro, login e filtros região/período; integrar cadastro com `POST /ocorrencias` (S5); notificação local de risco alto (S7 — hoje só existem as preferências em Ajustes); corrigir bugs dos testes internos (S8, aguarda lista do Marlon); testes de integração entre telas e casos de teste manuais (S9/S10); confirmar se a planilha PT-001 fecha a S11; consolidar resultados de usabilidade e testes de regressão (S12/S13); capturas de tela para o relatório (S14, atual — o ideal é após a integração) |
+
+**Decisões para a próxima conversa do time:**
+- Nova data para os testes de usabilidade (Semana 12 original já passou) — depende de
+  quando a integração fica pronta; o questionário e o TCLE assumem app integrado ao backend.
+- Onde hospedar a API (e o banco) para o app e para os testes com usuários externos — o
+  notebook do João via Tailscale não serve para sessões com usuários.
+- Até quando esperar a ANA / estação da USCS antes de documentar a ausência como limitação
+  (o fail-safe de redistribuição de pesos já cobre o funcionamento sem ela).
+- Quem implementa o agregador de reportes colaborativos (pendência de 17/08, sem responsável).
 
 ## FASE 1 — Replanejamento Técnico (01/07 a 14/07)
 
@@ -113,21 +159,21 @@ validação própria do time de integração.
 
 **Entregável da semana:** gráfico comparativo de latência antes/depois da indexação espacial — peça central da resposta sobre "complexidade computacional".
 
-### Semana 10 (31/08 – 06/09) — **semana atual**
+### Semana 10 (31/08 – 06/09)
 | Responsável | Atividade | Status |
 |---|---|---|
 | Henrique | Otimizações adicionais identificadas pelo benchmark (ex: paginação de resultados, cache simples) | 🔴 Não iniciada — depende dos resultados das Semanas 8–9 |
 | João | Implementação de testes automatizados básicos da API (principais endpoints) | ✅ Concluída em 03/09 — camada de contrato já existia (`test_ocorrencias_api.py`, repositório fake); adicionada a camada de integração contra Postgres/PostGIS real: `backend/tests/conftest.py` (fixture `db_session`, sessão isolada por teste via SAVEPOINT + rollback — padrão recomendado pelo SQLAlchemy para suítes de teste, cobre inclusive os `db.commit()` internos do repositório) e `backend/tests/test_ocorrencias_integracao.py` (3 casos, incluindo o filtro geoespacial via `db/repository.py` real). Isolamento validado na prática: `SELECT count(*) FROM ocorrencias` no banco compartilhado por Tailscale ficou em 0 após a suíte rodar. Sem `DATABASE_URL`, os 3 testes de integração são pulados (skip), não falham — 26 testes desta frente (23 já existentes antes de 03/09, entre contrato e benchmark do Henrique + 3 novos de integração) passam com Postgres disponível, 23 sem (3 skipped). **Nota de reconciliação (06/09/2026):** o total combinado de `backend/tests/` no fim do dia 03/09 é 29, não 26 — a diferença são 3 testes de latência (`test_fusao_climatica_latencia.py`) adicionados no mesmo dia por outra frente de trabalho (ver nota "Achado de revisão — latência das chamadas climáticas externas" abaixo), que não são cobertos por esta linha. Contagem por arquivo conferida em 06/09/2026 contra o repositório: 11 (`test_ocorrencias_api.py`) + 8 (`test_gerar_dados.py`) + 4 (`test_medir_consultas.py`) + 3 (`test_ocorrencias_integracao.py`) + 3 (`test_fusao_climatica_latencia.py`) = 29 |
-| Marlon | Implementação de tela de configurações/perfil simples do usuário | 🟡 Em implementação e desenvolvimento. **29/09/2026:** parte de configurações versionada no repositório (aba "Ajustes", `AjustesFragment.kt` + `Preferencias.kt`, commit `fc8e24a`: liga/desliga alertas, tipos de ocorrência, severidade mínima, raio de monitoramento, restaurar padrões). ~~Perfil do usuário não implementado~~ **30/09/2026:** ✅ Concluída — tela de perfil implementada (`PerfilFragment.kt` + `fragment_perfil.xml` + `Perfil.kt`), aberta pelo cartão no topo da aba "Ajustes": nome (obrigatório, validado), e-mail (opcional, formato validado), bairro de São Caetano do Sul (lista fixa) e `id_usuario` gerado pelo app (conforme `T13_campos_usuario.md`). Dados salvos só no aparelho, sem backend — ver nota "Tela de perfil do usuário (30/09/2026)" abaixo |
+| Marlon | Implementação de tela de configurações/perfil simples do usuário | ✅ Concluída (ver 30/09/2026 abaixo; até 29/09: 🟡 em implementação e desenvolvimento). **29/09/2026:** parte de configurações versionada no repositório (aba "Ajustes", `AjustesFragment.kt` + `Preferencias.kt`, commit `fc8e24a`: liga/desliga alertas, tipos de ocorrência, severidade mínima, raio de monitoramento, restaurar padrões). ~~Perfil do usuário não implementado~~ **30/09/2026:** ✅ Concluída — tela de perfil implementada (`PerfilFragment.kt` + `fragment_perfil.xml` + `Perfil.kt`), aberta pelo cartão no topo da aba "Ajustes": nome (obrigatório, validado), e-mail (opcional, formato validado), bairro de São Caetano do Sul (lista fixa) e `id_usuario` gerado pelo app (conforme `T13_campos_usuario.md`). Dados salvos só no aparelho, sem backend — ver nota "Tela de perfil do usuário (30/09/2026)" abaixo |
 | Guilherme | Apoio aos testes automatizados — casos de teste manuais documentados | 🟡 Em andamento — casos de teste manuais estão sendo organizados e documentados para servir de base ao apoio dos testes automatizados. |
 
 ### Semana 11 (07/09 – 13/09)
-| Responsável | Atividade |
-|---|---|
-| Henrique | Medição formal de latência end-to-end (app → backend → banco → resposta) em diferentes cenários |
-| João | Consolidação dos critérios de avaliação de desempenho (RNF de latência, com base científica) |
-| Marlon | Preparação do roteiro de teste de usabilidade com usuários externos |
-| Guilherme | Organização da documentação de testes realizados até o momento |
+| Responsável | Atividade | Status |
+|---|---|---|
+| Henrique | Medição formal de latência end-to-end (app → backend → banco → resposta) em diferentes cenários | 🔴 Não iniciada — depende do app integrado à API (Semana 5, 🔴) e de a API estar hospedada em algum lugar acessível ao app; a latência das chamadas climáticas externas foi tratada à parte em 03/09 (ver nota "Achado de revisão") |
+| João | Consolidação dos critérios de avaliação de desempenho (RNF de latência, com base científica) | ⚪ Sem status reportado — nenhum documento com os critérios no repositório (29/09) |
+| Marlon | Preparação do roteiro de teste de usabilidade com usuários externos | 🟡 Material pronto, falta alinhar ao app — commit `22791a7` ("AF - QA", 13/09, conta do João) adicionou `docs/questionario_teste_usabilidade.md` (roteiro de 5 tarefas guiadas + questionário para Google Forms) e `docs/tcle_teste_usabilidade.md`. O roteiro assume app integrado ao backend real e inclui tarefas (login, cadastro, filtro por região/período) cujas telas não estão no `android/` versionado — ajustar quando a base do app for unificada. Autoria (Marlon ou outro) não registrada |
+| Guilherme | Organização da documentação de testes realizados até o momento | 🟡 Base entregue em 13/09 (commit `22791a7`) — `docs/plano_e_fluxo_de_testes_TCC.xlsx`: plano PT-001 (escopo, critérios, responsáveis por módulo) e fluxo com 16 casos de teste; os de backend/algoritmo (`CT-API-*`, `CT-AHP-*`) registrados como executados, os 11 do app como "Não Executado" aguardando a integração. Confirmar com o Guilherme se é a entrega dele e se considera concluída |
 
 **Entregável da fase:** sistema integrado, com métricas de desempenho documentadas e o diferencial tecnológico (algoritmo de risco + benchmark espacial) validado.
 
@@ -136,28 +182,28 @@ validação própria do time de integração.
 ## FASE 4 — Testes, Validação e Redação Final (14/09 a 30/10)
 
 ### Semana 12 (14/09 – 20/09)
-| Responsável | Atividade |
-|---|---|
-| Henrique | Apoio técnico aos testes de usabilidade (ajustes de backend identificados durante os testes) |
-| João | Execução dos testes de usabilidade com usuários externos (registro de feedback) |
-| Marlon | Execução dos testes de usabilidade com usuários externos (condução das sessões) |
-| Guilherme | Consolidação dos resultados de usabilidade em tabela/relatório |
+| Responsável | Atividade | Status |
+|---|---|---|
+| Henrique | Apoio técnico aos testes de usabilidade (ajustes de backend identificados durante os testes) | 🔴 Não iniciada — os testes de usabilidade não aconteceram (ver linhas abaixo) |
+| João | Execução dos testes de usabilidade com usuários externos (registro de feedback) | 🔴 Não executada — pré-requisito do próprio plano PT-001 é o app integrado ao backend real, que não existe ainda; os casos de usabilidade da planilha seguem "Não Executado" com data "A definir (lançamento do protótipo integrado)". Precisa de nova data |
+| Marlon | Execução dos testes de usabilidade com usuários externos (condução das sessões) | 🔴 Não executada — mesmo motivo da linha acima |
+| Guilherme | Consolidação dos resultados de usabilidade em tabela/relatório | 🔴 Não iniciada — sem resultados para consolidar |
 
 ### Semana 13 (21/09 – 27/09)
-| Responsável | Atividade |
-|---|---|
-| Henrique | Correções de backend apontadas pelos testes de usabilidade e desempenho |
-| João | Redação da seção de metodologia de testes e avaliação (capítulo do relatório final) |
-| Marlon | Correções de interface apontadas pelos testes de usabilidade |
-| Guilherme | Apoio às correções de interface e testes de regressão |
+| Responsável | Atividade | Status |
+|---|---|---|
+| Henrique | Correções de backend apontadas pelos testes de usabilidade e desempenho | 🔴 Não iniciada — depende dos testes das Semanas 11–12 |
+| João | Redação da seção de metodologia de testes e avaliação (capítulo do relatório final) | ⚪ Sem status reportado — nenhum rascunho no repositório (29/09); o plano PT-001, o questionário e o TCLE de 13/09 servem de base para a parte de metodologia, a de resultados depende dos testes |
+| Marlon | Correções de interface apontadas pelos testes de usabilidade | 🔴 Não iniciada — depende da Semana 12 |
+| Guilherme | Apoio às correções de interface e testes de regressão | 🔴 Não iniciada — depende da Semana 12 |
 
-### Semana 14 (28/09 – 04/10)
-| Responsável | Atividade |
-|---|---|
-| Henrique | Redação da seção técnica sobre arquitetura final e algoritmo de classificação de risco |
-| João | Redação da seção sobre integração de múltiplas fontes de dados e resultados climáticos |
-| Marlon | Redação da seção sobre desenvolvimento do aplicativo Android (XML) e decisões de UI |
-| Guilherme | Levantamento de capturas de tela e evidências visuais do sistema para o relatório |
+### Semana 14 (28/09 – 04/10) — **semana atual**
+| Responsável | Atividade | Status |
+|---|---|---|
+| Henrique | Redação da seção técnica sobre arquitetura final e algoritmo de classificação de risco | ⚪ Sem status reportado — a parte do algoritmo já tem rascunho (`docs/T15_algoritmo_risco_fundamentacao.md` + `docs/T16_secao_algoritmo_risco.md`, do João); falta a arquitetura final |
+| João | Redação da seção sobre integração de múltiplas fontes de dados e resultados climáticos | ⚪ Sem status reportado — base existente: `docs/T16_secao_relatorio_apis.md` e `T16_secao_relatorio_apis_aluno3.md` (levantamento e comparação das APIs, última edição 17/08); precisa refletir a arquitetura atual (ANA/CPTEC, fusão em paralelo, escopo São Caetano do Sul) |
+| Marlon | Redação da seção sobre desenvolvimento do aplicativo Android (XML) e decisões de UI | ⚪ Sem status reportado |
+| Guilherme | Levantamento de capturas de tela e evidências visuais do sistema para o relatório | ⚪ Sem status reportado — já dá para capturar o app do `android/` (compila), mas com dados mockados; capturas definitivas ficam melhores após a integração |
 
 ### Semana 15 (05/10 – 11/10)
 | Responsável | Atividade |
@@ -361,6 +407,18 @@ tela de edição por cima da aba (volta com o botão voltar, mesmo padrão da te
   perfil foi testado em emulador (Pixel 8) na cópia local do Marlon: cartão vazio, erros de
   validação, salvar, seleção de bairro, cartão atualizado e limpar perfil.
 - **Não incluído:** integração com o backend (o backend não tem tabela/endpoint de usuários).
+
+**Atualização de 29/09/2026 — marcador de semana e pendências:** o marcador de "semana
+atual" estava parado na Semana 10 desde 06/09; movido para a Semana 14 (28/09–04/10). As
+Semanas 11–14 ganharam coluna de status, preenchida só com o que existe no repositório ou já
+estava documentado aqui — nenhum integrante reportou status dessas semanas. Para não
+confundir "sem registro" com "não feito", foi criada a marcação ⚪ (sem status reportado).
+Também nesta data: a célula da Semana 10 do Marlon começava com 🟡 embora a própria célula
+e a nota do perfil a dessem como concluída — o marcador inicial passou a ✅. Resumo das
+pendências por integrante na seção "Situação em 29/09/2026", no topo do documento.
+Observação sobre datas: o commit `4ae21d4` (tela de perfil) e a nota acima estão datados
+de 30/09/2026, mas já estavam no GitHub em 29/09/2026 — o relógio da máquina que gerou o
+commit estava adiantado (fuso `+0100` no commit). O conteúdo não muda; só a data.
 
 **Atualização de 20/08 — status do Marlon (Semanas 1–7):** Marlon reportou ao João o
 resumo de suas entregas nas Semanas 1–7 (migração de telas para XML, mapa com Google Maps
