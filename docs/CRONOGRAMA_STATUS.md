@@ -2,7 +2,7 @@
 
 **Sistema de Monitoramento Colaborativo de Áreas com Risco de Alagamento**
 Período: 01/07/2026 a 30/10/2026 (17 semanas)
-*Última atualização de status: 06/09/2026*
+*Última atualização de status: 29/09/2026*
 
 ## Legenda de responsáveis
 - **Henrique** — backend / tech lead
@@ -52,7 +52,7 @@ validação própria do time de integração.
 |---|---|---|
 | Henrique | Implementação dos endpoints REST principais no FastAPI (ocorrências: criar, listar, filtrar) | ✅ Concluída — `backend/main.py` + `backend/api/ocorrencias.py` (POST/GET/GET-por-id, filtros de fonte/nível/período/região); `backend/db/repository.py` isola o SQLAlchemy via `OcorrenciaRepositoryProtocol`, o que permitiu testar os 3 endpoints (8 casos, `backend/tests/test_ocorrencias_api.py`) sem Postgres/PostGIS vivo neste ambiente — integração contra o banco real fica para a Semana 5 |
 | João | Implementação do módulo de integração climática consolidada (OpenWeather + ANA + CPTEC) no backend | 🟡 Código pronto e testado (`fusao_climatica.py`); falta só a ANA responder o cadastro pra validar as 3 fontes juntas em produção |
-| Marlon | Implementação da tela de mapa em XML com Google Maps SDK (sem Compose) | ✅ Implementada — reportada por Marlon em 20/08; em manutenção ativa, sujeita a ajustes conforme novas atualizações e testes ao longo do projeto |
+| Marlon | Implementação da tela de mapa em XML com Google Maps SDK (sem Compose) | ✅ Implementada — reportada por Marlon em 20/08; em manutenção ativa, sujeita a ajustes conforme novas atualizações e testes ao longo do projeto. **29/09/2026:** uma versão da tela está versionada no repositório (`android/`, `MapaFragment.kt` + `fragment_mapa.xml`, commit `fc8e24a`) — ver nota "Código Android versionado no repositório" abaixo |
 | Guilherme | Implementação da tela de cadastro de ocorrência em XML, com validação de campos | ✅ Concluída — tela de cadastro implementada em XML com validações dos campos necessários para o registro de ocorrências. |
 
 ### Semana 4 (20/07 – 26/07)
@@ -60,7 +60,7 @@ validação própria do time de integração.
 |---|---|---|
 | Henrique | ~~Implementação da primeira versão do algoritmo de classificação de risco~~ | ✅ Absorvida pelo João — implementada em `algoritmo_risco.py` (Semana 4) e formalizada em `T15_algoritmo_risco_fundamentacao.md` (Semana 6) |
 | João | Apoio à implementação do algoritmo de risco — testes com dados reais das APIs já integradas | ✅ Concluída — `algoritmo_risco.py` testado com dado real de Santo André (score 4.2, Baixo risco) |
-| Marlon | Implementação da tela de listagem/histórico de ocorrências em XML | ✅ Implementada — reportada por Marlon em 20/08; em manutenção ativa, sujeita a ajustes conforme novas atualizações e testes ao longo do projeto |
+| Marlon | Implementação da tela de listagem/histórico de ocorrências em XML | ✅ Implementada — reportada por Marlon em 20/08; em manutenção ativa, sujeita a ajustes conforme novas atualizações e testes ao longo do projeto. **29/09/2026:** versionada no repositório uma tela de listagem (aba "Alertas", `AlertasFragment.kt`, commit `fc8e24a`) com filtro por situação (todos / em andamento / encerrados) — não cobre o filtro por região e período da linha do Guilherme abaixo |
 | Guilherme | Implementação de componentes de filtro (região e período) na interface XML | ✅ Concluída — componentes de filtragem por região e período implementados na interface para facilitar a consulta das ocorrências. |
 
 **Entregável da semana:** primeira versão funcional do algoritmo de risco testável via backend.
@@ -92,8 +92,8 @@ validação própria do time de integração.
 |---|---|---|
 | Henrique | Criação do ambiente de benchmark — geração de massa de dados simulada (1k, 10k, 100k registros geoespaciais) | 🟡 Geração testada (8 testes), inserção não testada (sem Postgres) — `backend/benchmark/gerar_dados.py` (função pura, sementes reprodutíveis) + `backend/benchmark/popular_banco.py` (1 banco Postgres por escala: `alagamentos_bench_1000/10000/100000`, aplica `schema.sql`, insere em lotes de 5000 via SQLAlchemy Core). Achado do próprio teste: `data_hora` usava `datetime.now()` como referência recalculada a cada chamada, quebrando a promessa de "mesma semente = mesmo dataset" — corrigido com parâmetro `referencia` explícito. Pronto para rodar assim que houver `ADMIN_DATABASE_URL` |
 | João | Refinamento do algoritmo de risco com dados de múltiplas fontes ponderadas | ✅ Concluída em 17/08 — `fusao_climatica.py` e `algoritmo_risco.py` agora conectados (`classificar_risco()`/`obter_classificacao_risco()`); testado com ANA disponível e indisponível |
-| Marlon | Implementação de tela de detalhes da ocorrência (visualização individual) | ✅ Implementada — reportada por Marlon em 20/08; em manutenção ativa, sujeita a ajustes conforme novas atualizações e testes ao longo do projeto |
-| Guilherme | Implementação de notificações locais simples (alerta visual de risco alto no app) | 🟡 Em andamento — estrutura do alerta local preparada, dependendo da disponibilização do nível de risco integrado aos dados reais do aplicativo para validação completa. |
+| Marlon | Implementação de tela de detalhes da ocorrência (visualização individual) | ✅ Implementada — reportada por Marlon em 20/08; em manutenção ativa, sujeita a ajustes conforme novas atualizações e testes ao longo do projeto. **29/09/2026:** uma versão da tela está versionada no repositório (`DetalhesFragment.kt` + `fragment_detalhes.xml`, commit `fc8e24a`), aberta a partir do marcador do mapa e da lista de alertas |
+| Guilherme | Implementação de notificações locais simples (alerta visual de risco alto no app) | 🟡 Em andamento — estrutura do alerta local preparada, dependendo da disponibilização do nível de risco integrado aos dados reais do aplicativo para validação completa. **29/09/2026:** o commit `fc8e24a` trouxe só as *preferências* de notificação (aba "Ajustes": tipos de ocorrência, severidade mínima e raio, salvos em `Preferencias.kt`) — nenhuma notificação é disparada ainda; a estrutura de alerta local do Guilherme não está nesse commit |
 
 ### Semana 8 (17/08 – 23/08)
 | Responsável | Atividade | Status |
@@ -118,7 +118,7 @@ validação própria do time de integração.
 |---|---|---|
 | Henrique | Otimizações adicionais identificadas pelo benchmark (ex: paginação de resultados, cache simples) | 🔴 Não iniciada — depende dos resultados das Semanas 8–9 |
 | João | Implementação de testes automatizados básicos da API (principais endpoints) | ✅ Concluída em 03/09 — camada de contrato já existia (`test_ocorrencias_api.py`, repositório fake); adicionada a camada de integração contra Postgres/PostGIS real: `backend/tests/conftest.py` (fixture `db_session`, sessão isolada por teste via SAVEPOINT + rollback — padrão recomendado pelo SQLAlchemy para suítes de teste, cobre inclusive os `db.commit()` internos do repositório) e `backend/tests/test_ocorrencias_integracao.py` (3 casos, incluindo o filtro geoespacial via `db/repository.py` real). Isolamento validado na prática: `SELECT count(*) FROM ocorrencias` no banco compartilhado por Tailscale ficou em 0 após a suíte rodar. Sem `DATABASE_URL`, os 3 testes de integração são pulados (skip), não falham — 26 testes desta frente (23 já existentes antes de 03/09, entre contrato e benchmark do Henrique + 3 novos de integração) passam com Postgres disponível, 23 sem (3 skipped). **Nota de reconciliação (06/09/2026):** o total combinado de `backend/tests/` no fim do dia 03/09 é 29, não 26 — a diferença são 3 testes de latência (`test_fusao_climatica_latencia.py`) adicionados no mesmo dia por outra frente de trabalho (ver nota "Achado de revisão — latência das chamadas climáticas externas" abaixo), que não são cobertos por esta linha. Contagem por arquivo conferida em 06/09/2026 contra o repositório: 11 (`test_ocorrencias_api.py`) + 8 (`test_gerar_dados.py`) + 4 (`test_medir_consultas.py`) + 3 (`test_ocorrencias_integracao.py`) + 3 (`test_fusao_climatica_latencia.py`) = 29 |
-| Marlon | Implementação de tela de configurações/perfil simples do usuário | 🟡 Em implementação e desenvolvimento |
+| Marlon | Implementação de tela de configurações/perfil simples do usuário | 🟡 Em implementação e desenvolvimento. **29/09/2026:** parte de configurações versionada no repositório (aba "Ajustes", `AjustesFragment.kt` + `Preferencias.kt`, commit `fc8e24a`: liga/desliga alertas, tipos de ocorrência, severidade mínima, raio de monitoramento, restaurar padrões). **Perfil do usuário não implementado** — segue 🟡 |
 | Guilherme | Apoio aos testes automatizados — casos de teste manuais documentados | 🟡 Em andamento — casos de teste manuais estão sendo organizados e documentados para servir de base ao apoio dos testes automatizados. |
 
 ### Semana 11 (07/09 – 13/09)
@@ -310,6 +310,40 @@ contradições entre linhas e contagens desatualizadas. Achados e correções:
 4. Legenda de status — ainda dizia "Guilherme segue sem status própria reportada", o que
    deixou de ser verdade nesta data. Atualizada.
 Nenhuma outra contradição entre responsáveis foi encontrada nas semanas restantes.
+
+**Código Android versionado no repositório (29/09/2026):** até esta data nenhum código
+Android estava no repositório — as entregas do Marlon e do Guilherme eram conhecidas só pelos
+resumos repassados. O commit `fc8e24a` (autor João Lourenço, enviado pela conta `mrlnalvs`)
+adicionou um projeto Android Studio completo na pasta `android/`, com navegação por abas
+inferiores e 5 telas em XML Views (sem Compose):
+- **Mapa** — Google Maps SDK, marcadores e círculos de área por ocorrência, cartão de status
+  geral e painel da ocorrência selecionada (Semana 3 do Marlon);
+- **Detalhes da ocorrência** — aberta pelo marcador do mapa e pela lista de alertas (Semana 7
+  do Marlon);
+- **Alertas** — listagem das ocorrências com filtro por situação (Semana 4 do Marlon);
+- **Previsão** — condição atual, próximas horas e próximos dias com risco de alagamento.
+  **Não prevista no cronograma** original de nenhum responsável;
+- **Ajustes** — preferências de notificação salvas no aparelho (parte de configurações da
+  Semana 10 do Marlon; perfil não implementado).
+
+Limitações registradas no momento do envio — por elas, nenhuma célula de status foi promovida
+a ✅ com base neste commit:
+1. **Não compilado nem executado.** A máquina de onde o commit saiu não tinha JDK no PATH
+   (`JAVA_HOME` ausente), então o Gradle não rodou; nenhum build ou teste em emulador
+   confirmado até esta data.
+2. **Dados 100% mockados** (`OcorrenciaRepository.kt`, `PrevisaoRepository.kt`) — nenhuma
+   tela consome a API do backend. A Semana 5 (integração do mapa com dados reais) segue 🔴
+   como estava. As ocorrências de exemplo usam coordenadas de São Paulo, ainda não de
+   São Caetano do Sul (escopo definido em 03/09).
+3. **Relação com as telas reportadas pelo Marlon (20/08) e pelo Guilherme (06/09) não
+   verificada.** O código deste commit foi desenvolvido/completado no notebook do João; não se
+   sabe se é a mesma base das telas relatadas pelos dois ou uma implementação paralela.
+   As telas de cadastro de ocorrência, login e filtros por região/período, relatadas pelo
+   Guilherme, **não** estão neste commit. Marlon e Guilherme precisam confirmar qual base
+   seguir antes de continuar o desenvolvimento, para não manter duas versões do app.
+4. **Chave do Google Maps fora do repositório:** lida de `android/local.properties`
+   (`MAPS_API_KEY=...`), arquivo não versionado. Quem clonar precisa adicionar essa linha com
+   a chave recebida por canal privado — mesmo tratamento da `DATABASE_URL`.
 
 **Atualização de 20/08 — status do Marlon (Semanas 1–7):** Marlon reportou ao João o
 resumo de suas entregas nas Semanas 1–7 (migração de telas para XML, mapa com Google Maps
