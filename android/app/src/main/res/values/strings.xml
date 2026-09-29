@@ -1,0 +1,78 @@
+<resources>
+    <string name="app_name">alagamentos</string>
+
+    <string name="status_alagamento_titulo">ALERTA — Alagamento em andamento</string>
+    <string name="status_alagamento_descricao">Há %1$d ponto(s) de alagamento ativo(s) na região.</string>
+    <string name="status_risco_titulo">ATENÇÃO — Risco alto de alagamento</string>
+    <string name="status_risco_descricao">Existem %1$d área(s) com risco alto na região.</string>
+    <string name="status_chuva_titulo">ATENÇÃO — Chuva forte</string>
+    <string name="status_chuva_descricao">Chuva intensa registrada em %1$d região(ões).</string>
+    <string name="status_normal_titulo">NORMAL — Sem risco identificado</string>
+    <string name="status_normal_descricao">Nenhum risco relevante na região no momento.</string>
+
+    <string name="situacao_atual">Situação atual</string>
+    <string name="resumo_alagamentos">• %1$d ponto(s) de alagamento</string>
+    <string name="resumo_risco">• %1$d área(s) com risco alto</string>
+    <string name="resumo_chuva">• Chuva forte em %1$d região(ões)</string>
+    <string name="resumo_atualizacao">Última atualização: %1$s</string>
+    <string name="sel_info">%1$s • %2$s • atualizado às %3$s</string>
+    <string name="ver_detalhes">Ver detalhes</string>
+
+    <!-- Tela de detalhes -->
+    <string name="detalhes_titulo">Detalhes da ocorrência</string>
+    <string name="voltar">Voltar</string>
+    <string name="rotulo_severidade">Severidade</string>
+    <string name="rotulo_situacao">Situação</string>
+    <string name="rotulo_deteccao">Detectado às</string>
+    <string name="rotulo_atualizacao">Última atualização</string>
+    <string name="rotulo_chuva">Chuva acumulada</string>
+    <string name="rotulo_temperatura">Temperatura</string>
+    <string name="rotulo_fonte">Fonte</string>
+    <string name="rotulo_coordenadas">Coordenadas</string>
+    <string name="rotulo_recomendacao">Recomendação</string>
+    <string name="valor_atualizacao">%1$s (há %2$d min)</string>
+    <string name="valor_chuva">%1$.1f mm</string>
+    <string name="valor_temperatura">%1$d °C</string>
+    <string name="valor_coordenadas">%1$.4f, %2$.4f</string>
+    <string name="valor_percentual">%1$d%%</string>
+    <string name="valor_raio">%1$d km</string>
+    <string name="tempo_minutos">há %1$d min</string>
+    <string name="tempo_horas">há %1$d h %2$d min</string>
+
+    <!-- Alertas -->
+    <string name="alertas_titulo">Alertas</string>
+    <string name="alertas_contagem">%1$d ocorrência(s) em andamento</string>
+    <string name="alertas_vazio">Nenhuma ocorrência neste filtro.</string>
+    <string name="alerta_info">%1$s • %2$s</string>
+    <string name="filtro_todos">Todos</string>
+    <string name="filtro_ativos">Em andamento</string>
+    <string name="filtro_encerrados">Encerrados</string>
+
+    <!-- Previsão -->
+    <string name="previsao_titulo">Previsão</string>
+    <string name="previsao_atualizacao">Atualizado às %1$s</string>
+    <string name="previsao_umidade_vento">Umidade %1$d%% • Vento %2$d km/h</string>
+    <string name="rotulo_chuva_ultima_hora">Chuva na última hora</string>
+    <string name="rotulo_risco_alagamento">Risco de alagamento</string>
+    <string name="previsao_aviso">⚠ Risco alto de alagamento previsto para %1$s, com até %2$.0f mm de chuva. Evite áreas baixas e próximas a córregos.</string>
+    <string name="previsao_proximas_horas">Próximas horas</string>
+    <string name="previsao_proximos_dias">Próximos dias</string>
+    <string name="previsao_dia_chuva">%1$d%% de chuva • %2$.0f mm</string>
+    <string name="previsao_min_max">%1$d° / %2$d°</string>
+
+    <!-- Ajustes -->
+    <string name="ajustes_titulo">Ajustes</string>
+    <string name="ajustes_receber_alertas">Receber alertas</string>
+    <string name="ajustes_receber_alertas_desc">Notificações sobre ocorrências na sua região.</string>
+    <string name="ajustes_tipos">TIPOS DE OCORRÊNCIA</string>
+    <string name="ajustes_severidade_minima">SEVERIDADE MÍNIMA PARA NOTIFICAR</string>
+    <string name="ajustes_sev_baixa">Todas (baixo, moderado e alto)</string>
+    <string name="ajustes_sev_moderada">Moderado e alto</string>
+    <string name="ajustes_sev_alta">Somente alto</string>
+    <string name="ajustes_raio">Raio de monitoramento</string>
+    <string name="ajustes_raio_desc">Distância máxima da sua localização para receber alertas.</string>
+    <string name="ajustes_sobre">Sobre</string>
+    <string name="ajustes_sobre_desc">Monitoramento de alagamentos. Os dados exibidos no momento são de exemplo.</string>
+    <string name="ajustes_restaurar">Restaurar padrões</string>
+    <string name="ajustes_restaurados">Ajustes restaurados</string>
+</resources>
