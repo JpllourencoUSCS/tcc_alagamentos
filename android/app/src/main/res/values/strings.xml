@@ -75,4 +75,30 @@
     <string name="ajustes_sobre_desc">Monitoramento de alagamentos. Os dados exibidos no momento são de exemplo.</string>
     <string name="ajustes_restaurar">Restaurar padrões</string>
     <string name="ajustes_restaurados">Ajustes restaurados</string>
+    <string name="ajustes_perfil_vazio_titulo">Criar seu perfil</string>
+    <string name="ajustes_perfil_vazio_desc">Informe seu nome e bairro</string>
+    <string name="ajustes_perfil_desc">Toque para editar o perfil</string>
+
+    <!-- Perfil -->
+    <string name="perfil_titulo">Perfil</string>
+    <string name="perfil_dados">DADOS PESSOAIS</string>
+    <string name="perfil_nome">Nome</string>
+    <string name="perfil_email">E-mail (opcional)</string>
+    <string name="perfil_email_ajuda">Usado apenas para contato sobre suas ocorrências.</string>
+    <string name="perfil_bairro">Bairro</string>
+    <string name="perfil_bairro_ajuda">Bairro de São Caetano do Sul que você quer acompanhar.</string>
+    <string name="perfil_bairro_cidade">%1$s • São Caetano do Sul</string>
+    <string name="perfil_sem_nome">Sem nome</string>
+    <string name="perfil_sem_bairro">Bairro não informado</string>
+    <string name="perfil_id">IDENTIFICADOR DO USUÁRIO</string>
+    <string name="perfil_id_desc">Gerado automaticamente pelo app para identificar suas ocorrências.</string>
+    <string name="perfil_salvar">Salvar perfil</string>
+    <string name="perfil_salvo">Perfil salvo</string>
+    <string name="perfil_limpar">Limpar perfil</string>
+    <string name="perfil_limpar_titulo">Limpar perfil?</string>
+    <string name="perfil_limpar_mensagem">Nome, e-mail e bairro serão apagados deste aparelho. O identificador do usuário é mantido.</string>
+    <string name="perfil_limpo">Perfil limpo</string>
+    <string name="perfil_erro_nome">Informe seu nome (mínimo de 2 letras)</string>
+    <string name="perfil_erro_email">E-mail inválido</string>
+    <string name="cancelar">Cancelar</string>
 </resources>

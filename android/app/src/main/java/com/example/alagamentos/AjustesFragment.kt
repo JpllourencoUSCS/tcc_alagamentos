@@ -22,9 +22,24 @@ class AjustesFragment : Fragment(R.layout.fragment_ajustes) {
         super.onViewCreated(view, savedInstanceState)
         prefs = Preferencias(requireContext())
 
+        preencherPerfil(view)
         criarSwitchesTipo(view)
         preencher(view)
         configurarListeners(view)
+    }
+
+    // Cartão do perfil no topo; a view é recriada ao voltar da tela de perfil
+    private fun preencherPerfil(view: View) {
+        val perfil = Perfil(requireContext())
+        view.findViewById<TextView>(R.id.ajustes_avatar).text = iniciais(perfil.nome)
+        view.findViewById<TextView>(R.id.ajustes_perfil_nome).text =
+            if (perfil.preenchido) perfil.nome else getString(R.string.ajustes_perfil_vazio_titulo)
+        view.findViewById<TextView>(R.id.ajustes_perfil_desc).text = when {
+            !perfil.preenchido -> getString(R.string.ajustes_perfil_vazio_desc)
+            perfil.bairro != null -> getString(R.string.perfil_bairro_cidade, perfil.bairro)
+            else -> getString(R.string.ajustes_perfil_desc)
+        }
+        view.findViewById<View>(R.id.card_perfil).setOnClickListener { abrirPerfil() }
     }
 
     private fun criarSwitchesTipo(view: View) {

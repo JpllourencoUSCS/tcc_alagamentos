@@ -2,7 +2,7 @@
 
 **Sistema de Monitoramento Colaborativo de Áreas com Risco de Alagamento**
 Período: 01/07/2026 a 30/10/2026 (17 semanas)
-*Última atualização de status: 29/09/2026*
+*Última atualização de status: 30/09/2026*
 
 ## Legenda de responsáveis
 - **Henrique** — backend / tech lead
@@ -118,7 +118,7 @@ validação própria do time de integração.
 |---|---|---|
 | Henrique | Otimizações adicionais identificadas pelo benchmark (ex: paginação de resultados, cache simples) | 🔴 Não iniciada — depende dos resultados das Semanas 8–9 |
 | João | Implementação de testes automatizados básicos da API (principais endpoints) | ✅ Concluída em 03/09 — camada de contrato já existia (`test_ocorrencias_api.py`, repositório fake); adicionada a camada de integração contra Postgres/PostGIS real: `backend/tests/conftest.py` (fixture `db_session`, sessão isolada por teste via SAVEPOINT + rollback — padrão recomendado pelo SQLAlchemy para suítes de teste, cobre inclusive os `db.commit()` internos do repositório) e `backend/tests/test_ocorrencias_integracao.py` (3 casos, incluindo o filtro geoespacial via `db/repository.py` real). Isolamento validado na prática: `SELECT count(*) FROM ocorrencias` no banco compartilhado por Tailscale ficou em 0 após a suíte rodar. Sem `DATABASE_URL`, os 3 testes de integração são pulados (skip), não falham — 26 testes desta frente (23 já existentes antes de 03/09, entre contrato e benchmark do Henrique + 3 novos de integração) passam com Postgres disponível, 23 sem (3 skipped). **Nota de reconciliação (06/09/2026):** o total combinado de `backend/tests/` no fim do dia 03/09 é 29, não 26 — a diferença são 3 testes de latência (`test_fusao_climatica_latencia.py`) adicionados no mesmo dia por outra frente de trabalho (ver nota "Achado de revisão — latência das chamadas climáticas externas" abaixo), que não são cobertos por esta linha. Contagem por arquivo conferida em 06/09/2026 contra o repositório: 11 (`test_ocorrencias_api.py`) + 8 (`test_gerar_dados.py`) + 4 (`test_medir_consultas.py`) + 3 (`test_ocorrencias_integracao.py`) + 3 (`test_fusao_climatica_latencia.py`) = 29 |
-| Marlon | Implementação de tela de configurações/perfil simples do usuário | 🟡 Em implementação e desenvolvimento. **29/09/2026:** parte de configurações versionada no repositório (aba "Ajustes", `AjustesFragment.kt` + `Preferencias.kt`, commit `fc8e24a`: liga/desliga alertas, tipos de ocorrência, severidade mínima, raio de monitoramento, restaurar padrões). **Perfil do usuário não implementado** — segue 🟡 |
+| Marlon | Implementação de tela de configurações/perfil simples do usuário | 🟡 Em implementação e desenvolvimento. **29/09/2026:** parte de configurações versionada no repositório (aba "Ajustes", `AjustesFragment.kt` + `Preferencias.kt`, commit `fc8e24a`: liga/desliga alertas, tipos de ocorrência, severidade mínima, raio de monitoramento, restaurar padrões). ~~Perfil do usuário não implementado~~ **30/09/2026:** ✅ Concluída — tela de perfil implementada (`PerfilFragment.kt` + `fragment_perfil.xml` + `Perfil.kt`), aberta pelo cartão no topo da aba "Ajustes": nome (obrigatório, validado), e-mail (opcional, formato validado), bairro de São Caetano do Sul (lista fixa) e `id_usuario` gerado pelo app (conforme `T13_campos_usuario.md`). Dados salvos só no aparelho, sem backend — ver nota "Tela de perfil do usuário (30/09/2026)" abaixo |
 | Guilherme | Apoio aos testes automatizados — casos de teste manuais documentados | 🟡 Em andamento — casos de teste manuais estão sendo organizados e documentados para servir de base ao apoio dos testes automatizados. |
 
 ### Semana 11 (07/09 – 13/09)
@@ -324,7 +324,7 @@ inferiores e 5 telas em XML Views (sem Compose):
 - **Previsão** — condição atual, próximas horas e próximos dias com risco de alagamento.
   **Não prevista no cronograma** original de nenhum responsável;
 - **Ajustes** — preferências de notificação salvas no aparelho (parte de configurações da
-  Semana 10 do Marlon; perfil não implementado).
+  Semana 10 do Marlon; perfil adicionado em 30/09/2026, ver nota abaixo).
 
 Limitações registradas no momento do envio — por elas, nenhuma célula de status foi promovida
 a ✅ com base neste commit:
@@ -344,6 +344,23 @@ a ✅ com base neste commit:
 4. **Chave do Google Maps fora do repositório:** lida de `android/local.properties`
    (`MAPS_API_KEY=...`), arquivo não versionado. Quem clonar precisa adicionar essa linha com
    a chave recebida por canal privado — mesmo tratamento da `DATABASE_URL`.
+
+**Tela de perfil do usuário (30/09/2026) — fecha a Semana 10 do Marlon:** adicionada ao
+projeto `android/` a tela de perfil que faltava na tarefa "configurações/perfil simples do
+usuário". Acesso por um cartão no topo da aba "Ajustes" (iniciais, nome e bairro), que abre a
+tela de edição por cima da aba (volta com o botão voltar, mesmo padrão da tela de detalhes).
+- **Campos:** nome (obrigatório, 2–60 caracteres), e-mail (opcional, formato validado quando
+  preenchido), bairro de São Caetano do Sul (lista com os 15 bairros, escopo definido em
+  03/09) e identificador do usuário (UUID gerado na primeira abertura — é o `id_usuario`
+  "gerado pelo sistema" de `T13_campos_usuario.md`, pronto para ser enviado nas ocorrências
+  quando a integração com o backend for feita).
+- **Armazenamento:** só no aparelho (SharedPreferences `perfil`, separado das preferências de
+  Ajustes — "Restaurar padrões" não apaga o perfil). "Limpar perfil" pede confirmação e
+  mantém o identificador. Sem login/autenticação, que continua fora do escopo.
+- **Verificação:** esta versão do `android/` compila (`assembleDebug`). O mesmo código de
+  perfil foi testado em emulador (Pixel 8) na cópia local do Marlon: cartão vazio, erros de
+  validação, salvar, seleção de bairro, cartão atualizado e limpar perfil.
+- **Não incluído:** integração com o backend (o backend não tem tabela/endpoint de usuários).
 
 **Atualização de 20/08 — status do Marlon (Semanas 1–7):** Marlon reportou ao João o
 resumo de suas entregas nas Semanas 1–7 (migração de telas para XML, mapa com Google Maps
