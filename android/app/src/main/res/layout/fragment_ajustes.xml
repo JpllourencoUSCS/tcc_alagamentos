@@ -128,14 +128,14 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/ajustes_tipos"
+                    android:text="@string/ajustes_fontes"
                     android:textColor="@color/text_secondary"
                     android:textSize="13sp"
                     android:textStyle="bold" />
 
-                <!-- Um switch por tipo de ocorrência (criados no código) -->
+                <!-- Um switch por fonte de dado do backend (criados no código) -->
                 <LinearLayout
-                    android:id="@+id/lista_tipos"
+                    android:id="@+id/lista_fontes"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical" />

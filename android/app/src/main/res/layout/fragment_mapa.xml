@@ -12,6 +12,7 @@
 
     <!-- Cartão de status geral (topo) -->
     <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_status"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="top"
@@ -59,11 +60,25 @@
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- Painel inferior -->
-    <com.google.android.material.card.MaterialCardView
+    <!-- Botão de cadastro + painel inferior (o botão acompanha a altura do painel) -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
+        android:orientation="vertical">
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/fab_registrar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginEnd="12dp"
+        android:text="@string/registrar_ocorrencia"
+        app:icon="@drawable/ic_adicionar" />
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_margin="12dp"
         app:cardBackgroundColor="@color/surface"
         app:cardCornerRadius="16dp"
@@ -92,7 +107,7 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/txt_resumo_alagamentos"
+                    android:id="@+id/txt_resumo_alto"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
@@ -100,7 +115,7 @@
                     android:textSize="14sp" />
 
                 <TextView
-                    android:id="@+id/txt_resumo_risco"
+                    android:id="@+id/txt_resumo_medio"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
@@ -108,7 +123,7 @@
                     android:textSize="14sp" />
 
                 <TextView
-                    android:id="@+id/txt_resumo_chuva"
+                    android:id="@+id/txt_resumo_baixo"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
@@ -165,4 +180,5 @@
             </LinearLayout>
         </FrameLayout>
     </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
 </FrameLayout>

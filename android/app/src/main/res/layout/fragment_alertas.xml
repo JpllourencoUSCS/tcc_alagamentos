@@ -25,12 +25,104 @@
         android:textColor="@color/text_secondary"
         android:textSize="14sp" />
 
+    <!-- Região e período: filtros aplicados pelo próprio backend (bbox e data_inicio) -->
+    <TextView
+        style="@style/RotuloFiltro"
+        android:text="@string/filtro_regiao" />
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="none">
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chips_regiao"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="16dp"
+            app:selectionRequired="true"
+            app:singleLine="true"
+            app:singleSelection="true">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_regiao_todas"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/filtro_regiao_todas" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_regiao_cidade"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/filtro_regiao_cidade" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_regiao_perto"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </com.google.android.material.chip.ChipGroup>
+    </HorizontalScrollView>
+
+    <TextView
+        style="@style/RotuloFiltro"
+        android:text="@string/filtro_periodo" />
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="none">
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chips_periodo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="16dp"
+            app:selectionRequired="true"
+            app:singleLine="true"
+            app:singleSelection="true">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_periodo_todo"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/filtro_periodo_todo" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_periodo_24h"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/filtro_periodo_24h" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_periodo_7d"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/filtro_periodo_7d" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_periodo_30d"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/filtro_periodo_30d" />
+        </com.google.android.material.chip.ChipGroup>
+    </HorizontalScrollView>
+
+    <TextView
+        style="@style/RotuloFiltro"
+        android:text="@string/filtro_risco" />
+
     <com.google.android.material.chip.ChipGroup
         android:id="@+id/chips_filtro"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="8dp"
         app:selectionRequired="true"
         app:singleSelection="true">
 
@@ -42,18 +134,25 @@
             android:text="@string/filtro_todos" />
 
         <com.google.android.material.chip.Chip
-            android:id="@+id/chip_ativos"
+            android:id="@+id/chip_alto"
             style="@style/Widget.Material3.Chip.Filter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/filtro_ativos" />
+            android:text="@string/filtro_alto" />
 
         <com.google.android.material.chip.Chip
-            android:id="@+id/chip_encerrados"
+            android:id="@+id/chip_medio"
             style="@style/Widget.Material3.Chip.Filter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/filtro_encerrados" />
+            android:text="@string/filtro_medio" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chip_baixo"
+            style="@style/Widget.Material3.Chip.Filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/filtro_baixo" />
     </com.google.android.material.chip.ChipGroup>
 
     <FrameLayout
@@ -71,7 +170,7 @@
                 android:orientation="vertical"
                 android:paddingHorizontal="16dp"
                 android:paddingTop="8dp"
-                android:paddingBottom="16dp" />
+                android:paddingBottom="88dp" />
         </ScrollView>
 
         <TextView
@@ -79,9 +178,20 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:gravity="center"
+            android:padding="24dp"
             android:text="@string/alertas_vazio"
             android:textColor="@color/text_secondary"
             android:textSize="14sp"
             android:visibility="gone" />
+
+        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+            android:id="@+id/fab_registrar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="16dp"
+            android:text="@string/registrar_ocorrencia"
+            app:icon="@drawable/ic_adicionar" />
     </FrameLayout>
 </LinearLayout>

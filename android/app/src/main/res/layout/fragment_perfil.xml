@@ -196,6 +196,14 @@
                 android:layout_marginTop="8dp"
                 android:text="@string/perfil_limpar"
                 android:textColor="@color/status_high" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_sair"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@string/perfil_sair" />
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

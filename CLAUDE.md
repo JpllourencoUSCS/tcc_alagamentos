@@ -72,13 +72,19 @@ investigação (03/09/2026)".
     Ao criar um teste novo que precisa de banco real, reusar `db_session` em vez
     de inventar outro padrão de setup/teardown.
 - `android/` — app Android (projeto Android Studio, Kotlin + XML Views, sem Compose;
-  pacote `com.example.alagamentos`), versionado desde 29/09/2026. Navegação por abas
-  inferiores em `MainActivity.kt` com um `Fragment` por tela (Mapa, Alertas, Previsão,
-  Ajustes; Detalhes e Perfil abrem por cima). Dados vêm de `OcorrenciaRepository.kt` e
-  `PrevisaoRepository.kt`, hoje **100% mockados** — é onde a integração com a API vai
-  entrar. Preferências e perfil ficam só no aparelho (SharedPreferences, `Preferencias.kt`/
-  `Perfil.kt`). A chave do Google Maps vem de `android/local.properties`
-  (`MAPS_API_KEY=...`), arquivo não versionado e repassado por canal privado. Build pelo
+  pacote `com.example.alagamentos`), versionado desde 29/09/2026. Entrada por
+  `LoginActivity.kt` (sem autenticação real); depois, navegação por abas inferiores em
+  `MainActivity.kt` com um `Fragment` por tela (Mapa, Alertas, Previsão, Ajustes; Detalhes,
+  Cadastro e Perfil abrem por cima). Desde 30/09/2026 os dados vêm da API real via
+  `ApiCliente.kt` (Retrofit) + `OcorrenciaRepository.kt` — `GET`/`POST /ocorrencias`, com os
+  filtros de região/período do backend; ainda não testado contra a API real, só contra um
+  servidor simulado. Endereço da API em `API_BASE_URL` no `android/local.properties`
+  (padrão `http://10.0.2.2:8000/`, o localhost do computador visto pelo emulador). A aba
+  Previsão só mostra aviso: o backend não tem endpoint de previsão. Preferências, perfil e
+  sessão ficam só no aparelho (SharedPreferences, `Preferencias.kt`/`Perfil.kt`);
+  notificações locais em `NotificadorRisco.kt`. A chave do Google Maps vem de
+  `android/local.properties` (`MAPS_API_KEY=...`), arquivo não versionado e repassado por
+  canal privado. Build pelo
   Gradle (`android/gradlew assembleDebug`) exige JDK — confirmar `JAVA_HOME` na máquina da
   sessão antes de contar com isso.
 - `testes-api/` — scripts de teste de API, um por fonte, nomeados `teste_<fonte>.py`

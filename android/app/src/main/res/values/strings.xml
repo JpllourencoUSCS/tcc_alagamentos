@@ -1,78 +1,82 @@
 <resources>
     <string name="app_name">alagamentos</string>
 
-    <string name="status_alagamento_titulo">ALERTA — Alagamento em andamento</string>
-    <string name="status_alagamento_descricao">Há %1$d ponto(s) de alagamento ativo(s) na região.</string>
-    <string name="status_risco_titulo">ATENÇÃO — Risco alto de alagamento</string>
-    <string name="status_risco_descricao">Existem %1$d área(s) com risco alto na região.</string>
-    <string name="status_chuva_titulo">ATENÇÃO — Chuva forte</string>
-    <string name="status_chuva_descricao">Chuva intensa registrada em %1$d região(ões).</string>
-    <string name="status_normal_titulo">NORMAL — Sem risco identificado</string>
-    <string name="status_normal_descricao">Nenhum risco relevante na região no momento.</string>
+    <!-- Carregamento / erro de conexão com a API -->
+    <string name="carregando_titulo">Carregando ocorrências…</string>
+    <string name="carregando_descricao">Buscando dados no servidor.</string>
+    <string name="erro_conexao_titulo">Sem conexão com o servidor</string>
+    <string name="erro_conexao_descricao">Não foi possível acessar a API em %1$s. Toque para tentar de novo.</string>
+
+    <!-- Mapa -->
+    <string name="status_alto_titulo">ALERTA — Risco alto de alagamento</string>
+    <string name="status_alto_descricao">%1$d ocorrência(s) com risco alto registrada(s).</string>
+    <string name="status_medio_titulo">ATENÇÃO — Risco médio de alagamento</string>
+    <string name="status_medio_descricao">%1$d ocorrência(s) com risco médio registrada(s).</string>
+    <string name="status_baixo_titulo">NORMAL — Somente risco baixo</string>
+    <string name="status_baixo_descricao">%1$d ocorrência(s) com risco baixo registrada(s).</string>
+    <string name="status_vazio_titulo">Nenhuma ocorrência registrada</string>
+    <string name="status_vazio_descricao">O servidor não retornou ocorrências.</string>
 
     <string name="situacao_atual">Situação atual</string>
-    <string name="resumo_alagamentos">• %1$d ponto(s) de alagamento</string>
-    <string name="resumo_risco">• %1$d área(s) com risco alto</string>
-    <string name="resumo_chuva">• Chuva forte em %1$d região(ões)</string>
-    <string name="resumo_atualizacao">Última atualização: %1$s</string>
-    <string name="sel_info">%1$s • %2$s • atualizado às %3$s</string>
+    <string name="resumo_alto">• %1$d com risco alto</string>
+    <string name="resumo_medio">• %1$d com risco médio</string>
+    <string name="resumo_baixo">• %1$d com risco baixo</string>
+    <string name="resumo_atualizacao">Registro mais recente: %1$s</string>
+    <string name="sel_info">%1$s • %2$s • %3$s</string>
     <string name="ver_detalhes">Ver detalhes</string>
 
     <!-- Tela de detalhes -->
     <string name="detalhes_titulo">Detalhes da ocorrência</string>
     <string name="voltar">Voltar</string>
-    <string name="rotulo_severidade">Severidade</string>
-    <string name="rotulo_situacao">Situação</string>
-    <string name="rotulo_deteccao">Detectado às</string>
-    <string name="rotulo_atualizacao">Última atualização</string>
-    <string name="rotulo_chuva">Chuva acumulada</string>
+    <string name="ocorrencia_sem_descricao">Ocorrência nº %1$d</string>
+    <string name="descricao_nao_informada">Sem descrição informada</string>
+    <string name="ocorrencia_nao_encontrada">Ocorrência não encontrada</string>
+    <string name="rotulo_severidade">Nível de risco</string>
+    <string name="rotulo_deteccao">Registrado em</string>
+    <string name="rotulo_clima">Condição do tempo</string>
+    <string name="rotulo_chuva">Chuva</string>
     <string name="rotulo_temperatura">Temperatura</string>
+    <string name="rotulo_umidade">Umidade</string>
+    <string name="rotulo_estacao">Estação de referência</string>
     <string name="rotulo_fonte">Fonte</string>
     <string name="rotulo_coordenadas">Coordenadas</string>
-    <string name="rotulo_recomendacao">Recomendação</string>
-    <string name="valor_atualizacao">%1$s (há %2$d min)</string>
     <string name="valor_chuva">%1$.1f mm</string>
-    <string name="valor_temperatura">%1$d °C</string>
+    <string name="valor_temperatura">%1$.1f °C</string>
     <string name="valor_coordenadas">%1$.4f, %2$.4f</string>
     <string name="valor_percentual">%1$d%%</string>
+    <string name="valor_estacao">nº %1$d</string>
     <string name="valor_raio">%1$d km</string>
     <string name="tempo_minutos">há %1$d min</string>
     <string name="tempo_horas">há %1$d h %2$d min</string>
+    <string name="tempo_dias">há %1$d d</string>
 
     <!-- Alertas -->
     <string name="alertas_titulo">Alertas</string>
-    <string name="alertas_contagem">%1$d ocorrência(s) em andamento</string>
+    <string name="alertas_contagem">%1$d ocorrência(s) registrada(s)</string>
     <string name="alertas_vazio">Nenhuma ocorrência neste filtro.</string>
-    <string name="alerta_info">%1$s • %2$s</string>
     <string name="filtro_todos">Todos</string>
-    <string name="filtro_ativos">Em andamento</string>
-    <string name="filtro_encerrados">Encerrados</string>
+    <string name="filtro_alto">Alto</string>
+    <string name="filtro_medio">Médio</string>
+    <string name="filtro_baixo">Baixo</string>
 
     <!-- Previsão -->
     <string name="previsao_titulo">Previsão</string>
-    <string name="previsao_atualizacao">Atualizado às %1$s</string>
-    <string name="previsao_umidade_vento">Umidade %1$d%% • Vento %2$d km/h</string>
-    <string name="rotulo_chuva_ultima_hora">Chuva na última hora</string>
-    <string name="rotulo_risco_alagamento">Risco de alagamento</string>
-    <string name="previsao_aviso">⚠ Risco alto de alagamento previsto para %1$s, com até %2$.0f mm de chuva. Evite áreas baixas e próximas a córregos.</string>
-    <string name="previsao_proximas_horas">Próximas horas</string>
-    <string name="previsao_proximos_dias">Próximos dias</string>
-    <string name="previsao_dia_chuva">%1$d%% de chuva • %2$.0f mm</string>
-    <string name="previsao_min_max">%1$d° / %2$d°</string>
+    <string name="previsao_indisponivel_titulo">Previsão indisponível</string>
+    <string name="previsao_indisponivel_descricao">O servidor ainda não disponibiliza dados de previsão do tempo. Esta aba será preenchida quando a API oferecer esse recurso.</string>
 
     <!-- Ajustes -->
     <string name="ajustes_titulo">Ajustes</string>
     <string name="ajustes_receber_alertas">Receber alertas</string>
     <string name="ajustes_receber_alertas_desc">Notificações sobre ocorrências na sua região.</string>
-    <string name="ajustes_tipos">TIPOS DE OCORRÊNCIA</string>
-    <string name="ajustes_severidade_minima">SEVERIDADE MÍNIMA PARA NOTIFICAR</string>
-    <string name="ajustes_sev_baixa">Todas (baixo, moderado e alto)</string>
-    <string name="ajustes_sev_moderada">Moderado e alto</string>
+    <string name="ajustes_fontes">FONTES DE DADOS</string>
+    <string name="ajustes_severidade_minima">NÍVEL DE RISCO MÍNIMO PARA NOTIFICAR</string>
+    <string name="ajustes_sev_baixa">Todos (baixo, médio e alto)</string>
+    <string name="ajustes_sev_moderada">Médio e alto</string>
     <string name="ajustes_sev_alta">Somente alto</string>
     <string name="ajustes_raio">Raio de monitoramento</string>
     <string name="ajustes_raio_desc">Distância máxima da sua localização para receber alertas.</string>
     <string name="ajustes_sobre">Sobre</string>
-    <string name="ajustes_sobre_desc">Monitoramento de alagamentos. Os dados exibidos no momento são de exemplo.</string>
+    <string name="ajustes_sobre_desc">Monitoramento de alagamentos. Os dados exibidos vêm da API do backend do projeto.</string>
     <string name="ajustes_restaurar">Restaurar padrões</string>
     <string name="ajustes_restaurados">Ajustes restaurados</string>
     <string name="ajustes_perfil_vazio_titulo">Criar seu perfil</string>
@@ -101,4 +105,62 @@
     <string name="perfil_erro_nome">Informe seu nome (mínimo de 2 letras)</string>
     <string name="perfil_erro_email">E-mail inválido</string>
     <string name="cancelar">Cancelar</string>
+    <string name="perfil_sair">Sair</string>
+
+    <!-- Login (protótipo, sem autenticação real) -->
+    <string name="login_titulo">Monitoramento de Alagamentos</string>
+    <string name="login_subtitulo">São Caetano do Sul</string>
+    <string name="login_usuario">Nome ou e-mail</string>
+    <string name="login_senha">Senha</string>
+    <string name="login_entrar">Entrar</string>
+    <string name="login_erro_usuario">Informe seu nome ou e-mail</string>
+    <string name="login_erro_senha">Informe uma senha</string>
+    <string name="login_aviso_prototipo">Protótipo acadêmico: não há verificação de senha. Os dados ficam só neste aparelho.</string>
+
+    <!-- Cadastro de ocorrência -->
+    <string name="registrar_ocorrencia">Registrar</string>
+    <string name="cadastro_titulo">Registrar ocorrência</string>
+    <string name="cadastro_local">LOCAL DA OCORRÊNCIA</string>
+    <string name="cadastro_local_instrucao">Toque no mapa para marcar o local ou use sua localização.</string>
+    <string name="cadastro_local_escolhido">Local marcado: %1$.5f, %2$.5f</string>
+    <string name="cadastro_local_fora">Local marcado: %1$.5f, %2$.5f — fora de São Caetano do Sul</string>
+    <string name="cadastro_erro_local">Marque o local da ocorrência antes de enviar.</string>
+    <string name="cadastro_usar_localizacao">Usar minha localização</string>
+    <string name="cadastro_buscando_localizacao">Buscando localização…</string>
+    <string name="cadastro_sem_permissao_local">Sem permissão de localização. Marque o local tocando no mapa.</string>
+    <string name="cadastro_sem_localizacao">Não foi possível obter sua localização. Marque o local tocando no mapa.</string>
+    <string name="cadastro_risco">NÍVEL DE RISCO</string>
+    <string name="cadastro_risco_auto">Automático</string>
+    <string name="cadastro_risco_auto_desc">O servidor calcula o risco com os dados climáticos do local (chuva, previsão e pluviômetros).</string>
+    <string name="cadastro_risco_manual_desc">O nível escolhido por você será registrado no lugar do cálculo automático.</string>
+    <string name="cadastro_descricao">Descrição (opcional)</string>
+    <string name="cadastro_descricao_ajuda">Ex.: rua alagada, água na altura da calçada.</string>
+    <string name="cadastro_enviar">Enviar ocorrência</string>
+    <string name="cadastro_enviando">Enviando… (o cálculo do risco pode levar alguns segundos)</string>
+    <string name="cadastro_sucesso">Ocorrência registrada — risco %1$s</string>
+    <string name="cadastro_sucesso_simples">Ocorrência registrada</string>
+    <string name="cadastro_erro_conexao">Sem conexão com o servidor (%1$s). Seus dados continuam no formulário; tente enviar de novo.</string>
+    <string name="cadastro_erro_dados">O servidor recusou os dados da ocorrência. Confira o local e a descrição.</string>
+    <string name="cadastro_erro_servidor">O servidor não conseguiu registrar a ocorrência (erro %1$d). Tente novamente.</string>
+
+    <!-- Filtros da aba Alertas -->
+    <string name="filtro_regiao">REGIÃO</string>
+    <string name="filtro_regiao_todas">Todas</string>
+    <string name="filtro_regiao_cidade">São Caetano do Sul</string>
+    <string name="filtro_regiao_perto">Perto de mim (%1$d km)</string>
+    <string name="filtro_perto_sem_permissao">Sem permissão de localização: mostrando todas as regiões.</string>
+    <string name="filtro_perto_sem_localizacao">Não foi possível obter sua localização: mostrando todas as regiões.</string>
+    <string name="filtro_periodo">PERÍODO</string>
+    <string name="filtro_periodo_todo">Todo o período</string>
+    <string name="filtro_periodo_24h">Últimas 24 h</string>
+    <string name="filtro_periodo_7d">7 dias</string>
+    <string name="filtro_periodo_30d">30 dias</string>
+    <string name="filtro_risco">NÍVEL DE RISCO</string>
+
+    <!-- Notificações locais -->
+    <string name="notif_canal_nome">Alertas de risco</string>
+    <string name="notif_canal_desc">Novas ocorrências de alagamento na sua região, conforme os Ajustes.</string>
+    <string name="notif_titulo">Alerta de alagamento — risco %1$s</string>
+    <string name="notif_titulo_varias">%1$d novas ocorrências de alagamento</string>
+    <string name="notif_texto_varias">%1$d com risco alto. Toque para ver no mapa.</string>
 </resources>

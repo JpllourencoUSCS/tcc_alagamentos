@@ -16,9 +16,12 @@
         app:title="@string/detalhes_titulo"
         app:titleTextColor="@color/text_primary" />
 
+    <!-- Fica oculto até a ocorrência chegar da API -->
     <ScrollView
+        android:id="@+id/det_conteudo"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:visibility="invisible">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -141,12 +144,12 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/rotulo_situacao"
+                            android:text="@string/rotulo_fonte"
                             android:textColor="@color/text_secondary"
                             android:textSize="12sp" />
 
                         <TextView
-                            android:id="@+id/det_situacao"
+                            android:id="@+id/det_fonte"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
@@ -179,7 +182,7 @@
                         layout="@layout/item_info" />
 
                     <include
-                        android:id="@+id/info_atualizacao"
+                        android:id="@+id/info_clima"
                         layout="@layout/item_info" />
 
                     <include
@@ -191,47 +194,16 @@
                         layout="@layout/item_info" />
 
                     <include
-                        android:id="@+id/info_fonte"
+                        android:id="@+id/info_umidade"
+                        layout="@layout/item_info" />
+
+                    <include
+                        android:id="@+id/info_estacao"
                         layout="@layout/item_info" />
 
                     <include
                         android:id="@+id/info_coordenadas"
                         layout="@layout/item_info" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Recomendação -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                app:cardBackgroundColor="@color/surface"
-                app:cardCornerRadius="16dp"
-                app:strokeColor="@color/divider"
-                app:strokeWidth="1dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/rotulo_recomendacao"
-                        android:textColor="@color/text_primary"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/det_recomendacao"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:lineSpacingExtra="2dp"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="14sp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>

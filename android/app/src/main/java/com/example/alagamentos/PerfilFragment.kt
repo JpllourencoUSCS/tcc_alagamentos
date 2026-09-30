@@ -77,6 +77,10 @@ class PerfilFragment : Fragment(R.layout.fragment_perfil) {
             salvar(view)
         }
 
+        view.findViewById<MaterialButton>(R.id.btn_sair).setOnClickListener {
+            LoginActivity.sair(requireContext())
+        }
+
         view.findViewById<MaterialButton>(R.id.btn_limpar_perfil).setOnClickListener {
             MaterialAlertDialogBuilder(requireContext())
                 .setTitle(R.string.perfil_limpar_titulo)

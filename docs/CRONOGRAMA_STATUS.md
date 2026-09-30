@@ -2,7 +2,7 @@
 
 **Sistema de Monitoramento Colaborativo de Áreas com Risco de Alagamento**
 Período: 01/07/2026 a 30/10/2026 (17 semanas)
-*Última atualização de status: 29/09/2026 — Semana 14 (28/09 – 04/10)*
+*Última atualização de status: 30/09/2026 — Semana 14 (28/09 – 04/10)*
 
 ## Legenda de responsáveis
 - **Henrique** — backend / tech lead
@@ -116,8 +116,8 @@ sobre APIs e algoritmo de risco (`T16_secao_*.md`).
 |---|---|---|
 | Henrique | Integração do banco de dados com os endpoints (persistência real das ocorrências e classificações) | 🟡 `POST /ocorrencias` calcula `nivel_risco`/`chuva_mm` automaticamente via `fusao_climatica` quando o cliente não informa (`backend/servicos/classificacao.py`, T14 "Notas de projeto"); o `OcorrenciaRepository` já grava via SQLAlchemy desde a Semana 3. **Validado em 03/09/2026 num notebook específico do João** (com Docker, diferente do notebook usado no dia a dia das sessões — ver nota de 06/09 abaixo e `CLAUDE.md`) contra um Postgres/PostGIS real (Docker + `docker-compose.yml`, ver nota abaixo) — `schema.sql` aplica sem erro, PostGIS 3.4 ativo, 23/23 testes passam com `DATABASE_URL` apontando pro container. Segue 🟡 e não ✅ porque isso ainda não foi confirmado no ambiente do Henrique nem em CI — falta padronizar isso pro time todo |
 | João | Testes de consistência dos dados climáticos consolidados (comparação entre fontes para a mesma região/horário) | 🔴 Bloqueada — depende da ANA responder o cadastro (único item fora do controle do time) |
-| Marlon | Integração da tela de mapa com dados reais do backend (consumo da API) | 🔴 Aguardando realização de teste com banco de dados contendo os dados reais |
-| Guilherme | Integração da tela de cadastro com o backend (envio de ocorrências reais) | 🟡 Em andamento — estrutura de integração preparada com o endpoint de ocorrências, mas a validação completa do fluxo com backend e banco reais depende do ambiente integrado do projeto. |
+| Marlon | Integração da tela de mapa com dados reais do backend (consumo da API) | 🟡 (era 🔴) Aguardando realização de teste com banco de dados contendo os dados reais **30/09/2026:** o consumo da API (GET /ocorrencias e /ocorrencias/{id}, `ApiCliente.kt`) já existia na cópia local do Marlon e passou ao `android/` com a unificação da base (ver nota "Tarefas do Guilherme e unificação da base Android"); mapa, alertas e detalhes não usam mais dados de exemplo. Validado só contra um servidor simulado — falta testar contra a API real, que ainda não está hospedada. Segue 🟡 |
+| Guilherme | Integração da tela de cadastro com o backend (envio de ocorrências reais) | 🟡 Em andamento — estrutura de integração preparada com o endpoint de ocorrências, mas a validação completa do fluxo com backend e banco reais depende do ambiente integrado do projeto. **30/09/2026:** implementado no `android/` — tela "Registrar ocorrência" (`CadastroFragment.kt`) envia `POST /ocorrencias` com `fonte=usuario` e o `id_usuario` do perfil; sem nível escolhido, o backend calcula o risco (AHP). Testado no emulador contra servidor simulado (envio, validação de local obrigatório e erro sem conexão). Falta validar contra a API real — segue 🟡 |
 
 ### Semana 6 (03/08 – 09/08)
 | Responsável | Atividade | Status |
@@ -139,7 +139,7 @@ sobre APIs e algoritmo de risco (`T16_secao_*.md`).
 | Henrique | Criação do ambiente de benchmark — geração de massa de dados simulada (1k, 10k, 100k registros geoespaciais) | 🟡 Geração testada (8 testes), inserção não testada (sem Postgres) — `backend/benchmark/gerar_dados.py` (função pura, sementes reprodutíveis) + `backend/benchmark/popular_banco.py` (1 banco Postgres por escala: `alagamentos_bench_1000/10000/100000`, aplica `schema.sql`, insere em lotes de 5000 via SQLAlchemy Core). Achado do próprio teste: `data_hora` usava `datetime.now()` como referência recalculada a cada chamada, quebrando a promessa de "mesma semente = mesmo dataset" — corrigido com parâmetro `referencia` explícito. Pronto para rodar assim que houver `ADMIN_DATABASE_URL` |
 | João | Refinamento do algoritmo de risco com dados de múltiplas fontes ponderadas | ✅ Concluída em 17/08 — `fusao_climatica.py` e `algoritmo_risco.py` agora conectados (`classificar_risco()`/`obter_classificacao_risco()`); testado com ANA disponível e indisponível |
 | Marlon | Implementação de tela de detalhes da ocorrência (visualização individual) | ✅ Implementada — reportada por Marlon em 20/08; em manutenção ativa, sujeita a ajustes conforme novas atualizações e testes ao longo do projeto. **29/09/2026:** uma versão da tela está versionada no repositório (`DetalhesFragment.kt` + `fragment_detalhes.xml`, commit `fc8e24a`), aberta a partir do marcador do mapa e da lista de alertas |
-| Guilherme | Implementação de notificações locais simples (alerta visual de risco alto no app) | 🟡 Em andamento — estrutura do alerta local preparada, dependendo da disponibilização do nível de risco integrado aos dados reais do aplicativo para validação completa. **29/09/2026:** o commit `fc8e24a` trouxe só as *preferências* de notificação (aba "Ajustes": tipos de ocorrência, severidade mínima e raio, salvos em `Preferencias.kt`) — nenhuma notificação é disparada ainda; a estrutura de alerta local do Guilherme não está nesse commit |
+| Guilherme | Implementação de notificações locais simples (alerta visual de risco alto no app) | ✅ Concluída em 30/09/2026 (detalhe no fim da célula). Histórico: 🟡 em andamento — estrutura do alerta local preparada, dependendo da disponibilização do nível de risco integrado aos dados reais do aplicativo para validação completa. **29/09/2026:** o commit `fc8e24a` trouxe só as *preferências* de notificação (aba "Ajustes": tipos de ocorrência, severidade mínima e raio, salvos em `Preferencias.kt`) — nenhuma notificação é disparada ainda; a estrutura de alerta local do Guilherme não está nesse commit **30/09/2026:** implementado (`NotificadorRisco.kt`) — ao receber ocorrências da API, o app notifica as novas (últimas 24 h) que atendem às preferências de Ajustes (nível mínimo, fontes e raio); toque abre os detalhes. Testado no emulador com servidor simulado. Limitação: só verifica com o app aberto (sem serviço em segundo plano) |
 
 ### Semana 8 (17/08 – 23/08)
 | Responsável | Atividade | Status |
@@ -147,7 +147,7 @@ sobre APIs e algoritmo de risco (`T16_secao_*.md`).
 | Henrique | Execução do benchmark sem índice espacial — medição de tempo de resposta nas consultas | 🟡 Lógica testada (4 testes), execução real pendente — `backend/benchmark/medir_consultas.py`: mede a mesma consulta que `db/repository.py` gera para o filtro de região (bbox → `geom && ST_MakeEnvelope`, ORDER BY + LIMIT), via `EXPLAIN (ANALYZE, FORMAT JSON)` para isolar o tempo de execução no Postgres (sem ruído de rede/driver). Reutilizável para a Semana 9 (`--indice presente`/`ausente`, mesmo script). O bloqueio de "sem Postgres" foi removido em 03/09 (banco real disponível via Docker + Tailscale, ver notas), mas a execução em si ainda não foi confirmada — segue 🟡, não ✅ |
 | João | Apoio à análise dos resultados do benchmark — interpretação dos dados coletados | 🔴 Bloqueada — depende da execução do benchmark pelo Henrique (item acima); nada a analisar enquanto não houver números |
 | Marlon | Testes de usabilidade interna das telas (com os próprios colegas) | ✅ Concluído e sofrendo ajustes de acordo com o desenvolvimento das demais etapas e definição do design visual do projeto |
-| Guilherme | Correção de bugs identificados nos testes de usabilidade | 🔴 Não iniciada — os testes em si já foram concluídos pelo Marlon nesta semana (ver linha dele acima), mas o levantamento consolidado dos problemas encontrados ainda não foi repassado ao Guilherme; correção pendente desse repasse. |
+| Guilherme | Correção de bugs identificados nos testes de usabilidade | 🔴 Não iniciada — os testes em si já foram concluídos pelo Marlon nesta semana (ver linha dele acima), mas o levantamento consolidado dos problemas encontrados ainda não foi repassado ao Guilherme; correção pendente desse repasse. **30/09/2026:** sem mudança — a lista de bugs do Marlon ainda não está no repositório |
 
 ### Semana 9 (24/08 – 30/08)
 | Responsável | Atividade | Status |
@@ -155,7 +155,7 @@ sobre APIs e algoritmo de risco (`T16_secao_*.md`).
 | Henrique | Implementação de índice GiST no PostGIS e execução do benchmark comparativo | 🔴 Não iniciada — depende da Semana 8 (benchmark sem índice) estar concluída primeiro |
 | João | Documentação científica do benchmark (fundamentação teórica de R-tree/GiST, conforme literatura) | 🔴 Não iniciada — sem resultados de benchmark ainda para documentar (depende do Henrique); a base teórica de `T17_indexacao_espacial_fundamentacao.md` (Semana 1) já existe e pode ser reaproveitada |
 | Marlon | Revisão e padronização visual de todas as telas (consistência de cores, fontes, espaçamento) | ✅ Concluído e sofrendo ajustes de acordo com o desenvolvimento das demais etapas e definição do design visual do projeto |
-| Guilherme | Testes de integração entre todas as telas do app | 🟡 Parcialmente bloqueada — testes de integração iniciados, porém a validação completa depende da integração das telas com os dados reais do backend. |
+| Guilherme | Testes de integração entre todas as telas do app | 🟡 Parcialmente bloqueada — testes de integração iniciados, porém a validação completa depende da integração das telas com os dados reais do backend. **30/09/2026:** navegação entre todas as telas testada no emulador (login → mapa → cadastro → detalhes; alertas com filtros → detalhes; ajustes → perfil → sair), contra servidor simulado. Falta repetir com a API real |
 
 **Entregável da semana:** gráfico comparativo de latência antes/depois da indexação espacial — peça central da resposta sobre "complexidade computacional".
 
@@ -203,7 +203,7 @@ sobre APIs e algoritmo de risco (`T16_secao_*.md`).
 | Henrique | Redação da seção técnica sobre arquitetura final e algoritmo de classificação de risco | ⚪ Sem status reportado — a parte do algoritmo já tem rascunho (`docs/T15_algoritmo_risco_fundamentacao.md` + `docs/T16_secao_algoritmo_risco.md`, do João); falta a arquitetura final |
 | João | Redação da seção sobre integração de múltiplas fontes de dados e resultados climáticos | ⚪ Sem status reportado — base existente: `docs/T16_secao_relatorio_apis.md` e `T16_secao_relatorio_apis_aluno3.md` (levantamento e comparação das APIs, última edição 17/08); precisa refletir a arquitetura atual (ANA/CPTEC, fusão em paralelo, escopo São Caetano do Sul) |
 | Marlon | Redação da seção sobre desenvolvimento do aplicativo Android (XML) e decisões de UI | ⚪ Sem status reportado |
-| Guilherme | Levantamento de capturas de tela e evidências visuais do sistema para o relatório | ⚪ Sem status reportado — já dá para capturar o app do `android/` (compila), mas com dados mockados; capturas definitivas ficam melhores após a integração |
+| Guilherme | Levantamento de capturas de tela e evidências visuais do sistema para o relatório | ⚪ Sem status reportado — já dá para capturar o app do `android/` (compila), mas com dados mockados; capturas definitivas ficam melhores após a integração **30/09/2026:** não feito — as capturas devem ser tiradas com a API real rodando (hoje só há dados de um servidor simulado, que não servem como evidência no relatório) |
 
 ### Semana 15 (05/10 – 11/10)
 | Responsável | Atividade |
@@ -407,6 +407,35 @@ tela de edição por cima da aba (volta com o botão voltar, mesmo padrão da te
   perfil foi testado em emulador (Pixel 8) na cópia local do Marlon: cartão vazio, erros de
   validação, salvar, seleção de bairro, cartão atualizado e limpar perfil.
 - **Não incluído:** integração com o backend (o backend não tem tabela/endpoint de usuários).
+
+**Tarefas do Guilherme e unificação da base Android (30/09/2026):** a pedido do João, as
+tarefas pendentes do Guilherme que envolvem código foram feitas no app, e a cópia local do
+Marlon passou a ser a base oficial do `android/` (resolve o gargalo nº 3 da "Situação em
+29/09/2026" do lado do Marlon). O código do Guilherme **não** foi usado — ele nunca chegou ao
+repositório; as telas abaixo foram escritas do zero seguindo T13, os casos de teste da planilha
+PT-001 e o questionário de usabilidade. Se o Guilherme tiver algo a aproveitar da cópia dele,
+deve partir desta base em vez de manter outra.
+- **Login** (`LoginActivity.kt`, CT-LOG-001): tela de entrada sem autenticação real (fora do
+  escopo) — qualquer nome/e-mail e senha preenchidos entram; "Sair" fica no Perfil.
+- **Cadastro de ocorrência** (`CadastroFragment.kt`, CT-CAD-001/002, S3/S5): botão
+  "Registrar" no Mapa e em Alertas; local por toque no mapa ou GPS (obrigatório), nível de risco
+  "Automático" (o backend calcula por AHP) ou escolhido, descrição opcional (até 300 caracteres,
+  como em T13); envia `POST /ocorrencias` e abre os detalhes da ocorrência criada.
+- **Filtros por região e período** (aba Alertas, CT-LST-002, S4): região "Todas", "São Caetano
+  do Sul" ou "Perto de mim" (raio de Ajustes) e período "Todo", "24 h", "7 dias" ou "30 dias";
+  aplicados pelo próprio backend (`lat_min`…`lon_max` e `data_inicio`).
+- **Notificação local** (`NotificadorRisco.kt`, CT-NOT-001, S7): ver linha da Semana 7.
+- **Base unificada:** entram também o cliente da API que já estava na cópia local
+  (`ApiCliente.kt`, Retrofit; endereço em `API_BASE_URL` no `local.properties`, padrão
+  `http://10.0.2.2:8000/`) e a aba Previsão só com aviso de "indisponível", porque o backend
+  não tem endpoint de previsão. Saem `PrevisaoRepository.kt` e os layouts da previsão mockada.
+- **Verificação:** compila; testado no emulador (Pixel 8) contra um **servidor simulado** que
+  imita `GET`/`POST /ocorrencias` com os mesmos filtros — Python/Docker não estavam disponíveis
+  na máquina usada. Nada foi testado contra a API real, por isso as linhas das Semanas 5 e 9
+  seguem 🟡.
+- **Continua pendente do Guilherme:** corrigir os bugs dos testes internos (S8, aguarda a lista
+  do Marlon), confirmar se a planilha PT-001 fecha a S11, e as tarefas que dependem dos testes
+  com usuários (S12/S13) e da API real (capturas de tela da S14).
 
 **Atualização de 29/09/2026 — marcador de semana e pendências:** o marcador de "semana
 atual" estava parado na Semana 10 desde 06/09; movido para a Semana 14 (28/09–04/10). As

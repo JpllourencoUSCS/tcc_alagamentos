@@ -39,6 +39,12 @@ class Perfil(context: Context) {
     val preenchido: Boolean
         get() = !nome.isNullOrBlank()
 
+    // Login do protótipo, sem autenticação real (fora do escopo, CT-LOG-001):
+    // só marca que a pessoa já passou pela tela de entrada neste aparelho
+    var sessaoAtiva: Boolean
+        get() = prefs.getBoolean(KEY_SESSAO, false)
+        set(valor) = prefs.edit { putBoolean(KEY_SESSAO, valor) }
+
     fun limpar() = prefs.edit {
         remove(KEY_NOME)
         remove(KEY_EMAIL)
@@ -50,6 +56,7 @@ class Perfil(context: Context) {
         private const val KEY_EMAIL = "email"
         private const val KEY_BAIRRO = "bairro"
         private const val KEY_ID = "id_usuario"
+        private const val KEY_SESSAO = "sessao_ativa"
     }
 }
 

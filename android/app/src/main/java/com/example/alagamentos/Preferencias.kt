@@ -22,15 +22,15 @@ class Preferencias(context: Context) {
         get() = prefs.getInt(KEY_RAIO, RAIO_PADRAO).coerceIn(RAIO_MIN, RAIO_MAX)
         set(valor) = prefs.edit { putInt(KEY_RAIO, valor) }
 
-    fun notificarTipo(tipo: TipoOcorrencia): Boolean =
-        prefs.getBoolean(chaveTipo(tipo), true)
+    fun notificarFonte(fonte: FonteDado): Boolean =
+        prefs.getBoolean(chaveFonte(fonte), true)
 
-    fun setNotificarTipo(tipo: TipoOcorrencia, valor: Boolean) =
-        prefs.edit { putBoolean(chaveTipo(tipo), valor) }
+    fun setNotificarFonte(fonte: FonteDado, valor: Boolean) =
+        prefs.edit { putBoolean(chaveFonte(fonte), valor) }
 
     fun restaurarPadrao() = prefs.edit { clear() }
 
-    private fun chaveTipo(tipo: TipoOcorrencia) = "notificar_${tipo.name}"
+    private fun chaveFonte(fonte: FonteDado) = "notificar_fonte_${fonte.name}"
 
     companion object {
         private const val KEY_NOTIFICACOES = "notificacoes_ativas"

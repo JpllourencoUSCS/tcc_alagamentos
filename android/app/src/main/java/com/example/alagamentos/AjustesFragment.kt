@@ -16,14 +16,14 @@ import com.google.android.material.slider.Slider
 class AjustesFragment : Fragment(R.layout.fragment_ajustes) {
 
     private lateinit var prefs: Preferencias
-    private val switchesTipo = mutableMapOf<TipoOcorrencia, MaterialSwitch>()
+    private val switchesFonte = mutableMapOf<FonteDado, MaterialSwitch>()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         prefs = Preferencias(requireContext())
 
         preencherPerfil(view)
-        criarSwitchesTipo(view)
+        criarSwitchesFonte(view)
         preencher(view)
         configurarListeners(view)
     }
@@ -42,12 +42,12 @@ class AjustesFragment : Fragment(R.layout.fragment_ajustes) {
         view.findViewById<View>(R.id.card_perfil).setOnClickListener { abrirPerfil() }
     }
 
-    private fun criarSwitchesTipo(view: View) {
-        val container = view.findViewById<LinearLayout>(R.id.lista_tipos)
-        switchesTipo.clear()
-        TipoOcorrencia.entries.forEach { tipo ->
+    private fun criarSwitchesFonte(view: View) {
+        val container = view.findViewById<LinearLayout>(R.id.lista_fontes)
+        switchesFonte.clear()
+        FonteDado.entries.forEach { fonte ->
             val switch = MaterialSwitch(requireContext()).apply {
-                text = tipo.rotulo
+                text = fonte.rotulo
                 setTextColor(ContextCompat.getColor(requireContext(), R.color.text_primary))
             }
             container.addView(
@@ -57,7 +57,7 @@ class AjustesFragment : Fragment(R.layout.fragment_ajustes) {
                     LinearLayout.LayoutParams.WRAP_CONTENT
                 )
             )
-            switchesTipo[tipo] = switch
+            switchesFonte[fonte] = switch
         }
     }
 
@@ -66,7 +66,7 @@ class AjustesFragment : Fragment(R.layout.fragment_ajustes) {
         val ativas = prefs.notificacoesAtivas
         view.findViewById<MaterialSwitch>(R.id.switch_notificacoes).isChecked = ativas
 
-        switchesTipo.forEach { (tipo, switch) -> switch.isChecked = prefs.notificarTipo(tipo) }
+        switchesFonte.forEach { (fonte, switch) -> switch.isChecked = prefs.notificarFonte(fonte) }
 
         view.findViewById<RadioGroup>(R.id.grupo_severidade).check(
             when (prefs.severidadeMinima) {
@@ -90,8 +90,8 @@ class AjustesFragment : Fragment(R.layout.fragment_ajustes) {
                 atualizarHabilitados(view, marcado)
             }
 
-        switchesTipo.forEach { (tipo, switch) ->
-            switch.setOnCheckedChangeListener { _, marcado -> prefs.setNotificarTipo(tipo, marcado) }
+        switchesFonte.forEach { (fonte, switch) ->
+            switch.setOnCheckedChangeListener { _, marcado -> prefs.setNotificarFonte(fonte, marcado) }
         }
 
         view.findViewById<RadioGroup>(R.id.grupo_severidade)
@@ -121,7 +121,7 @@ class AjustesFragment : Fragment(R.layout.fragment_ajustes) {
 
     // Sem notificações, as opções dependentes ficam desabilitadas
     private fun atualizarHabilitados(view: View, habilitado: Boolean) {
-        switchesTipo.values.forEach { it.isEnabled = habilitado }
+        switchesFonte.values.forEach { it.isEnabled = habilitado }
         view.findViewById<RadioGroup>(R.id.grupo_severidade).children
             .forEach { it.isEnabled = habilitado }
     }
