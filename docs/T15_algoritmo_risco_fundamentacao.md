@@ -160,6 +160,41 @@ tempo: primeiro a redistribuição da ANA é aplicada, depois a redistribuição
 do colaborativo ocorre sobre os pesos já ajustados. Em qualquer combinação, os pesos
 somam 1,0. Ver `_redistribuir_peso_ausente()` em `backend/algoritmo_risco.py`.
 
+### 6.4 Agregação dos reportes colaborativos (implementada em 03/10/2026)
+
+O componente C4 recebe um score 0–100 calculado por `backend/servicos/colaborativo.py` a
+partir dos reportes brutos de usuários (`ocorrencias.fonte = 'usuario'`). Até esta data o
+componente entrava sempre como `None` (ver seção 8).
+
+- **Vizinhança espacial e temporal:** entram os reportes a até **1 km** do ponto avaliado,
+  feitos nas **últimas 3 horas**. Alagamento é um fenômeno local e transitório: um reporte
+  de outro bairro ou do dia anterior não informa sobre o risco ali e naquele momento. A
+  busca usa o índice GiST (`&&` contra um bbox expandido) e depois `ST_DWithin` em
+  `geography`, para o raio exato em metros.
+- **Valor de cada reporte:** o nível informado pelo usuário vira o ponto médio da faixa
+  correspondente da própria escala do modelo: Baixo (0–30) → 15, Médio (30–60) → 45,
+  Alto (60–100) → 80. Assim, o componente fica na mesma escala dos outros três.
+- **Peso de cada reporte:** o produto de dois decaimentos lineares, um no tempo (1 no
+  instante do reporte, 0 após 3 h) e outro na distância (1 no ponto, 0 a 1 km).
+  Reportes mais recentes e mais próximos pesam mais, pela mesma lógica da ponderação pelo
+  inverso da distância usada em interpolação espacial. O score é a média ponderada dos
+  valores.
+- **Mínimo de 2 reportes:** com menos do que isso, o resultado é `None` e entra o
+  fail-safe 2 (seção 6.3). Um reporte isolado não move o score, o que reduz o efeito de
+  reportes equivocados ou mal-intencionados.
+
+Cada score calculado é registrado em `reportes_colaborativos_agregado` (área, janela de
+tempo, score e quantidade de reportes), na mesma transação da ocorrência que motivou o
+cálculo. Isso deixa rastreável qual valor do componente colaborativo entrou em cada
+classificação.
+
+**Exemplo:** um reporte "Alto" feito agora (peso 1) e um "Baixo" feito há 90 min (peso 0,5),
+ambos no ponto avaliado, resultam em (80 × 1 + 15 × 0,5) / 1,5 = **58,3**.
+
+Os parâmetros (1 km, 3 h, mínimo de 2) são escolhas de projeto do protótipo, não
+calibradas com dados reais. Recalibrá-los a partir do histórico de uso fica como trabalho
+futuro, junto com a recalibração dos pesos (seção 8).
+
 ## 7. Exemplo com dado real
 
 Executando `backend/algoritmo_risco.py` com os dados reais coletados em `testes-api/`
@@ -175,6 +210,16 @@ indisponível neste teste):
 Resultado coerente com a condição real observada (chuva leve, sem indício de risco de
 alagamento).
 
+**Segundo exemplo (03/10/2026, sistema integrado, `GET /risco` para o centro de São Caetano
+do Sul):** precipitação atual 0,0 mm/h, pico previsto 12,5 mm/3h, ANA indisponível, sem
+reportes colaborativos suficientes →
+
+```
+precipitação atual = 0,0 · previsão = 33,2 (4,17 mm/h equivalentes, faixa moderada)
+pesos após os dois fail-safes: precipitação 0,588 · previsão 0,412
+score = 33,2 × 0,412 = 13,7 → Baixo
+```
+
 ## 8. Limitações e trabalhos futuros
 
 - **Pesos fixos**: o modelo atual usa pesos estáticos (não variam por região ou estação
@@ -184,14 +229,40 @@ alagamento).
   (seção 4) foram feitos pela própria equipe do projeto, não por especialistas em
   hidrologia/defesa civil — uma limitação a declarar explicitamente na seção de
   limitações do relatório final.
-- **Componente colaborativo ainda não instrumentado end-to-end**: `reportes_colaborativos_score`
-  é recebido pronto pelo algoritmo (ou `None`, tratado pelo fail-safe da seção 6.3); a
-  lógica de agregação dos reportes brutos do app em um score 0–100 **ainda não existe em
-  nenhum repositório do projeto** (confirmado em 17/08/2026) — é uma dependência real e
-  não apenas hipotética para o modelo funcionar com as 4 fontes em produção.
-- **Sem análise de sensibilidade formal**: não foi medido o quanto o score final muda
-  para pequenas variações nos pesos — recomendado como trabalho futuro se houver tempo
-  na Fase 4.
+- ~~**Componente colaborativo ainda não instrumentado end-to-end**~~ — **resolvido em
+  03/10/2026** (seção 6.4). Até então, a lógica de agregação dos reportes brutos do app em
+  um score 0–100 não existia em nenhum repositório do projeto (confirmado em 17/08/2026), e
+  o componente entrava sempre como `None`. Continua em aberto a calibração dos parâmetros
+  da agregação (raio, janela e mínimo de reportes) com dados reais de uso.
+- ~~**Sem análise de sensibilidade formal**~~ — **feita em 03/10/2026** (seção 8.1).
+
+### 8.1 Análise de sensibilidade dos pesos (03/10/2026)
+
+`backend/analise_sensibilidade.py` mede o quanto a classificação mudaria se cada peso
+fosse um pouco diferente, **sem alterar os pesos do modelo**. Método "um fator por vez":
+o peso de um critério é multiplicado por 0,8, 0,9, 1,1 ou 1,2, e os outros três são
+reescalados proporcionalmente para a soma continuar 1. Cada conjunto de pesos é aplicado a
+**1.400 cenários**: chuva atual (8 valores de 0 a 60 mm/h) × pico previsto (7 valores de 0
+a 150 mm/3h) × pluviômetro (5 valores, incluindo ausente) × colaborativo (5 valores,
+incluindo ausente).
+
+| Critério (peso) | −20% | −10% | +10% | +20% | Variação média do score (±20%) |
+|---|---|---|---|---|---|
+| Precipitação atual (35%) | 6,9% | 3,2% | 3,7% | 7,1% | 2,0 pontos |
+| Previsão (25%) | 5,6% | 3,2% | 2,8% | 4,9% | 1,6 ponto |
+| Pluviômetro local (25%) | 4,9% | 2,7% | 2,6% | 4,7% | 1,5 ponto |
+| Colaborativo (15%) | 2,8% | 1,9% | 1,1% | 2,4% | 0,8 ponto |
+
+*(Percentual dos 1.400 cenários que mudam de classe — Baixo/Médio/Alto — em relação aos
+pesos originais. Maior variação individual do score: 7,6 pontos, na escala de 0 a 100.)*
+
+**Leitura:** com erros de até ±10% no julgamento de um peso, no máximo 3,7% dos cenários
+mudam de classe; com ±20%, no máximo 7,1%. As mudanças ocorrem nos cenários próximos aos
+limites de 30 e 60 pontos, onde qualquer modelo de faixas é sensível. A ordem de
+influência acompanha a ordem dos pesos (precipitação atual > previsão ≈ pluviômetro >
+colaborativo). O modelo é, portanto, **estável a imprecisões moderadas** nos julgamentos
+da matriz pareada — o que reduz, sem eliminar, a limitação de os julgamentos terem sido
+feitos pela própria equipe.
 
 ## 9. Referências
 

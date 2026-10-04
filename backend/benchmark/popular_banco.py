@@ -9,9 +9,8 @@ pelo mesmo índice/cache/estatísticas do planner) e permite ao script de
 benchmark (Semana 8/9) fazer DROP/CREATE INDEX em cada banco sem afetar os
 outros — inclusive em paralelo, se necessário.
 
-Não roda sozinho neste ambiente (sem Postgres/PostGIS disponível — ver
-CRONOGRAMA_STATUS.md, pendência de 18/08). Pronto para rodar assim que houver
-um Postgres acessível:
+Executado pela primeira vez contra Postgres real em 03/10/2026 (1k a 1M
+registros; resultados em benchmark/resultados/). Uso:
 
     export ADMIN_DATABASE_URL=postgresql+psycopg2://usuario:senha@host/postgres
     cd backend
@@ -45,7 +44,12 @@ def nome_banco_escala(escala: int) -> str:
 
 
 def url_para_banco(url_admin: str, nome_banco: str) -> str:
-    return str(make_url(url_admin).set(database=nome_banco))
+    # render_as_string(hide_password=False), não str(): no SQLAlchemy 2.x,
+    # str(URL) mascara a senha como "***", e a conexão com o banco da escala
+    # falhava com "password authentication failed" (bug achado na primeira
+    # execução real, 03/10/2026 — até então o script só tinha rodado em teste,
+    # sem banco com senha).
+    return make_url(url_admin).set(database=nome_banco).render_as_string(hide_password=False)
 
 
 def _banco_existe(url_admin: str, nome_banco: str) -> bool:
@@ -92,7 +96,13 @@ def _aplicar_schema(url_banco: str) -> None:
     engine = create_engine(url_banco)
     try:
         with engine.begin() as conn:
-            conn.exec_driver_sql(sql)
+            # Cursor do psycopg2 direto, sem parâmetros: `exec_driver_sql`
+            # repassa um dict de parâmetros vazio e o psycopg2 passa a tratar
+            # todo "%" do arquivo como marcador de formatação — e schema.sql
+            # tem "15%" num comentário (TypeError na primeira execução real,
+            # 03/10/2026).
+            with conn.connection.driver_connection.cursor() as cursor:
+                cursor.execute(sql)
     finally:
         engine.dispose()
 
@@ -140,6 +150,24 @@ def popular_escala(
     print(f"[{nome_banco}] inserindo em lotes de {tamanho_lote}...")
     duracao = _inserir_em_lotes(url_para_banco(url_admin, nome_banco), linhas, tamanho_lote)
     print(f"[{nome_banco}] concluído: {escala} linhas em {duracao:.2f}s.")
+
+    print(f"[{nome_banco}] atualizando estatísticas do planner (ANALYZE)...")
+    atualizar_estatisticas(url_para_banco(url_admin, nome_banco))
+
+
+def atualizar_estatisticas(url_banco: str) -> None:
+    """ANALYZE logo após a carga: sem estatísticas atualizadas, o planner do
+    Postgres estima a cardinalidade da tabela às cegas e pode escolher um plano
+    (seq scan vs. índice) que não escolheria em produção — o que invalidaria a
+    comparação com/sem índice. O autovacuum faria isso sozinho em algum
+    momento, mas não dá para depender de "em algum momento" num benchmark
+    (adicionado em 03/10/2026, antes da primeira execução real)."""
+    engine = create_engine(url_banco, isolation_level="AUTOCOMMIT")
+    try:
+        with engine.connect() as conn:
+            conn.execute(text("ANALYZE ocorrencias"))
+    finally:
+        engine.dispose()
 
 
 def main() -> None:

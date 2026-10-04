@@ -51,6 +51,18 @@ def test_criar_e_obter_ocorrencia(client):
     assert resp.json()["latitude"] == PAYLOAD_BASE["latitude"]
 
 
+# Janela de ~110 m em volta do ponto de PAYLOAD_BASE (Santo André). Os testes
+# consultam só essa janela, e não a tabela inteira: o banco compartilhado pode
+# ter dados de outras pessoas ou as ocorrências de demonstração
+# (backend/dados_demo.py, em São Caetano do Sul) — até 03/10/2026 estes testes
+# assumiam o banco vazio e quebravam com qualquer dado pré-existente.
+_D = 0.0005
+BBOX_TESTE = {
+    "lat_min": PAYLOAD_BASE["latitude"] - _D, "lon_min": PAYLOAD_BASE["longitude"] - _D,
+    "lat_max": PAYLOAD_BASE["latitude"] + _D, "lon_max": PAYLOAD_BASE["longitude"] + _D,
+}
+
+
 def test_listar_filtra_por_regiao_bbox_usando_indice_geoespacial(client):
     # Exercita o caminho real de db/repository.py (ST_MakeEnvelope + geom &&),
     # não a versão em Python puro do fake — prova que o filtro compila e
@@ -61,19 +73,16 @@ def test_listar_filtra_por_regiao_bbox_usando_indice_geoespacial(client):
         json={**PAYLOAD_BASE, "latitude": -3.7319, "longitude": -38.5267},  # Fortaleza
     )
 
-    resp = client.get(
-        "/ocorrencias",
-        params={"lat_min": -24, "lon_min": -47, "lat_max": -23, "lon_max": -46},
-    )
+    resp = client.get("/ocorrencias", params=BBOX_TESTE)
     assert resp.status_code == 200
     corpo = resp.json()
     assert len(corpo) == 1
     assert corpo[0]["latitude"] == PAYLOAD_BASE["latitude"]
 
 
-def test_listar_ocorrencias_comeca_vazio(client):
-    # Prova de que o isolamento funciona: se um teste anterior desta suíte
-    # tivesse deixado dado para trás, esta lista não estaria vazia.
-    resp = client.get("/ocorrencias")
+def test_isolamento_nao_deixa_dados_de_testes_anteriores(client):
+    # Prova de que o isolamento funciona: os testes acima criam ocorrências
+    # nesta janela; se alguma tivesse sobrevivido ao rollback, apareceria aqui.
+    resp = client.get("/ocorrencias", params=BBOX_TESTE)
     assert resp.status_code == 200
     assert resp.json() == []

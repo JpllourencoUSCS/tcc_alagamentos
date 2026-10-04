@@ -11,13 +11,15 @@ Rodar localmente (a partir de backend/, para os imports absolutos como
 from fastapi import FastAPI
 
 from api.ocorrencias import router as ocorrencias_router
+from api.risco import router as risco_router
 
 app = FastAPI(
     title="Sistema de Monitoramento Colaborativo de Alagamentos",
-    version="0.1.0",
+    version="0.2.0",
 )
 
 app.include_router(ocorrencias_router)
+app.include_router(risco_router)
 
 
 @app.get("/health")

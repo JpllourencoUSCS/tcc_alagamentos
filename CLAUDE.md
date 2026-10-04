@@ -35,6 +35,25 @@ são a mesma base. Nesta data o cronograma estava na Semana 14 (28/09–04/10), 
 pendências de todos consolidadas na seção "Situação em 29/09/2026" do
 `docs/CRONOGRAMA_STATUS.md`.
 
+**03/10/2026 (Semana 14):** sessão grande de recuperação de atrasos, no notebook com Docker
+(ver "Ambiente de desenvolvimento"). Resumo — detalhe na nota de 03/10/2026 do
+`docs/CRONOGRAMA_STATUS.md`:
+- **Benchmark executado pela primeira vez** (1k/10k/100k/1M, com e sem GiST) + gráficos +
+  otimizações da Semana 10 (`CLUSTER`); resultados em `backend/benchmark/resultados/`.
+- **Latência ponta a ponta medida** e critérios de desempenho escritos (`docs/T19_criterios_desempenho.md`).
+- **Backend:** agregador do componente colaborativo do AHP (pendência de 17/08), cache
+  climático, chave do OpenWeather via `.env` (era texto fixo), HTTP 503 quando a fonte
+  principal falha, novo `GET /risco`, API em contêiner, CI no GitHub Actions.
+- **App testado contra a API real** pela primeira vez (emulador, também em pt-BR): 2
+  defeitos achados e corrigidos; aba Previsão passou a mostrar o risco atual (`GET /risco`).
+  **Mapa ainda bloqueado:** a chave do Google Maps está restrita a certificados Android que
+  não incluem o do APK gerado no notebook do João (ver seção `android/` abaixo).
+- **Relatório:** rascunhos de seção de arquitetura, app, metodologia de testes, benchmark e
+  resultados/discussão; análise de sensibilidade do AHP; referências consolidadas; roteiro
+  da apresentação.
+- **Segurança:** a porta do banco (e a da API) não estava restrita ao Tailscale como este
+  arquivo dizia — ver "Ambiente de desenvolvimento".
+
 **03/09/2026:** descoberta de que o campus da USCS possui uma estação meteorológica
 própria. Time está investigando junto aos responsáveis a possibilidade de acesso aos
 dados — se viável, poderia "substituir" a ANA no papel de pluviômetro local do modelo AHP.
@@ -50,11 +69,24 @@ investigação (03/09/2026)".
   - `constants.py` — enums `NivelRisco`/`FonteDado`, vocabulário único reusado pelo ORM e pela API
   - `db/` — `models.py` (SQLAlchemy + GeoAlchemy2), `schema.sql` (DDL PostgreSQL/PostGIS),
     `session.py` (engine/`get_db`), `repository.py` (acesso a dados de `ocorrencias`)
-  - `api/` — endpoints FastAPI (`ocorrencias.py`, `schemas.py`); app principal em `backend/main.py`
+  - `api/` — endpoints FastAPI (`ocorrencias.py`: `POST`/`GET /ocorrencias`, `GET /ocorrencias/{id}`;
+    `risco.py`: `GET /risco`, risco atual num ponto, sem gravar nada; `schemas.py`); app
+    principal em `backend/main.py`
   - `servicos/` — camada de integração entre API e lógica de domínio (`classificacao.py`
-    liga o endpoint de criação à fusão climática + algoritmo de risco)
-  - `benchmark/` — geração de massa de dados sintética e medição de consultas
-    (Semanas 7–9: `gerar_dados.py`, `popular_banco.py`, `medir_consultas.py`)
+    liga os endpoints à fusão climática + agregador colaborativo + algoritmo de risco;
+    `colaborativo.py` agrega relatos de usuário — 1 km, 3 h, mínimo 2 — no score 0–100 do
+    componente colaborativo e registra em `reportes_colaborativos_agregado`)
+  - `fusao_climatica.py` lê `OPENWEATHER_API_KEY`/`ANA_IDENTIFICADOR`/`ANA_SENHA` do ambiente;
+    falha do OpenWeather vira `FonteClimaticaIndisponivel` (a API responde 503); cache de
+    10 min por célula de 0,01° (`obter_dados_consolidados_em_cache`)
+  - `benchmark/` — massa sintética, medição de consultas e de latência
+    (`gerar_dados.py`, `popular_banco.py`, `medir_consultas.py`, `gerar_graficos.py`,
+    `medir_latencia_api.py`; resultados versionados em `benchmark/resultados/`). Gráficos
+    exigem `pip install -r requirements-benchmark.txt` (matplotlib)
+  - `dados_demo.py` — 30 ocorrências **de demonstração** em São Caetano do Sul
+    (`id_usuario='demo-seed'`; `python -m dados_demo` / `--limpar`), usadas nos testes do app
+    e nas capturas. Não são dados reais.
+  - `analise_sensibilidade.py` — análise de sensibilidade dos pesos do AHP (não altera os pesos)
   - `tests/` — pytest; rodar com `cwd=backend/` (convenção de imports absolutos do
     projeto, ex. `from constants import ...`, sem pacote `backend.` no caminho).
     Dois tipos de teste convivem no mesmo diretório: testes de **contrato** (ex.
@@ -64,9 +96,12 @@ investigação (03/09/2026)".
     fixture `db_session` de `conftest.py` para rodar contra um Postgres/PostGIS
     real. Essa fixture isola cada teste numa transação com SAVEPOINT e dá
     rollback no final (padrão recomendado pelo próprio SQLAlchemy para suítes de
-    teste) — nenhum dado criado pelo teste sobrevive, então não importa se o
-    banco está vazio ou tem dado de outra pessoa (relevante com o banco
-    compartilhado por Tailscale, ver "Ambiente de desenvolvimento"). Sem
+    teste) — nenhum dado criado pelo teste sobrevive. Os testes também não podem
+    depender do que já existe no banco (dados de demonstração ou de outra pessoa,
+    no banco compartilhado por Tailscale): consultar só os dados que o próprio teste
+    criou, por exemplo com um bbox pequeno em volta deles — até 03/10/2026 dois testes
+    assumiam o banco vazio e quebravam. 61 testes em 03/10/2026 (53 sem banco + 8 de
+    integração). Sem
     `DATABASE_URL` definida, os testes de integração são pulados (skip), não
     falham — mesmo critério do resto do projeto para "sem Postgres disponível".
     Ao criar um teste novo que precisa de banco real, reusar `db_session` em vez
@@ -77,23 +112,45 @@ investigação (03/09/2026)".
   `MainActivity.kt` com um `Fragment` por tela (Mapa, Alertas, Previsão, Ajustes; Detalhes,
   Cadastro e Perfil abrem por cima). Desde 30/09/2026 os dados vêm da API real via
   `ApiCliente.kt` (Retrofit) + `OcorrenciaRepository.kt` — `GET`/`POST /ocorrencias`, com os
-  filtros de região/período do backend; ainda não testado contra a API real, só contra um
-  servidor simulado. Endereço da API em `API_BASE_URL` no `android/local.properties`
-  (padrão `http://10.0.2.2:8000/`, o localhost do computador visto pelo emulador). A aba
-  Previsão só mostra aviso: o backend não tem endpoint de previsão. Preferências, perfil e
-  sessão ficam só no aparelho (SharedPreferences, `Preferencias.kt`/`Perfil.kt`);
-  notificações locais em `NotificadorRisco.kt`. A chave do Google Maps vem de
-  `android/local.properties` (`MAPS_API_KEY=...`), arquivo não versionado e repassado por
-  canal privado. Build pelo
-  Gradle (`android/gradlew assembleDebug`) exige JDK — confirmar `JAVA_HOME` na máquina da
-  sessão antes de contar com isso.
+  filtros de região/período do backend; a aba Previsão usa `GET /risco` (risco AHP atual +
+  fontes do cálculo). **Testado contra a API real em 03/10/2026** (emulador, inclusive em
+  pt-BR/fuso de São Paulo) — evidências em `docs/evidencias_testes/2026-10-03/`. Endereço
+  da API em `API_BASE_URL` no `android/local.properties` (padrão `http://10.0.2.2:8000/`,
+  o localhost do computador visto pelo emulador). Preferências, perfil e sessão ficam só
+  no aparelho (SharedPreferences, `Preferencias.kt`/`Perfil.kt`); notificações locais em
+  `NotificadorRisco.kt`. Coordenadas exibidas sempre com ponto decimal
+  (`textoCoordenadas`, em `OcorrenciaVisual.kt`) — em pt-BR o `%.4f` gerava vírgulas
+  ambíguas. A chave do Google Maps vem de `android/local.properties` (`MAPS_API_KEY=...`),
+  arquivo não versionado e repassado por canal privado; **a chave é restrita por
+  certificado**: o APK precisa ser assinado por um certificado cujo SHA-1 esteja nas
+  restrições da chave no Google Cloud — o certificado de depuração do notebook com Docker
+  (SHA-1 `35:BA:18:CE:CD:B4:F8:85:29:AD:A2:8B:4B:09:20:C8:57:D3:6B:72`) ainda não está,
+  então lá o mapa aparece em branco ("Authorization failure" no logcat). Build pelo
+  Gradle (`android/gradlew assembleDebug`) exige JDK e Android SDK — confirmar na máquina
+  da sessão. Com o repositório dentro do OneDrive, definir
+  `ALAGAMENTOS_BUILD_DIR=C:\gradle-build\alagamentos` (lido por `android/build.gradle.kts`):
+  sem isso o OneDrive trava os intermediários e o build falha com "Unable to delete
+  directory". Testes de JVM: `gradlew testDebugUnitTest` (`FuncoesPurasTest.kt`).
+  `android/scripts/`: `adb_app.py` (automação do app no emulador via adb, usada nos testes
+  de 03/10) e `roteiro_capturas.py` (capturas do relatório em `docs/capturas/`).
 - `testes-api/` — scripts de teste de API, um por fonte, nomeados `teste_<fonte>.py`
 - `docs/` — documentação. `T05`–`T18` são o histórico de investigação (não apagar,
   não reescrever com conteúdo diferente do que realmente aconteceu). `T16_secao_*.md`
   são rascunhos de seções do relatório final e devem ser mantidos sincronizados com as
   decisões técnicas atuais. Material de teste (13/09/2026): `plano_e_fluxo_de_testes_TCC.xlsx`
-  (plano PT-001 + casos de teste), `questionario_teste_usabilidade.md` e
-  `tcle_teste_usabilidade.md`.
+  (plano PT-001 + casos de teste; versão 1.1 com 21 casos em 03/10/2026),
+  `questionario_teste_usabilidade.md` e `tcle_teste_usabilidade.md` (ambos dizem
+  explicitamente que as ocorrências do teste são de demonstração). Desde 03/10/2026:
+  `T19_criterios_desempenho.md` (RNF de latência + medições), `T16_secao_arquitetura.md`,
+  `T16_secao_app_android.md`, `T16_secao_metodologia_testes.md`, `T16_secao_benchmark.md`,
+  `T16_secao_resultados_discussao.md`, `referencias_consolidadas.md` (ABNT, com
+  pendências de verificação), `roteiro_apresentacao.md` (banca), `capturas/` e
+  `evidencias_testes/`.
+- Raiz: `Dockerfile` (imagem da API), `docker-compose.yml` (serviços `db` e `api`),
+  `.env.example` (variáveis esperadas no `.env`), `requirements.txt`,
+  `requirements-benchmark.txt`, `.github/workflows/ci.yml` (pytest contra PostGIS real +
+  build e testes do app a cada push — criado em 03/10/2026, ainda não executado no GitHub
+  até o primeiro push).
 
 ## Ambiente de desenvolvimento
 
@@ -137,8 +194,14 @@ compartilhado por Tailscale.
 
 **Banco compartilhado com o time via Tailscale (03/09/2026):** o banco desta máquina foi
 exposto ao time via [Tailscale](https://tailscale.com) (VPN privada) em vez de exposto na
-internet aberta — porta 5432 liberada só para a interface Tailscale (regra de Firewall do
-Windows "TCC Alagamentos - PostgreSQL (Tailscale)"). IP Tailscale desta máquina:
+internet aberta. A intenção era liberar a porta 5432 só para o Tailscale (regra de Firewall
+do Windows "TCC Alagamentos - PostgreSQL (Tailscale)"), mas **a revisão de 03/10/2026
+mostrou que não está assim**: a regra vale para qualquer interface, endereço e perfil de
+rede, e uma regra "Docker Desktop Backend" libera todas as portas do Docker no perfil
+Público — o banco (5432) e a API (8000) ficam alcançáveis na rede local do notebook (não na
+internet, por causa do NAT). A correção (PowerShell como administrador) está em
+`docs/ACESSO_BANCO_DEV.md`, seção 6; até ser aplicada, a API **não** é alcançável pelo
+Tailscale (falta a regra da porta 8000 no perfil Privado). IP Tailscale desta máquina:
 `100.114.69.115` (pode mudar se o Tailscale for reinstalado/reconfigurado — conferir com
 `tailscale ip -4`). Cada colega recebe um link de "Share" gerado no console do Tailscale
 (https://login.tailscale.com/admin/machines, no dispositivo `tcc-alagamentos-joao`) — isso
@@ -155,6 +218,28 @@ Guilherme e o próprio João em outras máquinas não têm Docker confirmado, en
 banco vivo disponível ao planejar tarefas do time sem confirmar antes. `docker-compose.yml`
 está no repo para replicar em qualquer máquina com Docker instalado.
 
+**Estado do notebook com Docker em 03/10/2026** (hostname `DESKTOP-NOGQFTB`, dispositivo
+Tailscale `tcc-alagamentos-joao`, Windows 11, Ryzen 5 5600G, 16 GB):
+- `docker compose up -d` sobe `alagamentos_db` e `alagamentos_api` (API em
+  `http://localhost:8000`, docs em `/docs`). A API lê `OPENWEATHER_API_KEY` (e as da ANA, se
+  houver) do `.env` — a do OpenWeather já está configurada. Depois de mudar o `.env`, rodar
+  `docker compose up -d api` para o contêiner pegar o valor novo; depois de mudar código do
+  backend, `docker compose up -d --build api`.
+- O banco principal tem as 30 ocorrências de demonstração (`backend/dados_demo.py`); os
+  bancos `alagamentos_bench_1000/10000/100000/1000000` são do benchmark (o de 1M ficou
+  reorganizado por `CLUSTER` no experimento da Semana 10 — recriar com
+  `popular_banco --recriar` antes de repetir a medição principal).
+- Para benchmark e scripts: `ADMIN_DATABASE_URL` = mesma URL do `DATABASE_URL` trocando o
+  banco por `postgres`.
+- **Android SDK e emulador instalados** em `%LOCALAPPDATA%\Android\Sdk` (cmdline-tools
+  novos: `sdkmanager` virou o `android` CLI; usar `--no-metrics`), AVD `tcc_pixel`
+  (Android 15, Google APIs), JDK em `C:\Program Files\Java\jdk-24`. Subir com
+  `emulator -avd tcc_pixel -gpu host` — com `swiftshader` (renderização por software) o
+  emulador ficou lento a ponto de dar ANR. O emulador está em pt-BR e no fuso de São Paulo.
+- Pela porta publicada do Docker Desktop, um `POST` leva ~50–60 ms a mais do que dentro do
+  contêiner (medido: 4,6 ms dentro, ~60 ms pela porta) — efeito do encaminhamento de porta
+  do Docker Desktop no Windows, não da aplicação (ver T19).
+
 ## Decisões técnicas já fechadas (não propor de novo sem pedido explícito)
 
 - **CEMADEN**: descartado — autenticação (SGAA) sem URL pública documentada.
@@ -165,9 +250,16 @@ está no repo para replicar em qualquer máquina com Docker instalado.
   Possível fonte alternativa/complementar em investigação desde 03/09/2026 (estação
   meteorológica do campus da USCS) — ainda não decidido, ver `docs/T_arquitetura_fontes_dados_final.md`.
 - **CPTEC/INPE**: fonte ativa só para previsão de 4 dias (validação cruzada qualitativa).
-  Condições atuais de aeroporto (METAR) foram testadas e descartadas.
+  Condições atuais de aeroporto (METAR) foram testadas e descartadas. Em 03/10/2026 todos
+  os endpoints responderam 403 a partir do notebook com Docker, e a BrasilAPI (que consulta
+  o mesmo serviço) também falhou — tratado pelo fail-safe, registrado como limitação; a
+  decisão de usar o CPTEC não foi reaberta.
 - **Modelo AHP**: pesos fixos — precipitação atual 35%, pluviômetro local 25%,
-  previsão 25%, colaborativo 15%. Não alterar sem o usuário pedir explicitamente.
+  previsão 25%, colaborativo 15%. Não alterar sem o usuário pedir explicitamente. A análise
+  de sensibilidade de 03/10/2026 (`backend/analise_sensibilidade.py`, T15 seção 8.1) só mede
+  o efeito de variar os pesos; não os altera. Os parâmetros da agregação colaborativa
+  (1 km, 3 h, mínimo de 2 relatos, T15 seção 6.4) são escolhas de projeto do protótipo, não
+  calibradas.
 
 ## Estilo de trabalho esperado
 
@@ -175,6 +267,12 @@ está no repo para replicar em qualquer máquina com Docker instalado.
   e, se for uma decisão de arquitetura, também no `docs/T_arquitetura_fontes_dados_final.md`.
 - Preferir entregar código pronto e testado a apenas explicar como fazer.
 - Validar sintaxe Python antes de considerar uma tarefa concluída.
+- Nunca gravar chaves ou senhas em arquivos versionados: `OPENWEATHER_API_KEY`, credenciais
+  da ANA e senha do banco ficam no `.env`; `MAPS_API_KEY` no `android/local.properties`
+  (ambos no `.gitignore`). Atenção: o logcat do Android imprime a chave do Maps por extenso
+  em erros de autorização — não copiar esse log para documentos.
+- Dados de demonstração (`dados_demo.py`) nunca devem ser apresentados como reais no
+  relatório, nas capturas ou no teste de usabilidade.
 - `backend/` tem suíte pytest (`backend/tests/`) — rodar antes de considerar uma mudança de
   backend concluída (`cd backend; python -m pytest tests/`). Sem Postgres disponível (ver
   "Ambiente de desenvolvimento"), o que não pode ser testado contra banco real fica marcado

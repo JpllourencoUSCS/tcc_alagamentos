@@ -172,7 +172,6 @@ class AlertasFragment : Fragment(R.layout.fragment_alertas) {
                     }
                 }
                 ocorrencias = lista
-                contagem.text = getString(R.string.alertas_contagem, lista.size)
                 preencherLista(view)
                 NotificadorRisco.verificar(requireContext(), lista)
             } catch (e: CancellationException) {
@@ -193,6 +192,11 @@ class AlertasFragment : Fragment(R.layout.fragment_alertas) {
     private fun preencherLista(view: View) {
         val todas = ocorrencias ?: return
         val lista = filtro?.let { f -> todas.filter { it.severidade == f } } ?: todas
+        // Contagem do que está na tela (região + período + nível), não só do que
+        // veio da API — antes ignorava o filtro de nível (achado no teste contra a
+        // API real, 03/10/2026)
+        view.findViewById<TextView>(R.id.txt_alertas_contagem).text =
+            getString(R.string.alertas_contagem, lista.size)
 
         val container = view.findViewById<LinearLayout>(R.id.lista_alertas)
         container.removeAllViews()

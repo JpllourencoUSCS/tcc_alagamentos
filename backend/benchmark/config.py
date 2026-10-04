@@ -29,13 +29,19 @@ JANELA_DIAS = 180
 # Semanas 8-9 — medição de consultas
 # ---------------------------------------------------------------------------
 
-# Viewport de mapa de ~6.6km x 6.6km centrado em Santo André (mesma
-# coordenada usada em PAYLOAD_BASE dos testes da API e nos dados reais de
-# testes-api/) — simula o caso de uso real ("usuário abre o mapa numa
-# vizinhança"), não o bbox inteiro da região piloto, que devolveria quase
-# todas as linhas e mascararia o ganho do índice.
-BBOX_CONSULTA_BENCHMARK = (-23.6939, -46.5683, -23.6339, -46.5083)
+# Viewport de mapa de ~6.6km x 6.6km centrado em São Caetano do Sul (escopo
+# do monitoramento definido em 03/09/2026; mesmo centro usado pelo app em
+# MapaFragment.kt) — simula o caso de uso real ("usuário abre o mapa na
+# cidade"), não o bbox inteiro da região piloto, que devolveria quase todas as
+# linhas e mascararia o ganho do índice. Até 03/10/2026 era centrado em Santo
+# André; como os dados sintéticos são uniformes na região piloto, a
+# seletividade (~0,5% das linhas) não muda com a troca.
+BBOX_CONSULTA_BENCHMARK = (-23.6529, -46.5848, -23.5929, -46.5248)
 
 NOME_INDICE_GEOM = "idx_ocorrencias_geom"
 REPETICOES_PADRAO = 20
+# Execuções descartadas antes de medir: a primeira leitura de cada banco paga
+# o custo de trazer páginas do disco para o cache do Postgres, o que mediria
+# I/O frio em vez do algoritmo de busca (adicionado em 03/10/2026).
+AQUECIMENTO_PADRAO = 3
 LIMITE_RESULTADOS_CONSULTA = 100  # mesmo default de limit em api/ocorrencias.py

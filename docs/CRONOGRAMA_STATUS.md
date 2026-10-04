@@ -2,7 +2,7 @@
 
 **Sistema de Monitoramento Colaborativo de Áreas com Risco de Alagamento**
 Período: 01/07/2026 a 30/10/2026 (17 semanas)
-*Última atualização de status: 30/09/2026 — Semana 14 (28/09 – 04/10)*
+*Última atualização de status: 03/10/2026 — Semana 14 (28/09 – 04/10)*
 
 ## Legenda de responsáveis
 - **Henrique** — backend / tech lead
@@ -23,7 +23,48 @@ enviada em 06/09/2026 (Semanas 5, 8, 9 e 10); e para as do Guilherme a partir do
 que ele enviou em 06/09/2026 (Semanas 1–10). Ambos os resumos são repasse direto, sem
 validação própria do time de integração.
 
+## Situação em 03/10/2026 — resumo atualizado
+
+**Onde estamos:** fim da Semana 14 de 17. Rascunho completo ao orientador na Semana 16
+(12–18/10); banca em 30/10. Em 03/10 uma sessão de trabalho no notebook com Docker
+adiantou tarefas de todos os integrantes (detalhe na nota "Sessão de 03/10/2026", no fim
+do documento). Tarefas de outros integrantes feitas nessa sessão estão marcadas como
+feitas, mas **o responsável original deve revisar** (principalmente os rascunhos de seção).
+
+**Os dois gargalos de 29/09 que dependiam só do time foram resolvidos:** o benchmark foi
+executado (Semanas 7–10) e o app foi testado contra a API real (Semana 5). O terceiro (duas
+bases do app) já tinha sido resolvido em 30/09.
+
+**O que ainda trava:**
+1. **Testes de usabilidade (S12) sem data.** Tudo está pronto (app integrado, dados de
+   demonstração, roteiro e TCLE ajustados), exceto as tarefas do mapa — ver item 2.
+   Resultados de usabilidade alimentam S13 e as seções de resultados do relatório.
+2. **Mapa do app em branco no ambiente de testes:** a chave do Google Maps está restrita
+   a certificados Android que não incluem o do APK gerado no notebook do João (SHA-1 no
+   `CLAUDE.md`). Quem administra a chave no Google Cloud precisa adicionar esse SHA-1.
+   Bloqueia CT-MAP-001/002, as Tarefas 4–5 da usabilidade e duas capturas de tela.
+3. **Firewall do notebook com Docker:** banco e API acessíveis na rede local (não só pelo
+   Tailscale) e API ainda não alcançável pelo Tailscale. Correção em
+   `docs/ACESSO_BANCO_DEV.md`, seção 6 (exige administrador).
+4. **Fontes externas:** ANA sem credencial (desde agosto); CPTEC respondendo 403 em 03/10.
+
+**Pendências por integrante:**
+
+| Integrante | Pendências |
+|---|---|
+| Henrique | Revisar os rascunhos `T16_secao_arquitetura.md` (S14) e `T16_secao_benchmark.md` (S15); confirmar acesso ao banco pelo Tailscale no ambiente dele (S5); apoio aos testes de usabilidade (S12) |
+| João | Aplicar a correção de firewall; liberar (ou pedir a quem tem acesso) o SHA-1 na chave do Maps; conduzir os testes de usabilidade (S12); completar metodologia/resultados com a usabilidade (S13/S15); conferir a citação dos limiares de chuva (`referencias_consolidadas.md`, pendência 1); primeiro push para o CI rodar |
+| Marlon | Revisar e complementar `T16_secao_app_android.md` (S14); revisar o roteiro de usabilidade ajustado (S11); conduzir as sessões de usabilidade e corrigir a interface (S12/S13); revisão ABNT (S15); slides a partir de `docs/roteiro_apresentacao.md` (S16); repassar a lista de bugs dos testes internos (S8) |
+| Guilherme | Confirmar a planilha PT-001 v1.1 (S10/S11); capturas do mapa e do cadastro quando a chave for liberada (S14); consolidar resultados de usabilidade e regressão (S12/S13); revisar `referencias_consolidadas.md` e organizar anexos (S15); corrigir os bugs dos testes internos do Marlon (S8) |
+
+**Decisões para a próxima conversa do time:** data dos testes de usabilidade; hospedagem
+da API para as sessões (Tailscale no celular de teste ou hospedagem em nuvem — a imagem
+Docker está pronta); prazo final para ANA/estação da USCS antes de documentar como
+limitação; se o CPTEC continuar com 403, registrar como limitação.
+
 ## Situação em 29/09/2026 — resumo para colocar o time em dia
+
+*(Mantida como registro; substituída pela "Situação em 03/10/2026" acima.)*
 
 **Onde estamos:** Semana 14 de 17 (Fase 4, redação). Faltam ~4,5 semanas para a banca
 (30/10) e ~2,5 semanas para o rascunho completo do relatório ir ao orientador (Semana 16,
@@ -114,10 +155,10 @@ sobre APIs e algoritmo de risco (`T16_secao_*.md`).
 ### Semana 5 (27/07 – 02/08)
 | Responsável | Atividade | Status |
 |---|---|---|
-| Henrique | Integração do banco de dados com os endpoints (persistência real das ocorrências e classificações) | 🟡 `POST /ocorrencias` calcula `nivel_risco`/`chuva_mm` automaticamente via `fusao_climatica` quando o cliente não informa (`backend/servicos/classificacao.py`, T14 "Notas de projeto"); o `OcorrenciaRepository` já grava via SQLAlchemy desde a Semana 3. **Validado em 03/09/2026 num notebook específico do João** (com Docker, diferente do notebook usado no dia a dia das sessões — ver nota de 06/09 abaixo e `CLAUDE.md`) contra um Postgres/PostGIS real (Docker + `docker-compose.yml`, ver nota abaixo) — `schema.sql` aplica sem erro, PostGIS 3.4 ativo, 23/23 testes passam com `DATABASE_URL` apontando pro container. Segue 🟡 e não ✅ porque isso ainda não foi confirmado no ambiente do Henrique nem em CI — falta padronizar isso pro time todo |
-| João | Testes de consistência dos dados climáticos consolidados (comparação entre fontes para a mesma região/horário) | 🔴 Bloqueada — depende da ANA responder o cadastro (único item fora do controle do time) |
-| Marlon | Integração da tela de mapa com dados reais do backend (consumo da API) | 🟡 (era 🔴) Aguardando realização de teste com banco de dados contendo os dados reais **30/09/2026:** o consumo da API (GET /ocorrencias e /ocorrencias/{id}, `ApiCliente.kt`) já existia na cópia local do Marlon e passou ao `android/` com a unificação da base (ver nota "Tarefas do Guilherme e unificação da base Android"); mapa, alertas e detalhes não usam mais dados de exemplo. Validado só contra um servidor simulado — falta testar contra a API real, que ainda não está hospedada. Segue 🟡 |
-| Guilherme | Integração da tela de cadastro com o backend (envio de ocorrências reais) | 🟡 Em andamento — estrutura de integração preparada com o endpoint de ocorrências, mas a validação completa do fluxo com backend e banco reais depende do ambiente integrado do projeto. **30/09/2026:** implementado no `android/` — tela "Registrar ocorrência" (`CadastroFragment.kt`) envia `POST /ocorrencias` com `fonte=usuario` e o `id_usuario` do perfil; sem nível escolhido, o backend calcula o risco (AHP). Testado no emulador contra servidor simulado (envio, validação de local obrigatório e erro sem conexão). Falta validar contra a API real — segue 🟡 |
+| Henrique | Integração do banco de dados com os endpoints (persistência real das ocorrências e classificações) | 🟡 `POST /ocorrencias` calcula `nivel_risco`/`chuva_mm` automaticamente via `fusao_climatica` quando o cliente não informa (`backend/servicos/classificacao.py`, T14 "Notas de projeto"); o `OcorrenciaRepository` já grava via SQLAlchemy desde a Semana 3. **Validado em 03/09/2026 num notebook específico do João** (com Docker, diferente do notebook usado no dia a dia das sessões — ver nota de 06/09 abaixo e `CLAUDE.md`) contra um Postgres/PostGIS real (Docker + `docker-compose.yml`, ver nota abaixo) — `schema.sql` aplica sem erro, PostGIS 3.4 ativo, 23/23 testes passam com `DATABASE_URL` apontando pro container. Segue 🟡 e não ✅ porque isso ainda não foi confirmado no ambiente do Henrique nem em CI — falta padronizar isso pro time todo. **03/10/2026:** API passou a rodar em contêiner (`Dockerfile`, serviço `api` no `docker-compose.yml`) contra o mesmo banco, usada pelo app nos testes do dia; criado CI no GitHub Actions que roda a suíte contra PostGIS real a cada push (`.github/workflows/ci.yml`) — vira ✅ quando o primeiro push rodar o CI com sucesso |
+| João | Testes de consistência dos dados climáticos consolidados (comparação entre fontes para a mesma região/horário) | 🔴 Bloqueada — depende da ANA responder o cadastro (único item fora do controle do time). **03/10/2026:** OpenWeather validado de ponta a ponta com chave real (centro de São Caetano do Sul → Baixo, 13,7); a comparação entre fontes continua impossível: ANA sem credencial e CPTEC respondendo 403 (BrasilAPI também falhou) |
+| Marlon | Integração da tela de mapa com dados reais do backend (consumo da API) | 🟡 (era 🔴) Aguardando realização de teste com banco de dados contendo os dados reais **30/09/2026:** o consumo da API (GET /ocorrencias e /ocorrencias/{id}, `ApiCliente.kt`) já existia na cópia local do Marlon e passou ao `android/` com a unificação da base (ver nota "Tarefas do Guilherme e unificação da base Android"); mapa, alertas e detalhes não usam mais dados de exemplo. Validado só contra um servidor simulado — falta testar contra a API real, que ainda não está hospedada. Segue 🟡. **03/10/2026:** testado contra a API e o banco reais no emulador — mapa (cartão "Situação atual" com os 30 registros de demonstração), alertas e detalhes recebem os dados da API. Segue 🟡 só pelo desenho do mapa: a chave do Google Maps recusa o certificado do APK gerado no notebook do João ("Authorization failure"), então os marcadores não aparecem lá |
+| Guilherme | Integração da tela de cadastro com o backend (envio de ocorrências reais) | ✅ Concluída em 03/10/2026 (ver fim da célula). Histórico: 🟡 Em andamento — estrutura de integração preparada com o endpoint de ocorrências, mas a validação completa do fluxo com backend e banco reais depende do ambiente integrado do projeto. **30/09/2026:** implementado no `android/` — tela "Registrar ocorrência" (`CadastroFragment.kt`) envia `POST /ocorrencias` com `fonte=usuario` e o `id_usuario` do perfil; sem nível escolhido, o backend calcula o risco (AHP). Testado no emulador contra servidor simulado (envio, validação de local obrigatório e erro sem conexão). Falta validar contra a API real — segue 🟡. **03/10/2026:** validado contra a API real — nível manual (POST 201, gravado no PostGIS), nível automático com clima real do OpenWeather (POST 201, classificado pelo AHP), envio sem local bloqueado e mensagem específica quando o cálculo automático está indisponível (HTTP 503). Casos CT-CAD-001 a 004 no PT-001 |
 
 ### Semana 6 (03/08 – 09/08)
 | Responsável | Atividade | Status |
@@ -125,7 +166,7 @@ sobre APIs e algoritmo de risco (`T16_secao_*.md`).
 | Henrique | Revisão de código backend e ajustes de performance inicial nas consultas | ✅ Concluída — 3 achados corrigidos: (1) filtro de região usava `BETWEEN` em lat/lon sem índice (full scan) → trocado para `&&`/`ST_MakeEnvelope` contra `geom`, usando o índice GiST já criado (liga direto com `T17`); (2) filtros `fonte`/`nivel_risco` da listagem aceitavam qualquer string e devolviam lista vazia em silêncio para valor inválido → tipados com os enums compartilhados, agora 422; (3) `sessionmaker(..., autocommit=False)` em `db/session.py` era parâmetro morto do SQLAlchemy 1.x (removido nas versões novas) → limpo. 11 testes passando (`backend/tests/`) |
 | João | Documentação técnica do algoritmo de classificação de risco (fundamentação e funcionamento) — insumo para o relatório | ✅ Concluída em 17/08 — `docs/T15_algoritmo_risco_fundamentacao.md` (matriz AHP formalizada, CR=0.0038) + rascunho de seção `docs/T16_secao_algoritmo_risco.md` |
 | Marlon | Ajustes visuais e de usabilidade nas telas Android já integradas | ✅ Implementada — reportada por Marlon em 20/08; em manutenção ativa, sujeita a ajustes conforme novas atualizações e testes ao longo do projeto |
-| Guilherme | Testes manuais do fluxo cadastro → listagem → mapa, registrando bugs encontrados | 🟡 Parcialmente bloqueada — testes do cadastro e das telas disponíveis realizados, porém o fluxo completo ainda depende da integração da listagem e principalmente do mapa com os dados reais do backend. |
+| Guilherme | Testes manuais do fluxo cadastro → listagem → mapa, registrando bugs encontrados | 🟡 Parcialmente bloqueada — testes do cadastro e das telas disponíveis realizados, porém o fluxo completo ainda depende da integração da listagem e principalmente do mapa com os dados reais do backend. **03/10/2026:** fluxo cadastro → listagem → detalhes executado contra a API real (emulador); o trecho do mapa segue bloqueado pela chave do Google Maps (ver S5 do Marlon) |
 
 **Entregável da fase:** protótipo com fluxo principal funcional (cadastro, listagem, mapa, classificação de risco básica).
 
@@ -136,7 +177,7 @@ sobre APIs e algoritmo de risco (`T16_secao_*.md`).
 ### Semana 7 (10/08 – 16/08)
 | Responsável | Atividade | Status |
 |---|---|---|
-| Henrique | Criação do ambiente de benchmark — geração de massa de dados simulada (1k, 10k, 100k registros geoespaciais) | 🟡 Geração testada (8 testes), inserção não testada (sem Postgres) — `backend/benchmark/gerar_dados.py` (função pura, sementes reprodutíveis) + `backend/benchmark/popular_banco.py` (1 banco Postgres por escala: `alagamentos_bench_1000/10000/100000`, aplica `schema.sql`, insere em lotes de 5000 via SQLAlchemy Core). Achado do próprio teste: `data_hora` usava `datetime.now()` como referência recalculada a cada chamada, quebrando a promessa de "mesma semente = mesmo dataset" — corrigido com parâmetro `referencia` explícito. Pronto para rodar assim que houver `ADMIN_DATABASE_URL` |
+| Henrique | Criação do ambiente de benchmark — geração de massa de dados simulada (1k, 10k, 100k registros geoespaciais) | ✅ Concluída em 03/10/2026 — inserção executada contra Postgres real em 1k, 10k, 100k e também 1M registros (1M levou ~7 min); a primeira execução real achou e corrigiu 2 bugs em `popular_banco.py` (a senha do banco era mascarada ao montar a URL de cada escala, e um "%" num comentário do `schema.sql` quebrava a aplicação do schema) e passou a rodar `ANALYZE` após a carga. Histórico: 🟡 Geração testada (8 testes), inserção não testada (sem Postgres) — `backend/benchmark/gerar_dados.py` (função pura, sementes reprodutíveis) + `backend/benchmark/popular_banco.py` (1 banco Postgres por escala: `alagamentos_bench_1000/10000/100000`, aplica `schema.sql`, insere em lotes de 5000 via SQLAlchemy Core). Achado do próprio teste: `data_hora` usava `datetime.now()` como referência recalculada a cada chamada, quebrando a promessa de "mesma semente = mesmo dataset" — corrigido com parâmetro `referencia` explícito. Pronto para rodar assim que houver `ADMIN_DATABASE_URL` |
 | João | Refinamento do algoritmo de risco com dados de múltiplas fontes ponderadas | ✅ Concluída em 17/08 — `fusao_climatica.py` e `algoritmo_risco.py` agora conectados (`classificar_risco()`/`obter_classificacao_risco()`); testado com ANA disponível e indisponível |
 | Marlon | Implementação de tela de detalhes da ocorrência (visualização individual) | ✅ Implementada — reportada por Marlon em 20/08; em manutenção ativa, sujeita a ajustes conforme novas atualizações e testes ao longo do projeto. **29/09/2026:** uma versão da tela está versionada no repositório (`DetalhesFragment.kt` + `fragment_detalhes.xml`, commit `fc8e24a`), aberta a partir do marcador do mapa e da lista de alertas |
 | Guilherme | Implementação de notificações locais simples (alerta visual de risco alto no app) | ✅ Concluída em 30/09/2026 (detalhe no fim da célula). Histórico: 🟡 em andamento — estrutura do alerta local preparada, dependendo da disponibilização do nível de risco integrado aos dados reais do aplicativo para validação completa. **29/09/2026:** o commit `fc8e24a` trouxe só as *preferências* de notificação (aba "Ajustes": tipos de ocorrência, severidade mínima e raio, salvos em `Preferencias.kt`) — nenhuma notificação é disparada ainda; a estrutura de alerta local do Guilherme não está nesse commit **30/09/2026:** implementado (`NotificadorRisco.kt`) — ao receber ocorrências da API, o app notifica as novas (últimas 24 h) que atendem às preferências de Ajustes (nível mínimo, fontes e raio); toque abre os detalhes. Testado no emulador com servidor simulado. Limitação: só verifica com o app aberto (sem serviço em segundo plano) |
@@ -144,36 +185,36 @@ sobre APIs e algoritmo de risco (`T16_secao_*.md`).
 ### Semana 8 (17/08 – 23/08)
 | Responsável | Atividade | Status |
 |---|---|---|
-| Henrique | Execução do benchmark sem índice espacial — medição de tempo de resposta nas consultas | 🟡 Lógica testada (4 testes), execução real pendente — `backend/benchmark/medir_consultas.py`: mede a mesma consulta que `db/repository.py` gera para o filtro de região (bbox → `geom && ST_MakeEnvelope`, ORDER BY + LIMIT), via `EXPLAIN (ANALYZE, FORMAT JSON)` para isolar o tempo de execução no Postgres (sem ruído de rede/driver). Reutilizável para a Semana 9 (`--indice presente`/`ausente`, mesmo script). O bloqueio de "sem Postgres" foi removido em 03/09 (banco real disponível via Docker + Tailscale, ver notas), mas a execução em si ainda não foi confirmada — segue 🟡, não ✅ |
-| João | Apoio à análise dos resultados do benchmark — interpretação dos dados coletados | 🔴 Bloqueada — depende da execução do benchmark pelo Henrique (item acima); nada a analisar enquanto não houver números |
+| Henrique | Execução do benchmark sem índice espacial — medição de tempo de resposta nas consultas | ✅ Concluída em 03/10/2026 — `resultados_sem_indice.csv`; metodologia revisada antes da execução (3 execuções de aquecimento, registro do plano escolhido e uma segunda consulta só espacial, porque a do endpoint pode usar o índice de `data_hora`). Histórico: 🟡 Lógica testada (4 testes), execução real pendente — `backend/benchmark/medir_consultas.py`: mede a mesma consulta que `db/repository.py` gera para o filtro de região (bbox → `geom && ST_MakeEnvelope`, ORDER BY + LIMIT), via `EXPLAIN (ANALYZE, FORMAT JSON)` para isolar o tempo de execução no Postgres (sem ruído de rede/driver). Reutilizável para a Semana 9 (`--indice presente`/`ausente`, mesmo script). O bloqueio de "sem Postgres" foi removido em 03/09 (banco real disponível via Docker + Tailscale, ver notas), mas a execução em si ainda não foi confirmada — segue 🟡, não ✅ |
+| João | Apoio à análise dos resultados do benchmark — interpretação dos dados coletados | ✅ Concluída em 03/10/2026 — análise em `docs/T16_secao_benchmark.md` (discussão O(n) × O(log n + k), escolha de plano do otimizador, ameaças à validade). Histórico: 🔴 Bloqueada — dependia da execução do benchmark |
 | Marlon | Testes de usabilidade interna das telas (com os próprios colegas) | ✅ Concluído e sofrendo ajustes de acordo com o desenvolvimento das demais etapas e definição do design visual do projeto |
 | Guilherme | Correção de bugs identificados nos testes de usabilidade | 🔴 Não iniciada — os testes em si já foram concluídos pelo Marlon nesta semana (ver linha dele acima), mas o levantamento consolidado dos problemas encontrados ainda não foi repassado ao Guilherme; correção pendente desse repasse. **30/09/2026:** sem mudança — a lista de bugs do Marlon ainda não está no repositório |
 
 ### Semana 9 (24/08 – 30/08)
 | Responsável | Atividade | Status |
 |---|---|---|
-| Henrique | Implementação de índice GiST no PostGIS e execução do benchmark comparativo | 🔴 Não iniciada — depende da Semana 8 (benchmark sem índice) estar concluída primeiro |
-| João | Documentação científica do benchmark (fundamentação teórica de R-tree/GiST, conforme literatura) | 🔴 Não iniciada — sem resultados de benchmark ainda para documentar (depende do Henrique); a base teórica de `T17_indexacao_espacial_fundamentacao.md` (Semana 1) já existe e pode ser reaproveitada |
+| Henrique | Implementação de índice GiST no PostGIS e execução do benchmark comparativo | ✅ Concluída em 03/10/2026 — `resultados_com_indice.csv`, gráficos (`grafico_consulta_espacial.png`, `grafico_consulta_endpoint.png`) e `resumo.md` em `backend/benchmark/resultados/` (script `gerar_graficos.py`). Consulta espacial com 100k registros: 14,65 ms → 0,18 ms (81,6×); com 1M: 71,7 → 4,8 ms (14,8×, custo dominado pelas 5.194 linhas devolvidas). Histórico: 🔴 Não iniciada |
+| João | Documentação científica do benchmark (fundamentação teórica de R-tree/GiST, conforme literatura) | ✅ Concluída em 03/10/2026 — `docs/T16_secao_benchmark.md` (metodologia, resultados, discussão, ameaças à validade, reprodutibilidade), apoiada em `T17`. Histórico: 🔴 Não iniciada |
 | Marlon | Revisão e padronização visual de todas as telas (consistência de cores, fontes, espaçamento) | ✅ Concluído e sofrendo ajustes de acordo com o desenvolvimento das demais etapas e definição do design visual do projeto |
-| Guilherme | Testes de integração entre todas as telas do app | 🟡 Parcialmente bloqueada — testes de integração iniciados, porém a validação completa depende da integração das telas com os dados reais do backend. **30/09/2026:** navegação entre todas as telas testada no emulador (login → mapa → cadastro → detalhes; alertas com filtros → detalhes; ajustes → perfil → sair), contra servidor simulado. Falta repetir com a API real |
+| Guilherme | Testes de integração entre todas as telas do app | 🟡 Parcialmente bloqueada — testes de integração iniciados, porém a validação completa depende da integração das telas com os dados reais do backend. **30/09/2026:** navegação entre todas as telas testada no emulador (login → mapa → cadastro → detalhes; alertas com filtros → detalhes; ajustes → perfil → sair), contra servidor simulado. Falta repetir com a API real. **03/10/2026:** repetido contra a API real, também com o aparelho em pt-BR; filtros conferidos contra a API em 8 combinações; achados e corrigidos BUG-001 (contador da lista ignorava o filtro de nível) e BUG-002 (coordenadas com vírgula decimal em pt-BR). Segue 🟡 só pelo mapa (chave do Google Maps) |
 
 **Entregável da semana:** gráfico comparativo de latência antes/depois da indexação espacial — peça central da resposta sobre "complexidade computacional".
 
 ### Semana 10 (31/08 – 06/09)
 | Responsável | Atividade | Status |
 |---|---|---|
-| Henrique | Otimizações adicionais identificadas pelo benchmark (ex: paginação de resultados, cache simples) | 🔴 Não iniciada — depende dos resultados das Semanas 8–9 |
+| Henrique | Otimizações adicionais identificadas pelo benchmark (ex: paginação de resultados, cache simples) | ✅ Concluída em 03/10/2026 — avaliado `CLUSTER` pelo índice GiST (1M registros: consulta espacial 2,04 → 0,89 ms; endpoint forçando GiST 5,00 → 1,04 ms), documentado como manutenção periódica, não aplicado no fluxo; investigado o otimizador escolhendo o índice de `data_hora` em 1M (`random_page_cost` não muda a escolha; diferença de poucos ms, mantido); **cache simples implementado** para os dados climáticos (10 min por célula de ~1 km, `fusao_climatica.obter_dados_consolidados_em_cache`); paginação já existia (`skip`/`limit`). Ver `T16_secao_benchmark.md`, 4.Y.4. Histórico: 🔴 Não iniciada |
 | João | Implementação de testes automatizados básicos da API (principais endpoints) | ✅ Concluída em 03/09 — camada de contrato já existia (`test_ocorrencias_api.py`, repositório fake); adicionada a camada de integração contra Postgres/PostGIS real: `backend/tests/conftest.py` (fixture `db_session`, sessão isolada por teste via SAVEPOINT + rollback — padrão recomendado pelo SQLAlchemy para suítes de teste, cobre inclusive os `db.commit()` internos do repositório) e `backend/tests/test_ocorrencias_integracao.py` (3 casos, incluindo o filtro geoespacial via `db/repository.py` real). Isolamento validado na prática: `SELECT count(*) FROM ocorrencias` no banco compartilhado por Tailscale ficou em 0 após a suíte rodar. Sem `DATABASE_URL`, os 3 testes de integração são pulados (skip), não falham — 26 testes desta frente (23 já existentes antes de 03/09, entre contrato e benchmark do Henrique + 3 novos de integração) passam com Postgres disponível, 23 sem (3 skipped). **Nota de reconciliação (06/09/2026):** o total combinado de `backend/tests/` no fim do dia 03/09 é 29, não 26 — a diferença são 3 testes de latência (`test_fusao_climatica_latencia.py`) adicionados no mesmo dia por outra frente de trabalho (ver nota "Achado de revisão — latência das chamadas climáticas externas" abaixo), que não são cobertos por esta linha. Contagem por arquivo conferida em 06/09/2026 contra o repositório: 11 (`test_ocorrencias_api.py`) + 8 (`test_gerar_dados.py`) + 4 (`test_medir_consultas.py`) + 3 (`test_ocorrencias_integracao.py`) + 3 (`test_fusao_climatica_latencia.py`) = 29 |
 | Marlon | Implementação de tela de configurações/perfil simples do usuário | ✅ Concluída (ver 30/09/2026 abaixo; até 29/09: 🟡 em implementação e desenvolvimento). **29/09/2026:** parte de configurações versionada no repositório (aba "Ajustes", `AjustesFragment.kt` + `Preferencias.kt`, commit `fc8e24a`: liga/desliga alertas, tipos de ocorrência, severidade mínima, raio de monitoramento, restaurar padrões). ~~Perfil do usuário não implementado~~ **30/09/2026:** ✅ Concluída — tela de perfil implementada (`PerfilFragment.kt` + `fragment_perfil.xml` + `Perfil.kt`), aberta pelo cartão no topo da aba "Ajustes": nome (obrigatório, validado), e-mail (opcional, formato validado), bairro de São Caetano do Sul (lista fixa) e `id_usuario` gerado pelo app (conforme `T13_campos_usuario.md`). Dados salvos só no aparelho, sem backend — ver nota "Tela de perfil do usuário (30/09/2026)" abaixo |
-| Guilherme | Apoio aos testes automatizados — casos de teste manuais documentados | 🟡 Em andamento — casos de teste manuais estão sendo organizados e documentados para servir de base ao apoio dos testes automatizados. |
+| Guilherme | Apoio aos testes automatizados — casos de teste manuais documentados | ✅ (confirmar com o Guilherme) — em 03/10/2026 a planilha PT-001 passou à versão 1.1 com 21 casos, executados contra a API real na sessão do João; testes automatizados do app criados (`FuncoesPurasTest.kt`, 6 testes de JVM). Histórico: 🟡 Em andamento — casos de teste manuais estão sendo organizados e documentados para servir de base ao apoio dos testes automatizados. |
 
 ### Semana 11 (07/09 – 13/09)
 | Responsável | Atividade | Status |
 |---|---|---|
-| Henrique | Medição formal de latência end-to-end (app → backend → banco → resposta) em diferentes cenários | 🔴 Não iniciada — depende do app integrado à API (Semana 5, 🔴) e de a API estar hospedada em algum lugar acessível ao app; a latência das chamadas climáticas externas foi tratada à parte em 03/09 (ver nota "Achado de revisão") |
-| João | Consolidação dos critérios de avaliação de desempenho (RNF de latência, com base científica) | ⚪ Sem status reportado — nenhum documento com os critérios no repositório (29/09) |
-| Marlon | Preparação do roteiro de teste de usabilidade com usuários externos | 🟡 Material pronto, falta alinhar ao app — commit `22791a7` ("AF - QA", 13/09, conta do João) adicionou `docs/questionario_teste_usabilidade.md` (roteiro de 5 tarefas guiadas + questionário para Google Forms) e `docs/tcle_teste_usabilidade.md`. O roteiro assume app integrado ao backend real e inclui tarefas (login, cadastro, filtro por região/período) cujas telas não estão no `android/` versionado — ajustar quando a base do app for unificada. Autoria (Marlon ou outro) não registrada |
-| Guilherme | Organização da documentação de testes realizados até o momento | 🟡 Base entregue em 13/09 (commit `22791a7`) — `docs/plano_e_fluxo_de_testes_TCC.xlsx`: plano PT-001 (escopo, critérios, responsáveis por módulo) e fluxo com 16 casos de teste; os de backend/algoritmo (`CT-API-*`, `CT-AHP-*`) registrados como executados, os 11 do app como "Não Executado" aguardando a integração. Confirmar com o Guilherme se é a entrega dele e se considera concluída |
+| Henrique | Medição formal de latência end-to-end (app → backend → banco → resposta) em diferentes cenários | ✅ Concluída em 03/10/2026 — `backend/benchmark/medir_latencia_api.py` (50 requisições HTTP por cenário, p50/p95) no banco de demonstração, no banco de 1M registros e com clima real: leituras p95 ≤ 16,5 ms; cadastro com risco automático p95 560 ms sem cache e 56,5 ms com cache. Cliente e servidor na mesma máquina (rede móvel real não medida — limitação registrada em T19). Histórico: 🔴 Não iniciada |
+| João | Consolidação dos critérios de avaliação de desempenho (RNF de latência, com base científica) | ✅ Concluída em 03/10/2026 — `docs/T19_criterios_desempenho.md`: RNF-01 a 05 baseados em Miller/Card/Nielsen, RAIL e ISO/IEC 25010, com verificação contra as medições (todos atendidos). Histórico: ⚪ Sem status reportado |
+| Marlon | Preparação do roteiro de teste de usabilidade com usuários externos | ✅ (revisão do Marlon pendente) — **03/10/2026:** roteiro e TCLE alinhados ao app integrado: as 5 tarefas existem no app; texto corrigido para "ocorrências de demonstração" (antes dizia "dados reais", o que seria inverídico para os participantes); adicionada a lista de preparação do ambiente antes de cada sessão. Histórico: 🟡 Material pronto, falta alinhar ao app — commit `22791a7` ("AF - QA", 13/09, conta do João) adicionou `docs/questionario_teste_usabilidade.md` (roteiro de 5 tarefas guiadas + questionário para Google Forms) e `docs/tcle_teste_usabilidade.md`. O roteiro assume app integrado ao backend real e inclui tarefas (login, cadastro, filtro por região/período) cujas telas não estão no `android/` versionado — ajustar quando a base do app for unificada. Autoria (Marlon ou outro) não registrada |
+| Guilherme | Organização da documentação de testes realizados até o momento | ✅ (confirmar com o Guilherme) — **03/10/2026:** PT-001 v1.1 (21 casos: 14 aprovados, 5 com a parte funcional aprovada aguardando usabilidade, 2 bloqueados pelo mapa) e evidências em `docs/evidencias_testes/2026-10-03/`. Histórico: 🟡 Base entregue em 13/09 (commit `22791a7`) — `docs/plano_e_fluxo_de_testes_TCC.xlsx`: plano PT-001 (escopo, critérios, responsáveis por módulo) e fluxo com 16 casos de teste; os de backend/algoritmo (`CT-API-*`, `CT-AHP-*`) registrados como executados, os 11 do app como "Não Executado" aguardando a integração. Confirmar com o Guilherme se é a entrega dele e se considera concluída |
 
 **Entregável da fase:** sistema integrado, com métricas de desempenho documentadas e o diferencial tecnológico (algoritmo de risco + benchmark espacial) validado.
 
@@ -185,7 +226,7 @@ sobre APIs e algoritmo de risco (`T16_secao_*.md`).
 | Responsável | Atividade | Status |
 |---|---|---|
 | Henrique | Apoio técnico aos testes de usabilidade (ajustes de backend identificados durante os testes) | 🔴 Não iniciada — os testes de usabilidade não aconteceram (ver linhas abaixo) |
-| João | Execução dos testes de usabilidade com usuários externos (registro de feedback) | 🔴 Não executada — pré-requisito do próprio plano PT-001 é o app integrado ao backend real, que não existe ainda; os casos de usabilidade da planilha seguem "Não Executado" com data "A definir (lançamento do protótipo integrado)". Precisa de nova data |
+| João | Execução dos testes de usabilidade com usuários externos (registro de feedback) | 🔴 Não executada — pré-requisito do próprio plano PT-001 é o app integrado ao backend real, que não existe ainda; os casos de usabilidade da planilha seguem "Não Executado" com data "A definir (lançamento do protótipo integrado)". Precisa de nova data. **03/10/2026:** pré-requisito técnico atendido (app integrado e testado contra a API real, dados de demonstração carregados); falta a data, os participantes e liberar o mapa (chave do Google Maps) para as Tarefas 4–5 |
 | Marlon | Execução dos testes de usabilidade com usuários externos (condução das sessões) | 🔴 Não executada — mesmo motivo da linha acima |
 | Guilherme | Consolidação dos resultados de usabilidade em tabela/relatório | 🔴 Não iniciada — sem resultados para consolidar |
 
@@ -193,33 +234,33 @@ sobre APIs e algoritmo de risco (`T16_secao_*.md`).
 | Responsável | Atividade | Status |
 |---|---|---|
 | Henrique | Correções de backend apontadas pelos testes de usabilidade e desempenho | 🔴 Não iniciada — depende dos testes das Semanas 11–12 |
-| João | Redação da seção de metodologia de testes e avaliação (capítulo do relatório final) | ⚪ Sem status reportado — nenhum rascunho no repositório (29/09); o plano PT-001, o questionário e o TCLE de 13/09 servem de base para a parte de metodologia, a de resultados depende dos testes |
+| João | Redação da seção de metodologia de testes e avaliação (capítulo do relatório final) | 🟡 Rascunho em 03/10/2026 — `docs/T16_secao_metodologia_testes.md` (5 frentes de avaliação, plano PT-001, testes automatizados, testes do app integrado, desempenho, protocolo de usabilidade, resultados e defeitos encontrados); falta a subseção de resultados de usabilidade. Histórico: ⚪ Sem status reportado |
 | Marlon | Correções de interface apontadas pelos testes de usabilidade | 🔴 Não iniciada — depende da Semana 12 |
 | Guilherme | Apoio às correções de interface e testes de regressão | 🔴 Não iniciada — depende da Semana 12 |
 
 ### Semana 14 (28/09 – 04/10) — **semana atual**
 | Responsável | Atividade | Status |
 |---|---|---|
-| Henrique | Redação da seção técnica sobre arquitetura final e algoritmo de classificação de risco | ⚪ Sem status reportado — a parte do algoritmo já tem rascunho (`docs/T15_algoritmo_risco_fundamentacao.md` + `docs/T16_secao_algoritmo_risco.md`, do João); falta a arquitetura final |
-| João | Redação da seção sobre integração de múltiplas fontes de dados e resultados climáticos | ⚪ Sem status reportado — base existente: `docs/T16_secao_relatorio_apis.md` e `T16_secao_relatorio_apis_aluno3.md` (levantamento e comparação das APIs, última edição 17/08); precisa refletir a arquitetura atual (ANA/CPTEC, fusão em paralelo, escopo São Caetano do Sul) |
-| Marlon | Redação da seção sobre desenvolvimento do aplicativo Android (XML) e decisões de UI | ⚪ Sem status reportado |
-| Guilherme | Levantamento de capturas de tela e evidências visuais do sistema para o relatório | ⚪ Sem status reportado — já dá para capturar o app do `android/` (compila), mas com dados mockados; capturas definitivas ficam melhores após a integração **30/09/2026:** não feito — as capturas devem ser tiradas com a API real rodando (hoje só há dados de um servidor simulado, que não servem como evidência no relatório) |
+| Henrique | Redação da seção técnica sobre arquitetura final e algoritmo de classificação de risco | 🟡 Rascunho em 03/10/2026, revisão do Henrique pendente — `docs/T16_secao_arquitetura.md` (componentes, endpoints, fluxo do cadastro automático, implantação, testes, decisões); a parte do algoritmo (`T16_secao_algoritmo_risco.md`) foi atualizada com a agregação colaborativa e um exemplo real de São Caetano do Sul. Histórico: ⚪ Sem status reportado |
+| João | Redação da seção sobre integração de múltiplas fontes de dados e resultados climáticos | ✅ Atualizada em 03/10/2026 — `T16_secao_relatorio_apis.md` ganhou a subseção 3.X.7 (integração atual: paralelismo, fail-safe, 503, cache, colaborativo, escopo São Caetano do Sul) e o registro do 403 do CPTEC. Histórico: ⚪ Sem status reportado — base existente: `docs/T16_secao_relatorio_apis.md` e `T16_secao_relatorio_apis_aluno3.md` (levantamento e comparação das APIs, última edição 17/08); precisa refletir a arquitetura atual (ANA/CPTEC, fusão em paralelo, escopo São Caetano do Sul) |
+| Marlon | Redação da seção sobre desenvolvimento do aplicativo Android (XML) e decisões de UI | 🟡 Rascunho em 03/10/2026 a partir do código — `docs/T16_secao_app_android.md`; falta o Marlon complementar com o histórico de decisões de UI (wireframes, testes internos, padronização visual), que não está no repositório. Histórico: ⚪ Sem status reportado |
+| Guilherme | Levantamento de capturas de tela e evidências visuais do sistema para o relatório | 🟡 5 de 7 em 03/10/2026 (ver fim da célula). Histórico: ⚪ Sem status reportado — já dá para capturar o app do `android/` (compila), mas com dados mockados; capturas definitivas ficam melhores após a integração **30/09/2026:** não feito — as capturas devem ser tiradas com a API real rodando (hoje só há dados de um servidor simulado, que não servem como evidência no relatório). **03/10/2026:** 🟡 5 de 7 capturas feitas com a API real, clima real e o aparelho em pt-BR (`docs/capturas/`, script `android/scripts/roteiro_capturas.py`); faltam as do mapa e do cadastro, que dependem de liberar a chave do Google Maps |
 
 ### Semana 15 (05/10 – 11/10)
-| Responsável | Atividade |
-|---|---|
-| Henrique | Redação da seção de benchmark de indexação espacial (resultados e discussão) |
-| João | Redação da seção de resultados gerais e discussão sobre o diferencial tecnológico |
-| Marlon | Revisão geral da redação — padronização de linguagem, normas ABNT, citações |
-| Guilherme | Organização de anexos, apêndices e lista de referências complementares |
+| Responsável | Atividade | Status (adiantado em 03/10/2026) |
+|---|---|---|
+| Henrique | Redação da seção de benchmark de indexação espacial (resultados e discussão) | 🟡 Rascunho pronto (`docs/T16_secao_benchmark.md`), revisão do Henrique pendente |
+| João | Redação da seção de resultados gerais e discussão sobre o diferencial tecnológico | 🟡 Rascunho pronto (`docs/T16_secao_resultados_discussao.md`), falta a subseção de usabilidade; análise de sensibilidade do AHP incluída (T15, seção 8.1) |
+| Marlon | Revisão geral da redação — padronização de linguagem, normas ABNT, citações | ⚪ Não iniciada (semana ainda não começou) |
+| Guilherme | Organização de anexos, apêndices e lista de referências complementares | 🟡 Referências consolidadas em ABNT (`docs/referencias_consolidadas.md`), com pendências de verificação; anexos ainda não organizados |
 
 ### Semana 16 (12/10 – 18/10)
-| Responsável | Atividade |
-|---|---|
-| Henrique | Revisão técnica cruzada do relatório (conferência de dados e resultados) |
-| João | Revisão técnica cruzada do relatório (conferência de dados e resultados) |
-| Marlon | Montagem da apresentação final (slides) |
-| Guilherme | Apoio à montagem da apresentação final (slides) |
+| Responsável | Atividade | Status (adiantado em 03/10/2026) |
+|---|---|---|
+| Henrique | Revisão técnica cruzada do relatório (conferência de dados e resultados) | ⚪ Não iniciada |
+| João | Revisão técnica cruzada do relatório (conferência de dados e resultados) | ⚪ Não iniciada (os rascunhos de 03/10 já passaram por uma conferência de números contra os CSVs e a planilha) |
+| Marlon | Montagem da apresentação final (slides) | 🟡 Roteiro de 18 slides e perguntas prováveis da banca em `docs/roteiro_apresentacao.md` |
+| Guilherme | Apoio à montagem da apresentação final (slides) | ⚪ Não iniciada |
 
 **Entregável da semana:** rascunho completo do relatório final para revisão do orientador.
 
@@ -239,11 +280,11 @@ sobre APIs e algoritmo de risco (`T16_secao_*.md`).
 
 | Ponto observado | Onde é endereçado |
 |---|---|
-| Latência na resposta | Semanas 7–11 (benchmark + medição formal de latência do banco); paralelização das chamadas às APIs climáticas externas corrigida em 03/09 (ver notas de status) |
-| Mais fontes de dados | Semanas 1–2 (levantamento e testes) e Semana 3 (integração consolidada: OpenWeather + ANA + CPTEC) |
-| Complexidade computacional do BD georreferenciado | Semanas 1, 7, 9 (estudo teórico + benchmark com/sem índice GiST) |
+| Latência na resposta | Semanas 7–11 (benchmark + medição formal de latência do banco); paralelização das chamadas às APIs climáticas externas corrigida em 03/09 (ver notas de status). **03/10:** critérios em T19 e todos atendidos — leituras p95 ≤ 16,5 ms com 1M registros; cadastro automático ~0,5 s sem cache e ~50 ms com cache |
+| Mais fontes de dados | Semanas 1–2 (levantamento e testes) e Semana 3 (integração consolidada: OpenWeather + ANA + CPTEC); **03/10:** dado colaborativo implementado como 4ª fonte do AHP |
+| Complexidade computacional do BD georreferenciado | Semanas 1, 7, 9 (estudo teórico + benchmark com/sem índice GiST). **03/10:** benchmark executado — 81,6× mais rápido com GiST em 100k registros; seção `T16_secao_benchmark.md` |
 | Remoção do Jetpack Compose / uso de XML | Semanas 1–6 (toda a camada Android replanejada em XML) |
-| Diferencial tecnológico | Algoritmo de classificação de risco por pesos (Semanas 1, 4–6, 9) |
+| Diferencial tecnológico | Algoritmo de classificação de risco por pesos (Semanas 1, 4–6, 9); **03/10:** agregação colaborativa, análise de sensibilidade e aba de risco no app (`GET /risco`); discussão em `T16_secao_resultados_discussao.md`, 5.X.4 |
 | Não parecer "colagem de APIs" | Algoritmo de risco como camada de processamento próprio + benchmark como contribuição técnica |
 | Remoção de "baixo custo" do título | Decidido com o orientador |
 
@@ -272,7 +313,9 @@ container real (ver passo a passo no `CLAUDE.md`, seção "Ambiente de desenvolv
 **Banco compartilhado com o time via Tailscale (03/09/2026):** em vez de cada um instalar
 Docker/Postgres/PostGIS na própria máquina, o banco do João foi exposto ao time por uma
 VPN privada (Tailscale) — porta 5432 liberada só pra essa interface, nunca pra internet
-aberta. Henrique é o primeiro a testar o acesso remoto (em andamento); Marlon e Guilherme
+aberta. *(Correção de 03/10/2026: a regra de firewall na prática não ficou restrita ao
+Tailscale — vale para qualquer rede, e uma regra do Docker Desktop libera todas as portas
+no perfil Público. Correção pendente em `docs/ACESSO_BANCO_DEV.md`, seção 6.)* Henrique é o primeiro a testar o acesso remoto (em andamento); Marlon e Guilherme
 ainda não. Guia de acesso e teste em `docs/ACESSO_BANCO_DEV.md`. Isso destrava o time pra
 testar/implementar contra um banco real **sem esperar** a decisão de hospedagem definitiva.
 **Ainda pendente:** confirmar que Henrique, Marlon e Guilherme conseguem de fato conectar
@@ -286,7 +329,9 @@ Adicionado fail-safe de redistribuição proporcional de peso quando não há re
 para uma área (antes, isso zerava 15% do score silenciosamente). **Pendência nova identificada:**
 o módulo que agrega reportes brutos de usuários em um score 0–100 ainda não existe em nenhum
 repositório do time — não é bloqueio para o protótipo (o fail-safe cobre a ausência), mas é
-necessário para validar o modelo com as 4 fontes reais em produção.
+necessário para validar o modelo com as 4 fontes reais em produção. **Resolvida em
+03/10/2026:** `backend/servicos/colaborativo.py` (T15, seção 6.4), testado contra PostGIS
+real e ligado ao cálculo automático e ao `GET /risco`.
 
 **Correção de data (03/09/2026):** o cronograma estava com o marcador de "semana atual"
 parado na Semana 8 (17/08–23/08) desde a última atualização de conteúdo (20/08), embora o
@@ -436,6 +481,47 @@ deve partir desta base em vez de manter outra.
 - **Continua pendente do Guilherme:** corrigir os bugs dos testes internos (S8, aguarda a lista
   do Marlon), confirmar se a planilha PT-001 fecha a S11, e as tarefas que dependem dos testes
   com usuários (S12/S13) e da API real (capturas de tela da S14).
+
+**Sessão de 03/10/2026 — recuperação dos atrasos (notebook com Docker, sessão do João):**
+o João pediu que tudo o que fosse possível fazer e testar naquele notebook fosse feito,
+independente do responsável. Nada abaixo foi inventado: cada item tem arquivo, teste ou
+medição no repositório. Os rascunhos de seção de outros integrantes precisam da revisão
+deles.
+- **Ambiente:** a máquina era o notebook com Docker (hostname `DESKTOP-NOGQFTB`). Instalados
+  matplotlib (no `.venv`) e Android SDK + emulador (AVD `tcc_pixel`, Android 15); o João
+  adicionou as chaves do OpenWeather (`.env`) e do Google Maps (`android/local.properties`).
+- **Benchmark (S7–S10):** executado em 1k/10k/100k/1M; 2 bugs de `popular_banco.py`
+  corrigidos; metodologia revisada (aquecimento, plano registrado, consulta só espacial);
+  gráficos; `CLUSTER` e escolha de plano investigados. Resultados em
+  `backend/benchmark/resultados/` e `docs/T16_secao_benchmark.md`.
+- **Latência (S11):** `medir_latencia_api.py`; critérios e verificação em
+  `docs/T19_criterios_desempenho.md` (RNF-01 a 05 atendidos). Achado: pela porta do Docker
+  Desktop no Windows, cada `POST` paga ~50 ms extras (dentro do contêiner: 4,6 ms).
+- **Backend:** chave do OpenWeather via ambiente (era `"sua_chave_aqui"` fixo); falha do
+  OpenWeather vira HTTP 503 com mensagem clara; cache climático de 10 min; agregador
+  colaborativo (pendência de 17/08); `GET /risco`; `Dockerfile` + serviço `api` no compose;
+  dados de demonstração (`dados_demo.py`, 30 ocorrências em São Caetano do Sul, marcadas
+  `demo-seed`); análise de sensibilidade do AHP; CI no GitHub Actions; dois testes de
+  integração que dependiam do banco vazio corrigidos. Suíte: 29 → 61 testes.
+- **App:** compilado e testado contra a API real no emulador (também em pt-BR); filtros
+  conferidos contra a API; BUG-001 (contador ignorava o filtro de nível) e BUG-002
+  (coordenadas com vírgula decimal em pt-BR) corrigidos; mensagem específica para o 503;
+  aba Previsão passou a mostrar o risco atual (`GET /risco`); 6 testes de JVM; automação
+  por adb (`android/scripts/`); build fora do OneDrive (`ALAGAMENTOS_BUILD_DIR`), porque
+  o OneDrive trava os intermediários do Gradle.
+- **Bloqueios encontrados:** chave do Google Maps restrita a certificados que não incluem o
+  do APK gerado lá; CPTEC respondendo 403 (BrasilAPI também falhou); firewall do notebook
+  não restringe o banco e a API ao Tailscale.
+- **Documentação:** PT-001 v1.1 (21 casos); evidências em `docs/evidencias_testes/2026-10-03/`;
+  capturas em `docs/capturas/`; TCLE e questionário corrigidos para "ocorrências de
+  demonstração"; rascunhos de seção (arquitetura, app, metodologia de testes, benchmark,
+  resultados/discussão); `T16_secao_relatorio_apis.md`, `T16_secao_algoritmo_risco.md`,
+  T15 (seções 6.4 e 8.1, segundo exemplo real) e T18 (nota) atualizados; referências
+  consolidadas; roteiro da apresentação; `ACESSO_BANCO_DEV.md` (API e segurança);
+  `CLAUDE.md` e `T_arquitetura_fontes_dados_final.md` atualizados a pedido do João.
+- **Pendência de verificação no relatório:** os limiares de chuva (2,5/7,6/50 mm/h) são
+  atribuídos à OMM, mas o 7,6 mm/h parece vir da American Meteorological Society — conferir
+  a citação (`docs/referencias_consolidadas.md`, pendência 1); não muda o modelo.
 
 **Atualização de 29/09/2026 — marcador de semana e pendências:** o marcador de "semana
 atual" estava parado na Semana 10 desde 06/09; movido para a Semana 14 (28/09–04/10). As

@@ -11,9 +11,11 @@ Equipe: Henrique, João, Marlon e Guilherme
 > configuração de "seções" no próprio Google Forms.
 >
 > **Importante:** este roteiro assume o aplicativo já **integrado ao backend real**
-> (dados reais de ocorrências e classificação de risco). A única ressalva estrutural que
-> permanece é a tela de login, que não implementa autenticação real (não faz parte do
-> escopo do sistema) — ver também o TCLE, `docs/tcle_teste_usabilidade.md`.
+> (validado em 03/10/2026 — ver `docs/evidencias_testes/2026-10-03/`), com as **ocorrências
+> de demonstração** de São Caetano do Sul carregadas (`backend/dados_demo.py`) e a
+> classificação de risco calculada pelo sistema. A tela de login não implementa
+> autenticação real (não faz parte do escopo do sistema) — ver também o TCLE,
+> `docs/tcle_teste_usabilidade.md`.
 
 ---
 
@@ -21,8 +23,8 @@ Equipe: Henrique, João, Marlon e Guilherme
 
 > Olá! Obrigado por participar da avaliação do aplicativo do nosso Trabalho de Conclusão de
 > Curso: um sistema de monitoramento colaborativo de risco de alagamento para São Caetano
-> do Sul. Você vai navegar pelo aplicativo, com dados reais de ocorrências cadastradas no
-> sistema, e depois responder a este questionário sobre sua experiência. Não existem
+> do Sul. Você vai navegar pelo aplicativo, com ocorrências de demonstração criadas pela
+> equipe para este teste, e depois responder a este questionário sobre sua experiência. Não existem
 > respostas certas ou erradas — queremos sua opinião sincera. A participação é voluntária e
 > as respostas são anônimas. Antes de continuar, leia e assine o Termo de Consentimento
 > Livre e Esclarecido (TCLE) que acompanha este link.
@@ -134,6 +136,35 @@ uma "seção" separada por tarefa no Google Forms):
 > informou voluntariamente no TCLE em separado."
 
 ---
+
+## Preparação do ambiente antes de cada sessão (para o grupo, não faz parte do Forms)
+
+Atualizado em 03/10/2026, depois do primeiro teste do app contra a API real:
+
+1. **API e banco no ar**, acessíveis pelo aparelho de teste: `docker compose up -d` no
+   notebook com Docker. No emulador desse notebook, o endereço padrão
+   (`http://10.0.2.2:8000/`) já funciona. Num celular físico, o `API_BASE_URL` do
+   `android/local.properties` deve apontar para um endereço que o celular alcance (IP
+   Tailscale do notebook com o app Tailscale no celular, ou hospedagem definitiva) — o APK
+   precisa ser gerado de novo depois de mudar esse valor.
+2. **Ocorrências de demonstração carregadas**: `python -m dados_demo` (em `backend/`). Elas
+   têm datas relativas ao momento da carga; para as tarefas com filtro "Últimas 24 h"
+   mostrarem resultados, recarregar no dia da sessão (`python -m dados_demo --limpar` e
+   depois `python -m dados_demo`).
+3. **Chave do Google Maps** no `android/local.properties` (`MAPS_API_KEY=...`) **e liberada
+   para o certificado que assina o APK**: a chave do projeto é restrita a apps Android
+   cadastrados no Google Cloud (SHA-1 do certificado + `com.example.alagamentos`). Se o APK
+   for gerado numa máquina cujo certificado não esteja cadastrado, o mapa aparece em branco
+   ("Authorization failure" no logcat) e as **Tarefas 4 e 5 não podem ser feitas**. O SHA-1
+   do certificado de depuração de cada máquina sai com
+   `keytool -list -v -keystore %USERPROFILE%\.android\debug.keystore -storepass android`.
+4. **Chave do OpenWeather** no `.env` (`OPENWEATHER_API_KEY=...`) para a opção "Automático"
+   do nível de risco na Tarefa 2. Sem ela, o app mostra "Risco automático indisponível" e o
+   participante precisa escolher Baixo, Médio ou Alto — anotar isso na observação da tarefa
+   se acontecer.
+5. **Depois da sessão**: as ocorrências cadastradas pelos participantes ficam no banco com o
+   `id_usuario` do aparelho de teste; apagar antes da próxima sessão para cada participante
+   começar do mesmo estado.
 
 ## Notas de rastreabilidade (para o grupo, não faz parte do Forms)
 

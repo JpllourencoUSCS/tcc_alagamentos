@@ -42,7 +42,7 @@
     <string name="rotulo_coordenadas">Coordenadas</string>
     <string name="valor_chuva">%1$.1f mm</string>
     <string name="valor_temperatura">%1$.1f °C</string>
-    <string name="valor_coordenadas">%1$.4f, %2$.4f</string>
+    <string name="valor_coordenadas">%1$s</string>
     <string name="valor_percentual">%1$d%%</string>
     <string name="valor_estacao">nº %1$d</string>
     <string name="valor_raio">%1$d km</string>
@@ -61,8 +61,25 @@
 
     <!-- Previsão -->
     <string name="previsao_titulo">Previsão</string>
-    <string name="previsao_indisponivel_titulo">Previsão indisponível</string>
-    <string name="previsao_indisponivel_descricao">O servidor ainda não disponibiliza dados de previsão do tempo. Esta aba será preenchida quando a API oferecer esse recurso.</string>
+    <string name="previsao_local_gps">Sua localização atual</string>
+    <string name="previsao_local_cidade">Centro de São Caetano do Sul</string>
+    <string name="previsao_risco_agora">RISCO DE ALAGAMENTO AGORA</string>
+    <string name="previsao_score">Pontuação %1$s de 100</string>
+    <string name="previsao_fontes_titulo">O QUE ENTROU NO CÁLCULO</string>
+    <string name="previsao_chuva_agora">Chuva agora (OpenWeather)</string>
+    <string name="previsao_pico">Pico nas próximas 24 h</string>
+    <string name="previsao_pluviometro">Pluviômetro local (ANA)</string>
+    <string name="previsao_relatos">Relatos de usuários (1 km, 3 h)</string>
+    <string name="previsao_cptec">Previsão CPTEC/INPE</string>
+    <string name="previsao_valor_mm_h">%1$s mm/h</string>
+    <string name="previsao_valor_mm_3h">%1$s mm em 3 h</string>
+    <string name="previsao_relatos_valor">%1$d relato(s)</string>
+    <string name="previsao_relatos_poucos">Poucos relatos</string>
+    <string name="previsao_sem_dado">Sem dado</string>
+    <string name="previsao_explicacao" formatted="false">O risco combina chuva atual (35%), pluviômetro local (25%), previsão (25%) e relatos de usuários próximos (15%). Fontes sem dado no momento têm o peso redistribuído entre as demais.</string>
+    <string name="previsao_atualizar">Atualizar</string>
+    <string name="previsao_indisponivel_titulo">Dados climáticos indisponíveis</string>
+    <string name="previsao_indisponivel_descricao">O servidor não conseguiu consultar as fontes de clima agora. Tente atualizar em alguns minutos.</string>
 
     <!-- Ajustes -->
     <string name="ajustes_titulo">Ajustes</string>
@@ -122,8 +139,8 @@
     <string name="cadastro_titulo">Registrar ocorrência</string>
     <string name="cadastro_local">LOCAL DA OCORRÊNCIA</string>
     <string name="cadastro_local_instrucao">Toque no mapa para marcar o local ou use sua localização.</string>
-    <string name="cadastro_local_escolhido">Local marcado: %1$.5f, %2$.5f</string>
-    <string name="cadastro_local_fora">Local marcado: %1$.5f, %2$.5f — fora de São Caetano do Sul</string>
+    <string name="cadastro_local_escolhido">Local marcado: %1$s</string>
+    <string name="cadastro_local_fora">Local marcado: %1$s — fora de São Caetano do Sul</string>
     <string name="cadastro_erro_local">Marque o local da ocorrência antes de enviar.</string>
     <string name="cadastro_usar_localizacao">Usar minha localização</string>
     <string name="cadastro_buscando_localizacao">Buscando localização…</string>
@@ -142,6 +159,7 @@
     <string name="cadastro_erro_conexao">Sem conexão com o servidor (%1$s). Seus dados continuam no formulário; tente enviar de novo.</string>
     <string name="cadastro_erro_dados">O servidor recusou os dados da ocorrência. Confira o local e a descrição.</string>
     <string name="cadastro_erro_servidor">O servidor não conseguiu registrar a ocorrência (erro %1$d). Tente novamente.</string>
+    <string name="cadastro_erro_risco_auto">Risco automático indisponível. Escolha Baixo, Médio ou Alto e reenvie.</string>
 
     <!-- Filtros da aba Alertas -->
     <string name="filtro_regiao">REGIÃO</string>

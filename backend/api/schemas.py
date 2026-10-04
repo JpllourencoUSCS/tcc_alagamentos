@@ -24,6 +24,39 @@ class OcorrenciaCreate(BaseModel):
     id_estacao_ref: int | None = None
 
 
+class ComponentesRisco(BaseModel):
+    """Score 0-100 de cada componente do AHP; null = fonte sem dado (o peso
+    dela foi redistribuído, ver T15 seção 6.3)."""
+
+    precipitacao_atual: float | None
+    previsao: float | None
+    pluviometro_local: float | None
+    colaborativo: float | None
+
+
+class FontesRisco(BaseModel):
+    precipitacao_atual: str | None
+    previsao: str | None
+    pluviometro_local: str | None
+
+
+class RiscoOut(BaseModel):
+    """Risco de alagamento calculado agora para um ponto (GET /risco)."""
+
+    latitude: float
+    longitude: float
+    classificacao: NivelRisco
+    score_final: float
+    componentes: ComponentesRisco
+    precipitacao_atual_mm_h: float
+    pico_previsto_mm_3h: float
+    pluviometro_local_mm_h: float | None
+    reportes_colaborativos: int
+    validacao_cptec: str | None
+    fontes: FontesRisco
+    dados_em_cache: bool
+
+
 class OcorrenciaOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

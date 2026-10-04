@@ -25,7 +25,9 @@ apoiar o monitoramento colaborativo de áreas com risco de alagamento na cidade 
 Caetano do Sul, combinando dados climáticos de múltiplas fontes com um algoritmo de
 classificação de risco. Esta etapa da pesquisa tem por objetivo avaliar a **usabilidade**
 do aplicativo já integrado ao backend real — ou seja, o quão fácil, clara e agradável é a
-experiência de uso das telas, com dados reais de ocorrências e classificação de risco.
+experiência de uso das telas. As ocorrências exibidas durante o teste são **de
+demonstração**, criadas pela equipe para esta avaliação (não representam alagamentos que
+de fato aconteceram); a classificação de risco é a calculada pelo próprio sistema.
 
 ## 2. Procedimentos
 
@@ -42,8 +44,8 @@ Caso concorde em participar, você será convidado(a) a:
 A participação tem duração estimada de 15 a 25 minutos e pode ser interrompida a qualquer
 momento, por qualquer motivo, sem necessidade de justificativa.
 
-**Importante:** mesmo utilizando dados reais de ocorrências e das fontes climáticas
-integradas, este aplicativo é um protótipo acadêmico em fase de testes, não uma ferramenta
+**Importante:** mesmo integrado às fontes climáticas reais, este aplicativo é um protótipo
+acadêmico em fase de testes, com ocorrências de demonstração, não uma ferramenta
 oficial de defesa civil ou serviço de alerta certificado. Nenhuma decisão sobre situações
 reais de risco de alagamento deve se basear apenas no que for exibido durante este teste.
 

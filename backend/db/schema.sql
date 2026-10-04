@@ -7,10 +7,9 @@
 --     índice GiST (docs/T17_indexacao_espacial_fundamentacao.md) efetivamente indexa.
 --   - `fonte` (em ambas as tabelas) troca inmet/cemaden por ana/cptec, refletindo a
 --     decisão de arquitetura registrada em docs/T_arquitetura_fontes_dados_final.md.
---   - nova tabela `reportes_colaborativos_agregado`: ainda não tem processo que a
---     popule (módulo de agregação pendente, ver nota de 17/08 no CRONOGRAMA_STATUS.md),
---     mas o modelo já reserva o espaço para não exigir migração extra quando o módulo
---     existir.
+--   - nova tabela `reportes_colaborativos_agregado`: reservada na modelagem para não
+--     exigir migração extra; preenchida desde 03/10/2026 por
+--     backend/servicos/colaborativo.py (pendência de 17/08 no CRONOGRAMA_STATUS.md).
 
 CREATE EXTENSION IF NOT EXISTS postgis;
 
@@ -53,9 +52,9 @@ CREATE TABLE IF NOT EXISTS ocorrencias (
 -- ---------------------------------------------------------------------------
 -- Tabela nova: reportes_colaborativos_agregado
 -- Componente "colaborativo" do AHP (15% do score, ver algoritmo_risco.py) precisa
--- de um score 0-100 já agregado por área/janela de tempo. O módulo que calcula
--- esse agregado a partir dos reportes brutos (fonte='usuario' em `ocorrencias`)
--- ainda não existe — esta tabela só reserva onde o resultado vai morar.
+-- de um score 0-100 já agregado por área/janela de tempo. Calculado a partir dos
+-- reportes brutos (fonte='usuario' em `ocorrencias`) por servicos/colaborativo.py;
+-- cada score usado numa classificação fica registrado aqui.
 -- ---------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS reportes_colaborativos_agregado (
     id               BIGSERIAL PRIMARY KEY,

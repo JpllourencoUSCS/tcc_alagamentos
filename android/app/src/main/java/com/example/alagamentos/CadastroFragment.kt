@@ -112,8 +112,8 @@ class CadastroFragment : Fragment(R.layout.fragment_cadastro) {
         val (msg, cor) = when {
             p == null && erro -> getString(R.string.cadastro_erro_local) to R.color.status_high
             p == null -> getString(R.string.cadastro_local_instrucao) to R.color.text_secondary
-            !dentroDaCidade(p) -> getString(R.string.cadastro_local_fora, p.latitude, p.longitude) to R.color.status_medium
-            else -> getString(R.string.cadastro_local_escolhido, p.latitude, p.longitude) to R.color.text_primary
+            !dentroDaCidade(p) -> getString(R.string.cadastro_local_fora, textoCoordenadas(p.latitude, p.longitude, 5)) to R.color.status_medium
+            else -> getString(R.string.cadastro_local_escolhido, textoCoordenadas(p.latitude, p.longitude, 5)) to R.color.text_primary
         }
         texto.text = msg
         texto.setTextColor(ContextCompat.getColor(requireContext(), cor))
@@ -178,8 +178,13 @@ class CadastroFragment : Fragment(R.layout.fragment_cadastro) {
             } catch (e: HttpException) {
                 definirEnviando(view, false)
                 aviso(
-                    if (e.code() == 422) getString(R.string.cadastro_erro_dados)
-                    else getString(R.string.cadastro_erro_servidor, e.code())
+                    when (e.code()) {
+                        422 -> getString(R.string.cadastro_erro_dados)
+                        // Backend sem a fonte climática para o cálculo automático (AHP):
+                        // com o nível escolhido à mão, o envio funciona
+                        503 -> getString(R.string.cadastro_erro_risco_auto)
+                        else -> getString(R.string.cadastro_erro_servidor, e.code())
+                    }
                 )
             } catch (e: IOException) {
                 definirEnviando(view, false)

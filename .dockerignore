@@ -1,0 +1,10 @@
+.git
+.venv
+venv
+.env
+android
+docs
+testes-api
+**/__pycache__
+**/.pytest_cache
+backend/benchmark/resultados

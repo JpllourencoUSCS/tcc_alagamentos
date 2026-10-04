@@ -1,25 +1,34 @@
 """
 Medição de tempo de consulta geoespacial, com e sem índice GiST (Semanas 8-9
-— Henrique, reconstruído em 18/08/2026).
+— Henrique, reconstruído em 18/08/2026; metodologia revisada em 03/10/2026,
+antes da primeira execução real).
 
-Um módulo só para as duas semanas: a métrica e a consulta medida são
+Um módulo só para as duas semanas: a métrica e as consultas medidas são
 idênticas, muda apenas se o índice existe ou não no momento da medição — é
 exatamente o contraste que o benchmark precisa isolar. Semana 8 usa
 `--indice ausente`; Semana 9 soma `--indice presente` (mesmo script, mesmas
-escalas) e o gráfico comparativo cruza os dois CSVs de saída.
+escalas) e `benchmark/gerar_graficos.py` cruza os dois CSVs de saída.
 
-A consulta medida é a mesma que `db/repository.OcorrenciaRepository.listar`
-gera para um filtro de região (bbox -> `geom && ST_MakeEnvelope`, ORDER BY
-data_hora DESC, LIMIT) — o benchmark mede o caso de uso real do endpoint, não
-uma consulta sintética à parte.
+Duas consultas são medidas (revisão de 03/10/2026):
+
+- `endpoint`: a mesma que `db/repository.OcorrenciaRepository.listar` gera
+  para um filtro de região (bbox -> `geom && ST_MakeEnvelope`, ORDER BY
+  data_hora DESC, LIMIT) — o caso de uso real do app.
+- `espacial`: só o filtro espacial (`count(*)` das linhas no bbox), sem
+  ORDER BY/LIMIT. Isola o efeito do índice GiST: na consulta `endpoint`, o
+  planner pode preferir percorrer `idx_ocorrencias_data_hora` de trás para
+  frente e parar ao achar as 100 primeiras linhas no bbox — custo que depende
+  da seletividade do bbox, não de n —, o que mascara o crescimento O(n) do
+  scan sequencial que a hipótese de T17 quer evidenciar.
 
 Usa `EXPLAIN (ANALYZE, FORMAT JSON)` em vez de cronometrar em Python: isola o
 tempo de execução dentro do Postgres, sem ruído de rede/driver/serialização —
 metodologia mais defensável para comparar O(n) vs. O(log n) na banca do que
-wall-clock do lado do cliente.
+wall-clock do lado do cliente. O mesmo JSON informa o plano escolhido (scan
+sequencial, bitmap/index scan no GiST etc.), registrado no CSV como evidência
+de que o índice foi de fato usado quando presente.
 
-Não roda sozinho neste ambiente (sem Postgres/PostGIS — ver CRONOGRAMA_STATUS.md).
-Pronto para rodar assim que houver banco populado (ver benchmark/popular_banco.py):
+Uso (Postgres do docker-compose.yml; ver CLAUDE.md, "Ambiente de desenvolvimento"):
 
     export ADMIN_DATABASE_URL=postgresql+psycopg2://usuario:senha@host/postgres
     cd backend
@@ -35,13 +44,14 @@ from pathlib import Path
 from sqlalchemy import create_engine, text
 
 from benchmark.config import (
+    AQUECIMENTO_PADRAO,
     BBOX_CONSULTA_BENCHMARK,
     ESCALAS,
     LIMITE_RESULTADOS_CONSULTA,
     NOME_INDICE_GEOM,
     REPETICOES_PADRAO,
 )
-from benchmark.popular_banco import nome_banco_escala, url_para_banco
+from benchmark.popular_banco import atualizar_estatisticas, nome_banco_escala, url_para_banco
 
 SQL_CONSULTA_BBOX = """
     SELECT * FROM ocorrencias
@@ -49,6 +59,18 @@ SQL_CONSULTA_BBOX = """
     ORDER BY data_hora DESC
     LIMIT :limite
 """
+
+SQL_CONSULTA_FILTRO_ESPACIAL = """
+    SELECT count(*) FROM ocorrencias
+    WHERE geom && ST_MakeEnvelope(:lon_min, :lat_min, :lon_max, :lat_max, 4326)
+"""
+
+CONSULTAS = {
+    "endpoint": SQL_CONSULTA_BBOX,
+    "espacial": SQL_CONSULTA_FILTRO_ESPACIAL,
+}
+
+CAMPOS_CSV = ["escala", "indice", "consulta", "repeticao", "tempo_ms", "linhas", "plano"]
 
 
 def indice_existe(url_banco: str, nome_indice: str = NOME_INDICE_GEOM) -> bool:
@@ -89,16 +111,35 @@ def criar_indice(
         engine.dispose()
 
 
-def medir_consulta_bbox(
+def resumir_plano(no: dict) -> str:
+    """Pura — resume a árvore de um plano do EXPLAIN (FORMAT JSON) numa linha
+    legível, da raiz às folhas: ex. "Aggregate > Bitmap Heap Scan > Bitmap
+    Index Scan[idx_ocorrencias_geom]". É o que prova, no CSV, se o planner
+    usou o índice GiST ou fez scan sequencial."""
+    rotulo = no["Node Type"]
+    if no.get("Index Name"):
+        rotulo += f"[{no['Index Name']}]"
+    filhos = [resumir_plano(filho) for filho in no.get("Plans", [])]
+    if not filhos:
+        return rotulo
+    if len(filhos) == 1:
+        return f"{rotulo} > {filhos[0]}"
+    return f"{rotulo} > ({' | '.join(filhos)})"
+
+
+def medir_consulta(
     url_banco: str,
+    sql: str = SQL_CONSULTA_BBOX,
     bbox: tuple[float, float, float, float] = BBOX_CONSULTA_BENCHMARK,
     limite: int = LIMITE_RESULTADOS_CONSULTA,
     repeticoes: int = REPETICOES_PADRAO,
-) -> list[float]:
-    """Roda a consulta `repeticoes` vezes via EXPLAIN ANALYZE e retorna os
-    tempos de execução em milissegundos (só o que o Postgres gastou
-    executando o plano — "Execution Time" do JSON de saída do EXPLAIN, não
-    inclui planejamento nem round-trip de rede)."""
+    aquecimento: int = AQUECIMENTO_PADRAO,
+) -> list[dict]:
+    """Roda `aquecimento` execuções descartadas e depois `repeticoes` medidas
+    via EXPLAIN ANALYZE. Retorna, para cada execução medida, o tempo de
+    execução em milissegundos (só o que o Postgres gastou executando o plano —
+    "Execution Time" do JSON, não inclui planejamento nem round-trip de rede),
+    as linhas devolvidas pela raiz do plano e o plano resumido."""
     lat_min, lon_min, lat_max, lon_max = bbox
     params = {
         "lat_min": lat_min, "lon_min": lon_min,
@@ -106,17 +147,35 @@ def medir_consulta_bbox(
         "limite": limite,
     }
     engine = create_engine(url_banco)
-    tempos = []
+    medicoes = []
     try:
         with engine.connect() as conn:
-            for _ in range(repeticoes):
+            for i in range(aquecimento + repeticoes):
                 plano = conn.execute(
-                    text(f"EXPLAIN (ANALYZE, FORMAT JSON) {SQL_CONSULTA_BBOX}"), params
-                ).scalar_one()
-                tempos.append(plano[0]["Execution Time"])
+                    text(f"EXPLAIN (ANALYZE, FORMAT JSON) {sql}"), params
+                ).scalar_one()[0]
+                if i < aquecimento:
+                    continue
+                medicoes.append({
+                    "tempo_ms": plano["Execution Time"],
+                    "linhas": plano["Plan"]["Actual Rows"],
+                    "plano": resumir_plano(plano["Plan"]),
+                })
     finally:
         engine.dispose()
-    return tempos
+    return medicoes
+
+
+def medir_consulta_bbox(
+    url_banco: str,
+    bbox: tuple[float, float, float, float] = BBOX_CONSULTA_BENCHMARK,
+    limite: int = LIMITE_RESULTADOS_CONSULTA,
+    repeticoes: int = REPETICOES_PADRAO,
+) -> list[float]:
+    """Compatibilidade com a versão de 18/08: só os tempos da consulta do
+    endpoint, sem aquecimento."""
+    medicoes = medir_consulta(url_banco, SQL_CONSULTA_BBOX, bbox, limite, repeticoes, aquecimento=0)
+    return [m["tempo_ms"] for m in medicoes]
 
 
 def resumo_estatistico(tempos: list[float]) -> dict:
@@ -135,7 +194,11 @@ def resumo_estatistico(tempos: list[float]) -> dict:
 
 
 def medir_escala(
-    url_admin: str, escala: int, com_indice: bool, repeticoes: int
+    url_admin: str,
+    escala: int,
+    com_indice: bool,
+    repeticoes: int,
+    aquecimento: int = AQUECIMENTO_PADRAO,
 ) -> list[dict]:
     nome_banco = nome_banco_escala(escala)
     url_banco = url_para_banco(url_admin, nome_banco)
@@ -146,16 +209,33 @@ def medir_escala(
     elif not com_indice and indice_existe(url_banco):
         print(f"[{nome_banco}] removendo {NOME_INDICE_GEOM} (medição sem índice)...")
         remover_indice(url_banco)
+    # Estatísticas recalculadas depois de mexer no índice, para o planner
+    # decidir com a mesma informação nas duas condições.
+    atualizar_estatisticas(url_banco)
 
-    print(f"[{nome_banco}] medindo {repeticoes} execuções (índice={'sim' if com_indice else 'não'})...")
-    tempos = medir_consulta_bbox(url_banco, repeticoes=repeticoes)
-    resumo = resumo_estatistico(tempos)
-    print(f"[{nome_banco}] média={resumo['media_ms']:.2f}ms mediana={resumo['mediana_ms']:.2f}ms")
-
-    return [
-        {"escala": escala, "indice": com_indice, "repeticao": i, "tempo_ms": t}
-        for i, t in enumerate(tempos)
-    ]
+    linhas = []
+    for nome_consulta, sql in CONSULTAS.items():
+        print(
+            f"[{nome_banco}] consulta '{nome_consulta}': {aquecimento} aquecimento + "
+            f"{repeticoes} medidas (índice={'sim' if com_indice else 'não'})..."
+        )
+        medicoes = medir_consulta(url_banco, sql, repeticoes=repeticoes, aquecimento=aquecimento)
+        resumo = resumo_estatistico([m["tempo_ms"] for m in medicoes])
+        print(
+            f"[{nome_banco}]   média={resumo['media_ms']:.3f}ms "
+            f"mediana={resumo['mediana_ms']:.3f}ms  plano: {medicoes[0]['plano']}"
+        )
+        linhas.extend(
+            {
+                "escala": escala,
+                "indice": com_indice,
+                "consulta": nome_consulta,
+                "repeticao": i,
+                **m,
+            }
+            for i, m in enumerate(medicoes)
+        )
+    return linhas
 
 
 def main() -> None:
@@ -166,6 +246,7 @@ def main() -> None:
         help="'ausente' = Semana 8 (baseline); 'presente' = Semana 9 (comparação).",
     )
     parser.add_argument("--repeticoes", type=int, default=REPETICOES_PADRAO)
+    parser.add_argument("--aquecimento", type=int, default=AQUECIMENTO_PADRAO)
     parser.add_argument("--saida", type=str, required=True, help="Caminho do CSV de resultados.")
     args = parser.parse_args()
 
@@ -179,11 +260,12 @@ def main() -> None:
     com_indice = args.indice == "presente"
     linhas = []
     for escala in args.escalas:
-        linhas.extend(medir_escala(url_admin, escala, com_indice, args.repeticoes))
+        linhas.extend(medir_escala(url_admin, escala, com_indice, args.repeticoes, args.aquecimento))
 
     caminho_saida = Path(args.saida)
+    caminho_saida.parent.mkdir(parents=True, exist_ok=True)
     with caminho_saida.open("w", newline="", encoding="utf-8") as f:
-        escritor = csv.DictWriter(f, fieldnames=["escala", "indice", "repeticao", "tempo_ms"])
+        escritor = csv.DictWriter(f, fieldnames=CAMPOS_CSV)
         escritor.writeheader()
         escritor.writerows(linhas)
     print(f"\nResultados salvos em {caminho_saida.resolve()}")

@@ -1,0 +1,5 @@
+# Dependências extras do benchmark (gráficos de backend/benchmark/gerar_graficos.py).
+# Separadas do requirements.txt para não pesar a imagem Docker da API.
+#   pip install -r requirements-benchmark.txt
+-r requirements.txt
+matplotlib

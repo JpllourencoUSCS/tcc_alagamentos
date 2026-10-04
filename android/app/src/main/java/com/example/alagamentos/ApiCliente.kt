@@ -40,6 +40,13 @@ interface AlagamentosApi {
     @POST("ocorrencias")
     suspend fun criarOcorrencia(@Body dados: OcorrenciaCreateDto): OcorrenciaDto
 
+    // Risco calculado agora para o ponto (backend/api/risco.py); 503 = fonte climática fora
+    @GET("risco")
+    suspend fun obterRisco(
+        @Query("latitude") latitude: Double,
+        @Query("longitude") longitude: Double
+    ): RiscoDto
+
     companion object {
         // Teto de `limit` aceito pelo backend (Query(le=500))
         const val LIMITE_MAXIMO = 500
@@ -94,6 +101,26 @@ data class OcorrenciaDto(
         )
     }
 }
+
+// Formato JSON de RiscoOut (backend/api/schemas.py). Componente null = fonte sem
+// dado no momento (o peso dela foi redistribuído pelo AHP).
+data class RiscoDto(
+    @SerializedName("classificacao") val classificacao: String,
+    @SerializedName("score_final") val scoreFinal: Double,
+    @SerializedName("componentes") val componentes: ComponentesRiscoDto,
+    @SerializedName("precipitacao_atual_mm_h") val precipitacaoAtualMmH: Double,
+    @SerializedName("pico_previsto_mm_3h") val picoPrevistoMm3h: Double,
+    @SerializedName("pluviometro_local_mm_h") val pluviometroLocalMmH: Double?,
+    @SerializedName("reportes_colaborativos") val reportesColaborativos: Int,
+    @SerializedName("validacao_cptec") val validacaoCptec: String?
+)
+
+data class ComponentesRiscoDto(
+    @SerializedName("precipitacao_atual") val precipitacaoAtual: Double?,
+    @SerializedName("previsao") val previsao: Double?,
+    @SerializedName("pluviometro_local") val pluviometroLocal: Double?,
+    @SerializedName("colaborativo") val colaborativo: Double?
+)
 
 // `data_hora` é TIMESTAMPTZ (vem com fuso); sem fuso, trata como UTC
 private fun lerDataHora(texto: String): ZonedDateTime {

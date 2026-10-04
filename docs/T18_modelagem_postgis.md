@@ -51,6 +51,11 @@ não exija uma migração de schema adicional. A lógica de cálculo em si **nã
 tarefa** (Semana 2 é modelagem, não o módulo de agregação) — fica registrada como pendência
 em aberto, já sinalizada no cronograma.
 
+> **Atualização (03/10/2026):** o módulo de agregação foi implementado
+> (`backend/servicos/colaborativo.py`, descrito em T15, seção 6.4) e passou a preencher
+> esta tabela sem nenhuma migração de schema — a reserva feita aqui funcionou como
+> planejado.
+
 ## 5. Índices e o que fica para a Semana 9
 
 `schema.sql` já cria o índice GiST (`idx_ocorrencias_geom`) como parte da modelagem — é

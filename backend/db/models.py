@@ -90,10 +90,10 @@ class Ocorrencia(Base):
 class ReporteColaborativoAgregado(Base):
     """Score 0-100 já agregado de reportes de usuários por área/janela de tempo —
     é o que alimenta o componente `reportes_colaborativos_score` de
-    backend/algoritmo_risco.py. O módulo que calcula esse agregado a partir dos
-    reportes brutos (Ocorrencia.fonte == 'usuario') ainda não existe (pendência
-    aberta em 17/08 no CRONOGRAMA_STATUS.md); esta tabela só reserva onde o
-    resultado do futuro módulo vai morar."""
+    backend/algoritmo_risco.py. Preenchida por servicos/colaborativo.py desde
+    03/10/2026: cada score calculado a partir dos reportes brutos
+    (Ocorrencia.fonte == 'usuario') durante um POST /ocorrencias fica registrado
+    aqui (pendência aberta em 17/08 no CRONOGRAMA_STATUS.md)."""
 
     __tablename__ = "reportes_colaborativos_agregado"
     __table_args__ = (

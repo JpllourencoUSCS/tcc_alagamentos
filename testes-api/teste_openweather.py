@@ -1,8 +1,12 @@
+import os
 import requests
 import json
 from datetime import datetime
 
-API_KEY = "sua_chave_aqui"
+# Mesma variável do backend (fusao_climatica.py, .env); até 03/10/2026 era o texto
+# fixo "sua_chave_aqui". Atenção: rodar este script sobrescreve os JSONs do teste
+# original de Santo André em testes-api/.
+API_KEY = os.environ.get("OPENWEATHER_API_KEY") or exit("Defina OPENWEATHER_API_KEY (ver .env.example).")
 lat = -23.6573  # Santo André
 lon = -46.5289
 

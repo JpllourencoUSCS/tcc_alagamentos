@@ -73,12 +73,31 @@ silenciosamente. Em ambos os casos, a decisão de projeto é a mesma: evitar que
 indisponibilidade temporária ou estrutural de uma fonte subestime artificialmente o
 score final.
 
+O componente colaborativo é calculado a partir dos reportes feitos pelos próprios
+usuários no aplicativo. Entram os reportes a até 1 km do ponto avaliado, feitos nas
+últimas 3 horas. Cada um é convertido no ponto médio da faixa de risco informada (Baixo →
+15, Médio → 45, Alto → 80) e ponderado pela proximidade no tempo e no espaço: reportes mais
+recentes e mais próximos pesam mais. O score do componente é a média ponderada desses
+valores. Com menos de dois reportes na vizinhança, o componente é considerado ausente e
+entra a redistribuição de peso descrita acima, para que um único reporte isolado não
+altere a classificação. A busca dos reportes vizinhos usa o mesmo índice espacial GiST
+avaliado no benchmark do sistema.
+
 ### 3.Y.4 Teste com Dado Real
 
 O algoritmo foi validado com dados reais coletados para o município de Santo André, SP
 (precipitação atual de 0,35 mm/h e pico de previsão de 2,14 mm em 3h, ambos obtidos via
 OpenWeather), resultando em um score final de **4,2 (Baixo risco)** — resultado coerente
 com a condição de chuva leve observada no momento da coleta.
+
+Um segundo teste foi feito em 03/10/2026 já com o sistema integrado, para o centro de São
+Caetano do Sul, escopo atual do monitoramento: sem chuva no momento (0,0 mm/h), com pico
+previsto de 12,5 mm em 3 horas nas 24 horas seguintes, pluviômetro da ANA indisponível e
+sem reportes colaborativos suficientes. O componente de previsão recebeu 33,2 pontos (chuva
+equivalente de 4,2 mm/h, moderada) e o de precipitação atual, zero. Com os pesos dos dois
+componentes ausentes redistribuídos, a previsão passou a pesar 41,2%, resultando em um
+score final de **13,7 (Baixo risco)** — coerente com um dia ainda seco, com chuva moderada
+prevista.
 
 ### 3.Y.5 Limitações
 
@@ -87,13 +106,12 @@ pareada foram definidos pela própria equipe do projeto, sem validação por esp
 externos em hidrologia ou defesa civil, o que é declarado aqui como limitação
 metodológica do protótipo. Os pesos são fixos e não variam por região ou sazonalidade;
 uma extensão natural do trabalho seria a recalibração dos pesos por microrregião a
-partir de histórico real de ocorrências. Por fim, a agregação dos reportes brutos de
-usuários em um score numérico 0–100 para o componente colaborativo ainda não foi
-implementada em nenhum módulo do sistema — o algoritmo já está preparado para operar sem
-esse dado (fail-safe), mas a validação com as quatro fontes em produção depende dessa
-peça ainda não construída.
+partir de histórico real de ocorrências. Da mesma forma, os parâmetros da agregação
+colaborativa (raio de 1 km, janela de 3 horas e mínimo de dois reportes) são escolhas de
+projeto do protótipo, ainda não calibradas com dados reais de uso.
 
 ---
 
-*Seção redigida com base em `backend/algoritmo_risco.py` e na documentação técnica
-`docs/T15_algoritmo_risco_fundamentacao.md`, consolidada em 17/08/2026.*
+*Seção redigida com base em `backend/algoritmo_risco.py`, `backend/servicos/colaborativo.py`
+e na documentação técnica `docs/T15_algoritmo_risco_fundamentacao.md` (consolidada em
+17/08/2026; agregação colaborativa incluída em 03/10/2026).*

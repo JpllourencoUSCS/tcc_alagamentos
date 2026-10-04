@@ -1,0 +1,161 @@
+escala,indice,consulta,repeticao,tempo_ms,linhas,plano
+1000,False,endpoint,0,0.161,7,Limit > Sort > Seq Scan
+1000,False,endpoint,1,0.312,7,Limit > Sort > Seq Scan
+1000,False,endpoint,2,0.159,7,Limit > Sort > Seq Scan
+1000,False,endpoint,3,0.337,7,Limit > Sort > Seq Scan
+1000,False,endpoint,4,0.199,7,Limit > Sort > Seq Scan
+1000,False,endpoint,5,0.178,7,Limit > Sort > Seq Scan
+1000,False,endpoint,6,0.212,7,Limit > Sort > Seq Scan
+1000,False,endpoint,7,0.181,7,Limit > Sort > Seq Scan
+1000,False,endpoint,8,0.158,7,Limit > Sort > Seq Scan
+1000,False,endpoint,9,0.237,7,Limit > Sort > Seq Scan
+1000,False,endpoint,10,0.253,7,Limit > Sort > Seq Scan
+1000,False,endpoint,11,0.154,7,Limit > Sort > Seq Scan
+1000,False,endpoint,12,0.153,7,Limit > Sort > Seq Scan
+1000,False,endpoint,13,0.153,7,Limit > Sort > Seq Scan
+1000,False,endpoint,14,0.151,7,Limit > Sort > Seq Scan
+1000,False,endpoint,15,0.153,7,Limit > Sort > Seq Scan
+1000,False,endpoint,16,0.151,7,Limit > Sort > Seq Scan
+1000,False,endpoint,17,0.151,7,Limit > Sort > Seq Scan
+1000,False,endpoint,18,0.15,7,Limit > Sort > Seq Scan
+1000,False,endpoint,19,0.15,7,Limit > Sort > Seq Scan
+1000,False,espacial,0,0.151,1,Aggregate > Seq Scan
+1000,False,espacial,1,0.18,1,Aggregate > Seq Scan
+1000,False,espacial,2,0.15,1,Aggregate > Seq Scan
+1000,False,espacial,3,0.209,1,Aggregate > Seq Scan
+1000,False,espacial,4,0.152,1,Aggregate > Seq Scan
+1000,False,espacial,5,0.174,1,Aggregate > Seq Scan
+1000,False,espacial,6,0.176,1,Aggregate > Seq Scan
+1000,False,espacial,7,0.16,1,Aggregate > Seq Scan
+1000,False,espacial,8,0.199,1,Aggregate > Seq Scan
+1000,False,espacial,9,0.2,1,Aggregate > Seq Scan
+1000,False,espacial,10,0.212,1,Aggregate > Seq Scan
+1000,False,espacial,11,0.168,1,Aggregate > Seq Scan
+1000,False,espacial,12,0.199,1,Aggregate > Seq Scan
+1000,False,espacial,13,0.182,1,Aggregate > Seq Scan
+1000,False,espacial,14,0.171,1,Aggregate > Seq Scan
+1000,False,espacial,15,0.157,1,Aggregate > Seq Scan
+1000,False,espacial,16,0.151,1,Aggregate > Seq Scan
+1000,False,espacial,17,0.234,1,Aggregate > Seq Scan
+1000,False,espacial,18,0.187,1,Aggregate > Seq Scan
+1000,False,espacial,19,0.149,1,Aggregate > Seq Scan
+10000,False,endpoint,0,1.454,48,Limit > Sort > Seq Scan
+10000,False,endpoint,1,1.478,48,Limit > Sort > Seq Scan
+10000,False,endpoint,2,1.484,48,Limit > Sort > Seq Scan
+10000,False,endpoint,3,1.363,48,Limit > Sort > Seq Scan
+10000,False,endpoint,4,1.499,48,Limit > Sort > Seq Scan
+10000,False,endpoint,5,1.916,48,Limit > Sort > Seq Scan
+10000,False,endpoint,6,1.657,48,Limit > Sort > Seq Scan
+10000,False,endpoint,7,1.446,48,Limit > Sort > Seq Scan
+10000,False,endpoint,8,1.388,48,Limit > Sort > Seq Scan
+10000,False,endpoint,9,1.513,48,Limit > Sort > Seq Scan
+10000,False,endpoint,10,1.592,48,Limit > Sort > Seq Scan
+10000,False,endpoint,11,2.136,48,Limit > Sort > Seq Scan
+10000,False,endpoint,12,1.586,48,Limit > Sort > Seq Scan
+10000,False,endpoint,13,1.437,48,Limit > Sort > Seq Scan
+10000,False,endpoint,14,1.455,48,Limit > Sort > Seq Scan
+10000,False,endpoint,15,1.488,48,Limit > Sort > Seq Scan
+10000,False,endpoint,16,1.417,48,Limit > Sort > Seq Scan
+10000,False,endpoint,17,1.494,48,Limit > Sort > Seq Scan
+10000,False,endpoint,18,1.644,48,Limit > Sort > Seq Scan
+10000,False,endpoint,19,2.311,48,Limit > Sort > Seq Scan
+10000,False,espacial,0,1.454,1,Aggregate > Seq Scan
+10000,False,espacial,1,1.468,1,Aggregate > Seq Scan
+10000,False,espacial,2,1.458,1,Aggregate > Seq Scan
+10000,False,espacial,3,2.082,1,Aggregate > Seq Scan
+10000,False,espacial,4,1.82,1,Aggregate > Seq Scan
+10000,False,espacial,5,1.96,1,Aggregate > Seq Scan
+10000,False,espacial,6,2.183,1,Aggregate > Seq Scan
+10000,False,espacial,7,1.932,1,Aggregate > Seq Scan
+10000,False,espacial,8,1.911,1,Aggregate > Seq Scan
+10000,False,espacial,9,1.612,1,Aggregate > Seq Scan
+10000,False,espacial,10,1.523,1,Aggregate > Seq Scan
+10000,False,espacial,11,2.084,1,Aggregate > Seq Scan
+10000,False,espacial,12,2.052,1,Aggregate > Seq Scan
+10000,False,espacial,13,1.613,1,Aggregate > Seq Scan
+10000,False,espacial,14,1.991,1,Aggregate > Seq Scan
+10000,False,espacial,15,1.862,1,Aggregate > Seq Scan
+10000,False,espacial,16,1.368,1,Aggregate > Seq Scan
+10000,False,espacial,17,2.016,1,Aggregate > Seq Scan
+10000,False,espacial,18,1.528,1,Aggregate > Seq Scan
+10000,False,espacial,19,1.405,1,Aggregate > Seq Scan
+100000,False,endpoint,0,7.502,100,Limit > Index Scan[idx_ocorrencias_data_hora]
+100000,False,endpoint,1,7.256,100,Limit > Index Scan[idx_ocorrencias_data_hora]
+100000,False,endpoint,2,8.049,100,Limit > Index Scan[idx_ocorrencias_data_hora]
+100000,False,endpoint,3,8.177,100,Limit > Index Scan[idx_ocorrencias_data_hora]
+100000,False,endpoint,4,8.56,100,Limit > Index Scan[idx_ocorrencias_data_hora]
+100000,False,endpoint,5,8.517,100,Limit > Index Scan[idx_ocorrencias_data_hora]
+100000,False,endpoint,6,8.372,100,Limit > Index Scan[idx_ocorrencias_data_hora]
+100000,False,endpoint,7,8.269,100,Limit > Index Scan[idx_ocorrencias_data_hora]
+100000,False,endpoint,8,7.582,100,Limit > Index Scan[idx_ocorrencias_data_hora]
+100000,False,endpoint,9,7.642,100,Limit > Index Scan[idx_ocorrencias_data_hora]
+100000,False,endpoint,10,7.544,100,Limit > Index Scan[idx_ocorrencias_data_hora]
+100000,False,endpoint,11,8.015,100,Limit > Index Scan[idx_ocorrencias_data_hora]
+100000,False,endpoint,12,7.632,100,Limit > Index Scan[idx_ocorrencias_data_hora]
+100000,False,endpoint,13,8.591,100,Limit > Index Scan[idx_ocorrencias_data_hora]
+100000,False,endpoint,14,8.066,100,Limit > Index Scan[idx_ocorrencias_data_hora]
+100000,False,endpoint,15,8.118,100,Limit > Index Scan[idx_ocorrencias_data_hora]
+100000,False,endpoint,16,8.137,100,Limit > Index Scan[idx_ocorrencias_data_hora]
+100000,False,endpoint,17,7.927,100,Limit > Index Scan[idx_ocorrencias_data_hora]
+100000,False,endpoint,18,7.604,100,Limit > Index Scan[idx_ocorrencias_data_hora]
+100000,False,endpoint,19,8.507,100,Limit > Index Scan[idx_ocorrencias_data_hora]
+100000,False,espacial,0,14.401,1,Aggregate > Seq Scan
+100000,False,espacial,1,14.991,1,Aggregate > Seq Scan
+100000,False,espacial,2,14.66,1,Aggregate > Seq Scan
+100000,False,espacial,3,14.538,1,Aggregate > Seq Scan
+100000,False,espacial,4,15.323,1,Aggregate > Seq Scan
+100000,False,espacial,5,14.574,1,Aggregate > Seq Scan
+100000,False,espacial,6,14.579,1,Aggregate > Seq Scan
+100000,False,espacial,7,15.373,1,Aggregate > Seq Scan
+100000,False,espacial,8,14.759,1,Aggregate > Seq Scan
+100000,False,espacial,9,14.365,1,Aggregate > Seq Scan
+100000,False,espacial,10,14.64,1,Aggregate > Seq Scan
+100000,False,espacial,11,14.404,1,Aggregate > Seq Scan
+100000,False,espacial,12,15.291,1,Aggregate > Seq Scan
+100000,False,espacial,13,14.766,1,Aggregate > Seq Scan
+100000,False,espacial,14,14.474,1,Aggregate > Seq Scan
+100000,False,espacial,15,15.205,1,Aggregate > Seq Scan
+100000,False,espacial,16,14.604,1,Aggregate > Seq Scan
+100000,False,espacial,17,14.557,1,Aggregate > Seq Scan
+100000,False,espacial,18,15.474,1,Aggregate > Seq Scan
+100000,False,espacial,19,14.917,1,Aggregate > Seq Scan
+1000000,False,endpoint,0,9.077,100,Limit > Index Scan[idx_ocorrencias_data_hora]
+1000000,False,endpoint,1,8.632,100,Limit > Index Scan[idx_ocorrencias_data_hora]
+1000000,False,endpoint,2,9.063,100,Limit > Index Scan[idx_ocorrencias_data_hora]
+1000000,False,endpoint,3,7.793,100,Limit > Index Scan[idx_ocorrencias_data_hora]
+1000000,False,endpoint,4,10.402,100,Limit > Index Scan[idx_ocorrencias_data_hora]
+1000000,False,endpoint,5,11.047,100,Limit > Index Scan[idx_ocorrencias_data_hora]
+1000000,False,endpoint,6,11.507,100,Limit > Index Scan[idx_ocorrencias_data_hora]
+1000000,False,endpoint,7,11.735,100,Limit > Index Scan[idx_ocorrencias_data_hora]
+1000000,False,endpoint,8,11.511,100,Limit > Index Scan[idx_ocorrencias_data_hora]
+1000000,False,endpoint,9,9.647,100,Limit > Index Scan[idx_ocorrencias_data_hora]
+1000000,False,endpoint,10,11.282,100,Limit > Index Scan[idx_ocorrencias_data_hora]
+1000000,False,endpoint,11,9.254,100,Limit > Index Scan[idx_ocorrencias_data_hora]
+1000000,False,endpoint,12,8.519,100,Limit > Index Scan[idx_ocorrencias_data_hora]
+1000000,False,endpoint,13,8.975,100,Limit > Index Scan[idx_ocorrencias_data_hora]
+1000000,False,endpoint,14,10.73,100,Limit > Index Scan[idx_ocorrencias_data_hora]
+1000000,False,endpoint,15,12.908,100,Limit > Index Scan[idx_ocorrencias_data_hora]
+1000000,False,endpoint,16,12.008,100,Limit > Index Scan[idx_ocorrencias_data_hora]
+1000000,False,endpoint,17,13.007,100,Limit > Index Scan[idx_ocorrencias_data_hora]
+1000000,False,endpoint,18,10.691,100,Limit > Index Scan[idx_ocorrencias_data_hora]
+1000000,False,endpoint,19,12.571,100,Limit > Index Scan[idx_ocorrencias_data_hora]
+1000000,False,espacial,0,71.481,1,Aggregate > Gather > Aggregate > Seq Scan
+1000000,False,espacial,1,70.392,1,Aggregate > Gather > Aggregate > Seq Scan
+1000000,False,espacial,2,80.784,1,Aggregate > Gather > Aggregate > Seq Scan
+1000000,False,espacial,3,78.32,1,Aggregate > Gather > Aggregate > Seq Scan
+1000000,False,espacial,4,70.084,1,Aggregate > Gather > Aggregate > Seq Scan
+1000000,False,espacial,5,73.113,1,Aggregate > Gather > Aggregate > Seq Scan
+1000000,False,espacial,6,78.574,1,Aggregate > Gather > Aggregate > Seq Scan
+1000000,False,espacial,7,80.859,1,Aggregate > Gather > Aggregate > Seq Scan
+1000000,False,espacial,8,76.338,1,Aggregate > Gather > Aggregate > Seq Scan
+1000000,False,espacial,9,71.977,1,Aggregate > Gather > Aggregate > Seq Scan
+1000000,False,espacial,10,77.037,1,Aggregate > Gather > Aggregate > Seq Scan
+1000000,False,espacial,11,68.991,1,Aggregate > Gather > Aggregate > Seq Scan
+1000000,False,espacial,12,68.98,1,Aggregate > Gather > Aggregate > Seq Scan
+1000000,False,espacial,13,72.393,1,Aggregate > Gather > Aggregate > Seq Scan
+1000000,False,espacial,14,69.202,1,Aggregate > Gather > Aggregate > Seq Scan
+1000000,False,espacial,15,68.192,1,Aggregate > Gather > Aggregate > Seq Scan
+1000000,False,espacial,16,84.41,1,Aggregate > Gather > Aggregate > Seq Scan
+1000000,False,espacial,17,68.359,1,Aggregate > Gather > Aggregate > Seq Scan
+1000000,False,espacial,18,68.64,1,Aggregate > Gather > Aggregate > Seq Scan
+1000000,False,espacial,19,68.703,1,Aggregate > Gather > Aggregate > Seq Scan

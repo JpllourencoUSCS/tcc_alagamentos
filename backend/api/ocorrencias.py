@@ -17,6 +17,7 @@ from api.schemas import OcorrenciaCreate, OcorrenciaOut
 from constants import FonteDado, NivelRisco
 from db.repository import FiltrosOcorrencia, OcorrenciaRepository
 from db.session import get_db
+from fusao_climatica import FonteClimaticaIndisponivel
 from servicos.classificacao import ClassificadorRiscoProtocol, ClassificadorRiscoReal
 
 router = APIRouter(prefix="/ocorrencias", tags=["ocorrencias"])
@@ -26,8 +27,10 @@ def get_ocorrencia_repository(db: Session = Depends(get_db)) -> OcorrenciaReposi
     return OcorrenciaRepository(db)
 
 
-def get_classificador_risco() -> ClassificadorRiscoProtocol:
-    return ClassificadorRiscoReal()
+def get_classificador_risco(db: Session = Depends(get_db)) -> ClassificadorRiscoProtocol:
+    # Mesma sessão da requisição: o agregado colaborativo registrado durante a
+    # classificação é gravado no mesmo commit da ocorrência.
+    return ClassificadorRiscoReal(db)
 
 
 @router.post("", response_model=OcorrenciaOut, status_code=201)
@@ -42,7 +45,18 @@ def criar_ocorrencia(
     # se o cliente mandou um valor, ele decide (reporte manual do usuário
     # pode divergir do que as fontes automáticas indicam nesse instante).
     if valores["nivel_risco"] is None:
-        resultado = classificador.classificar(valores["latitude"], valores["longitude"])
+        try:
+            resultado = classificador.classificar(valores["latitude"], valores["longitude"])
+        except FonteClimaticaIndisponivel:
+            # 503, não 500: a falha é de uma fonte externa (OpenWeather), não
+            # do backend, e o cliente tem uma saída — informar o nível à mão.
+            raise HTTPException(
+                status_code=503,
+                detail=(
+                    "Não foi possível calcular o risco automaticamente agora (fonte "
+                    "climática indisponível). Informe o nível de risco manualmente."
+                ),
+            )
         valores["nivel_risco"] = resultado["classificacao"]
         if valores.get("chuva_mm") is None:
             valores["chuva_mm"] = resultado["chuva_mm"]

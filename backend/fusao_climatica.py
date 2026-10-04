@@ -24,16 +24,26 @@ alternativo não respondeu em nenhum dos testes realizados.
 """
 
 import os
+import threading
+import time
 import requests
 import xml.etree.ElementTree as ET
 from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from dataclasses import dataclass
 
 from algoritmo_risco import EntradaRisco, calcular_risco
 
 
-OPENWEATHER_API_KEY = "sua_chave_aqui"  # mesma chave usada em teste_openweather.py
+# Lida do ambiente (03/10/2026), como as credenciais da ANA logo abaixo — até
+# então era o texto fixo "sua_chave_aqui", e todo POST /ocorrencias sem
+# nivel_risco falhava contra a API real com 401 do OpenWeather.
+OPENWEATHER_API_KEY = os.environ.get("OPENWEATHER_API_KEY", "")
+
+
+class FonteClimaticaIndisponivel(RuntimeError):
+    """OpenWeather (fonte principal, sem fail-safe) não respondeu ou não está
+    configurado — o risco não pode ser calculado automaticamente."""
 
 ANA_BASE_URL = "https://www.ana.gov.br/hidrowebservice/EstacoesTelemetricas"
 ANA_IDENTIFICADOR = os.environ.get("ANA_IDENTIFICADOR")  # CPF/CNPJ cadastrado junto à ANA
@@ -71,7 +81,15 @@ class DadosClimaticosConsolidados:
 
 # ---------- OpenWeather ----------
 
+def _exigir_chave_openweather() -> None:
+    if not OPENWEATHER_API_KEY:
+        raise FonteClimaticaIndisponivel(
+            "OPENWEATHER_API_KEY não definida — configure no .env (ver .env.example)."
+        )
+
+
 def _buscar_openweather_atual(lat: float, lon: float) -> dict:
+    _exigir_chave_openweather()
     url = (
         f"https://api.openweathermap.org/data/2.5/weather"
         f"?lat={lat}&lon={lon}&appid={OPENWEATHER_API_KEY}&units=metric&lang=pt_br"
@@ -82,6 +100,7 @@ def _buscar_openweather_atual(lat: float, lon: float) -> dict:
 
 
 def _buscar_openweather_previsao(lat: float, lon: float) -> dict:
+    _exigir_chave_openweather()
     url = (
         f"https://api.openweathermap.org/data/2.5/forecast"
         f"?lat={lat}&lon={lon}&appid={OPENWEATHER_API_KEY}&units=metric&lang=pt_br"
@@ -106,7 +125,7 @@ def _obter_token_ana() -> str | None:
     if not (ANA_IDENTIFICADOR and ANA_SENHA):
         return None
 
-    agora = datetime.utcnow()
+    agora = datetime.now(timezone.utc)  # utcnow() é obsoleto desde o Python 3.12
     if _ana_token_cache["token"] and _ana_token_cache["obtido_em"]:
         if agora - _ana_token_cache["obtido_em"] < timedelta(minutes=55):
             return _ana_token_cache["token"]
@@ -199,8 +218,16 @@ def obter_dados_consolidados(
         futuro_ana = executor.submit(_buscar_ana, codigo_estacao_ana)
         futuro_cptec = executor.submit(_buscar_cptec_previsao, id_cidade_cptec)
 
-        atual = futuro_atual.result()
-        previsao = futuro_previsao.result()
+        try:
+            atual = futuro_atual.result()
+            previsao = futuro_previsao.result()
+        except FonteClimaticaIndisponivel:
+            raise
+        except Exception as erro:
+            # Timeout, 401 (chave inválida), erro de rede... tudo vira um único
+            # tipo de erro, que a API traduz em 503 com mensagem clara em vez
+            # de um 500 genérico (03/10/2026).
+            raise FonteClimaticaIndisponivel(f"OpenWeather indisponível: {erro}") from erro
         pluviometro_local = futuro_ana.result()
         cptec_validacao = futuro_cptec.result()
 
@@ -222,6 +249,50 @@ def obter_dados_consolidados(
         fonte_pluviometro_local=fonte_local,
         validacao_cptec=cptec_validacao,
     )
+
+
+# ---------- Cache de dados climáticos (Semana 10, otimização — 03/10/2026) ----------
+
+# OpenWeather atualiza a condição atual a cada ~10 min; buscar de novo antes
+# disso só repete o mesmo dado pagando 4 chamadas externas (latência de
+# segundos no POST). A chave arredonda lat/lon em 2 casas (~1,1 km), escala
+# compatível com a resolução das fontes (OpenWeather é por grade, ANA/CPTEC
+# por estação/município) — dois reportes no mesmo bairro em poucos minutos
+# reaproveitam a mesma consulta. Era um dos itens "ainda em aberto" do achado
+# de latência de 03/09/2026 (ver docs/CRONOGRAMA_STATUS.md).
+CACHE_TTL_S = 600
+CACHE_CASAS_DECIMAIS = 2
+_cache_dados: dict[tuple[float, float], tuple[float, DadosClimaticosConsolidados]] = {}
+_cache_trava = threading.Lock()
+
+
+def chave_cache(lat: float, lon: float) -> tuple[float, float]:
+    return (round(lat, CACHE_CASAS_DECIMAIS), round(lon, CACHE_CASAS_DECIMAIS))
+
+
+def limpar_cache() -> None:
+    with _cache_trava:
+        _cache_dados.clear()
+
+
+def obter_dados_consolidados_em_cache(
+    lat: float, lon: float, agora: float | None = None
+) -> tuple[DadosClimaticosConsolidados, bool]:
+    """Como `obter_dados_consolidados`, mas reaproveita o resultado de uma
+    consulta da mesma célula (~1 km) feita há menos de CACHE_TTL_S. Retorna
+    (dados, veio_do_cache). Falhas não entram no cache: a próxima chamada tenta
+    as fontes de novo."""
+    agora = time.monotonic() if agora is None else agora
+    chave = chave_cache(lat, lon)
+    with _cache_trava:
+        item = _cache_dados.get(chave)
+    if item is not None and agora - item[0] < CACHE_TTL_S:
+        return item[1], True
+
+    dados = obter_dados_consolidados(lat, lon)
+    with _cache_trava:
+        _cache_dados[chave] = (agora, dados)
+    return dados, False
 
 
 # ---------- Integração com o algoritmo de risco (Semana 7) ----------

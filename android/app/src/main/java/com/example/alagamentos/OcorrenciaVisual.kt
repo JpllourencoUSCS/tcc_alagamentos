@@ -5,6 +5,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import java.time.Duration
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 // Cor da ocorrência: segue o nível de risco calculado pelo backend
 fun Ocorrencia.corRes(): Int = severidade.corRes()
@@ -28,7 +29,12 @@ fun Context.titulo(o: Ocorrencia): String =
     o.descricao ?: getString(R.string.ocorrencia_sem_descricao, o.id)
 
 fun Context.coordenadas(o: Ocorrencia): String =
-    getString(R.string.valor_coordenadas, o.latitude, o.longitude)
+    getString(R.string.valor_coordenadas, textoCoordenadas(o.latitude, o.longitude))
+
+// Sempre com ponto decimal (padrão de GPS): no aparelho em português, "%.4f" daria
+// "-23,6148, -46,5435", com a vírgula decimal confundida com a separadora
+fun textoCoordenadas(latitude: Double, longitude: Double, casas: Int = 4): String =
+    String.format(Locale.US, "%.${casas}f, %.${casas}f", latitude, longitude)
 
 private val formatoDataHora = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
 

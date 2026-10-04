@@ -102,6 +102,17 @@ de precipitação atual redundante, foi testado e descartado: o feed retornou va
 previsão de 4 dias, e apenas como validação qualitativa — o endpoint usado não retorna volume de
 chuva em mm, então não alimenta numericamente o modelo de classificação de risco.
 
+Em 03/10/2026, durante os testes integrados, todos os endpoints do CPTEC (inclusive o de
+Santo André, que funcionava em agosto) passaram a responder **HTTP 403 (acesso negado)** a
+partir da rede usada nos testes, com e sem identificação de navegador. Por ser uma fonte só
+de validação qualitativa, o sistema continuou funcionando (o campo fica vazio e a
+classificação não muda), o que confirma na prática o desenho de tolerância a falhas por
+fonte. No mesmo dia, a BrasilAPI — serviço público que consulta o CPTEC por outra
+infraestrutura — também falhou ao buscar a previsão de Santo André ("erro ao buscar
+previsões para a cidade"), o que indica um problema do lado do serviço do CPTEC, e não só
+da rede de testes. *(Verificar de novo antes da versão final; se persistir, registrar nas
+limitações.)*
+
 ### 3.X.5 API de Georreferenciamento
 
 Para conversão de endereços em coordenadas geográficas (geocoding), foi avaliada a API
@@ -135,13 +146,45 @@ original sem necessidade de trocar de fornecedor.
 Diante desses critérios, o Google Maps SDK foi selecionado como solução para a camada de
 mapas do sistema, hoje implementada em XML (`Marlon`, Semana 3).
 
-### 3.X.7 Síntese das Decisões Tecnológicas
+### 3.X.7 Integração das Fontes no Sistema
+
+O escopo do monitoramento foi definido como o município de **São Caetano do Sul** (decisão
+de 03/09/2026). O município não tem estação própria do CPTEC; os identificadores usados são
+os de Santo André (`4704`), município vizinho, e o código da ANA confirmado para São Caetano
+do Sul (`21489000`) fica disponível para quando o cadastro for aprovado. Está em
+investigação, ainda sem decisão, o uso da estação meteorológica do campus da USCS como
+pluviômetro local.
+
+As fontes são combinadas pelo módulo de fusão climática do backend
+(`backend/fusao_climatica.py`), com quatro decisões de projeto:
+
+1. **Consultas em paralelo.** As quatro chamadas externas (OpenWeather condição atual,
+   OpenWeather previsão, ANA e CPTEC) são independentes e rodam ao mesmo tempo, cada uma com
+   limite de 10 s. O tempo total fica limitado à fonte mais lenta, e não à soma de todas.
+2. **Tolerância a falhas por fonte.** ANA e CPTEC indisponíveis não interrompem o cálculo:
+   o componente fica ausente e o peso do pluviômetro é redistribuído pelo modelo AHP. Só a
+   falha do OpenWeather, fonte principal, impede o cálculo automático; nesse caso a API
+   responde com um erro claro (HTTP 503) e o aplicativo orienta o usuário a informar o
+   nível manualmente.
+3. **Cache de 10 minutos por região de ~1 km.** O OpenWeather atualiza a condição atual
+   aproximadamente a cada 10 minutos, então consultas repetidas da mesma região nesse
+   intervalo reutilizam o resultado, sem novas chamadas externas.
+4. **Dado colaborativo como quarta fonte.** Os reportes feitos pelos usuários no aplicativo
+   a até 1 km do ponto, nas últimas 3 horas, são agregados num score de 0 a 100 e entram no
+   modelo com peso de 15% (detalhes na seção do algoritmo). É a fonte que torna o sistema
+   colaborativo e que não depende de nenhum órgão externo.
+
+As credenciais (chave do OpenWeather, identificador e senha da ANA) são lidas de variáveis
+de ambiente e nunca ficam no código-fonte nem no repositório.
+
+### 3.X.8 Síntese das Decisões Tecnológicas
 
 | Componente | Solução Adotada | Justificativa |
 |---|---|---|
 | Precipitação atual + previsão principal | OpenWeather API | Documentação, plano gratuito, JSON padronizado |
 | Pluviômetro local (dado físico institucional) | ANA | Papel que era do CEMADEN no modelo de risco; processo de cadastro oficialmente documentado |
-| Previsão redundante (validação cruzada) | CPTEC/INPE | Sem autenticação; previsão de 4 dias funcional de ponta a ponta |
+| Previsão redundante (validação cruzada) | CPTEC/INPE | Sem autenticação; previsão de 4 dias funcional de ponta a ponta (em agosto; 403 em 03/10/2026, ver 3.X.4) |
+| Dado colaborativo | Reportes dos usuários do app | Única fonte sob controle do projeto; agregação por proximidade no tempo e no espaço |
 | Geocoding | Nominatim (OpenStreetMap) | Gratuito, sem autenticação, testado com sucesso |
 | SDK de mapas (Android) | Google Maps SDK | Suporte nativo tanto a Compose quanto a XML Views; documentação extensa |
 
@@ -154,4 +197,6 @@ papéis de dado físico institucional e previsão redundante que essas duas font
 
 *Seção redigida com base nos testes realizados entre 23/05/2026 e 05/08/2026, e revisada em
 17/08/2026 para refletir a arquitetura final de fontes de dados (`docs/T_arquitetura_fontes_dados_final.md`).
-Arquivos de resultado disponíveis em `testes-api/` no repositório do projeto.*
+Atualizada em 03/10/2026 com o escopo de São Caetano do Sul, a integração atual das fontes
+(seção 3.X.7) e o comportamento do CPTEC nos testes integrados. Arquivos de resultado
+disponíveis em `testes-api/` no repositório do projeto.*

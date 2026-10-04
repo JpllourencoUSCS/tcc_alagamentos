@@ -31,5 +31,25 @@ services:
       timeout: 5s
       retries: 10
 
+  # API FastAPI (03/10/2026) — mesma imagem do Dockerfile na raiz. Fica em
+  # http://localhost:8000 (docs interativas em /docs); o emulador Android a
+  # enxerga em http://10.0.2.2:8000 (padrão do app) e o time, pelo IP
+  # Tailscale desta máquina na porta 8000 (exige liberar a porta no firewall,
+  # ver docs/ACESSO_BANCO_DEV.md).
+  api:
+    build: .
+    container_name: alagamentos_api
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER:-alagamentos}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-alagamentos}
+      OPENWEATHER_API_KEY: ${OPENWEATHER_API_KEY:-}
+      ANA_IDENTIFICADOR: ${ANA_IDENTIFICADOR:-}
+      ANA_SENHA: ${ANA_SENHA:-}
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+
 volumes:
   pgdata:
