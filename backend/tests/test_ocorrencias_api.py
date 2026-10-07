@@ -159,6 +159,16 @@ def test_listar_ocorrencias_fonte_invalida_e_422():
     assert resp.status_code == 422
 
 
+def test_fonte_inmet_no_lugar_de_cptec():
+    # 07/10/2026: o vocabulário de fonte acompanhou a troca do CPTEC pelo INMET
+    client, _, _ = _cliente()
+    resp = client.post("/ocorrencias", json={**PAYLOAD_BASE, "fonte": "inmet"})
+    assert resp.status_code == 201
+    assert resp.json()["fonte"] == "inmet"
+    assert client.get("/ocorrencias", params={"fonte": "inmet"}).status_code == 200
+    assert client.get("/ocorrencias", params={"fonte": "cptec"}).status_code == 422
+
+
 def test_obter_ocorrencia_existente():
     client, _, _ = _cliente()
     criada = client.post("/ocorrencias", json=PAYLOAD_BASE).json()

@@ -67,7 +67,7 @@ com o fim de semana (17–18/10) como margem. São ~8 dias úteis.
 |---|---|---|
 | **Reescrever o documento teórico no template** (ver seções 3 e 5) | todos; João consolida | rascunhos T16 (prontos) |
 | **Testes de usabilidade** (5–8 participantes, protocolo e TCLE prontos) | Marlon conduz, Guilherme consolida | data; mapa liberado |
-| Liberar o SHA-1 `35:BA:18:CE:CD:B4:F8:85:29:AD:A2:8B:4B:09:20:C8:57:D3:6B:72` na chave do Google Maps (Google Cloud → Credenciais → restrições de app Android) | quem criou a chave (provavelmente Marlon) | — bloqueia mapa, CT-MAP-001/002, tarefas 4–5 da usabilidade e 2 capturas |
+| Liberar o SHA-1 `35:BA:18:CE:CD:B4:F8:85:29:AD:A2:8B:4B:09:20:C8:57:D3:6B:72` na chave do Google Maps (Google Cloud → Credenciais → restrições de app Android) | quem criou a chave (provavelmente Marlon) | **Feito em 07/10** (pelo João): mapa funcionando, CT-MAP-001/002 executados e capturas refeitas |
 | Ajustes de escopo da seção 4 (Open-Meteo + fusão, AHP 3 critérios, deduplicação do colaborativo) | backend (João/Henrique) | aprovação do orientador |
 | Completar o benchmark com as consultas que o documento promete (raio com `ST_DWithin`, vizinhos mais próximos, `EXPLAIN (ANALYZE, BUFFERS)`) e percentis | Henrique | — |
 | Separar a latência por etapa dentro da API (fontes externas, banco, cálculo do índice) — ponto 13 | Henrique | — |
@@ -268,7 +268,7 @@ a escolha do AHP já está fechada (não é mais "AHP ou método similar").
 
 | Dia | Tarefa | Quem |
 |---|---|---|
-| **Qua 07/10** | Validar com o orientador os ajustes da seção 4 e o título; liberar o SHA-1 na chave do Maps; marcar as sessões de usabilidade; corrigir o firewall; push | João (orientador), Marlon (chave) |
+| **Qua 07/10** | Validar com o orientador os ajustes da seção 4 e o título; liberar o SHA-1 na chave do Maps (feito em 07/10); marcar as sessões de usabilidade; corrigir o firewall; push | João (orientador), Marlon (chave) |
 | **Qua 07 – Qui 08/10** | Implementar os ajustes aprovados (C, D, E, F, G), latência por etapa, benchmark complementar; testes; atualizar T15/T16 | Backend (Henrique/João) |
 | **Qua 07 – Seg 12/10** | Reescrever o documento no template: elementos pré-textuais, capítulos 1–3 ajustados, capítulo 4 (Desenvolvimento) e 5 (Testes) a partir dos T16 | Todos, por capítulo; João consolida |
 | **Sex 09 – Seg 12/10** | Sessões de usabilidade (5–8 participantes) e consolidação | Marlon, Guilherme |

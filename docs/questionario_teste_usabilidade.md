@@ -158,6 +158,9 @@ Atualizado em 03/10/2026, depois do primeiro teste do app contra a API real:
    ("Authorization failure" no logcat) e as **Tarefas 4 e 5 não podem ser feitas**. O SHA-1
    do certificado de depuração de cada máquina sai com
    `keytool -list -v -keystore %USERPROFILE%\.android\debug.keystore -storepass android`.
+   Em 07/10/2026 o certificado do notebook de testes com Docker foi cadastrado e o mapa
+   funcionou lá (CT-MAP-001/002); APKs gerados em outras máquinas ainda precisam do
+   cadastro do certificado delas.
 4. **Chave do OpenWeather** no `.env` (`OPENWEATHER_API_KEY=...`) para a opção "Automático"
    do nível de risco na Tarefa 2. Sem ela, o app mostra "Risco automático indisponível" e o
    participante precisa escolher Baixo, Médio ou Alto — anotar isso na observação da tarefa

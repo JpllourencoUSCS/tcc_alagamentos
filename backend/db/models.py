@@ -54,7 +54,7 @@ class EstacaoReferencia(Base):
 
 class Ocorrencia(Base):
     """Registro de ocorrência — tanto reportes de usuário quanto leituras
-    automáticas das fontes climáticas (OpenWeather/ANA/CPTEC)."""
+    automáticas das fontes climáticas (OpenWeather/ANA/INMET; até 06/10/2026, CPTEC)."""
 
     __tablename__ = "ocorrencias"
     __table_args__ = (

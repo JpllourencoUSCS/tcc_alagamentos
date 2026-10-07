@@ -32,9 +32,9 @@ o requisito funcional ou não funcional correspondente.
 
 ### 4.X.2 Testes automatizados do backend
 
-A suíte pytest (`backend/tests/`) tem **98 testes** em 07/10/2026, em dois níveis:
+A suíte pytest (`backend/tests/`) tem **99 testes** em 07/10/2026, em dois níveis:
 
-- **Testes de contrato (90).** Substituem o banco e as fontes climáticas por implementações
+- **Testes de contrato (91).** Substituem o banco e as fontes climáticas por implementações
   em memória, injetadas pelo mecanismo de dependências do FastAPI. Verificam rotas,
   validação, códigos de status, regras do algoritmo AHP, agregação colaborativa, cache,
   paralelismo das chamadas externas e a lógica pura dos scripts de benchmark. Rodam em
@@ -90,20 +90,27 @@ módulo.
 
 ### 4.X.6 Resultados
 
-**Testes automatizados:** 98 de 98 aprovados com o banco disponível; sem banco, 90
+**Testes automatizados:** 99 de 99 aprovados com o banco disponível; sem banco, 91
 aprovados e 8 pulados por desenho (07/10/2026, incluindo a integração com o INMET e a
 regra de piso dos avisos).
 
-**Casos do PT-001 (21 casos, em 03/10/2026):**
+**Casos do PT-001 (22 casos, em 07/10/2026):**
 
 | Status | Casos |
 |---|---|
-| Aprovado | 14 — CT-API-001 a 005, CT-AHP-001 a 003, CT-CAD-002 a 004, CT-LST-002, CT-NOT-001, CT-PRV-001 |
-| Em execução (parte funcional aprovada; falta a avaliação com participantes) | 5 — CT-CAD-001, CT-LST-001, CT-DET-001, CT-CFG-001, CT-LOG-001 |
-| Bloqueado | 2 — CT-MAP-001 e CT-MAP-002 (a chave do Google Maps só aceita os certificados Android cadastrados no Google Cloud, e o APK de teste é assinado com outro) |
+| Aprovado | 15 — CT-API-001 a 005, CT-AHP-001 a 003, CT-CAD-002 a 004, CT-LST-002, CT-NOT-001, CT-PRV-001 e 002 |
+| Em execução (parte funcional aprovada; falta a avaliação com participantes) | 7 — CT-CAD-001, CT-LST-001, CT-MAP-001, CT-MAP-002, CT-DET-001, CT-CFG-001, CT-LOG-001 |
 
-Os casos de cadastro automático (CT-CAD-004) e da aba de risco (CT-PRV-001) foram
-executados com dados climáticos reais do OpenWeather, e os resultados exibidos pelo app
+Os casos do mapa (CT-MAP-001 e 002) ficaram bloqueados de 03/10 a 07/10/2026: a chave do
+Google Maps só aceita os certificados Android cadastrados no Google Cloud, e o APK de teste
+era assinado com outro. Depois do cadastro do certificado, foram executados contra a API
+real: os marcadores correspondem às ocorrências devolvidas pela API (a posição de uma delas
+foi conferida com a consulta direta pelo identificador), e o toque num marcador leva aos
+detalhes da mesma ocorrência. O cadastro (CT-CAD-001) foi repetido marcando o local por um
+toque no mapa, e o ponto gravado no banco é o mesmo que foi tocado.
+
+Os casos de cadastro automático (CT-CAD-004) e da aba de risco (CT-PRV-001 e 002) foram
+executados com dados reais do OpenWeather e do INMET, e os resultados exibidos pelo app
 foram conferidos com a resposta direta da API para o mesmo ponto. Os testes do app foram
 repetidos com o emulador configurado em português do Brasil e no fuso de São Paulo, como
 estarão os aparelhos dos participantes.
@@ -131,5 +138,6 @@ registrados).*
 
 ---
 
-*Seção redigida com base em `docs/plano_e_fluxo_de_testes_TCC.xlsx` (versão 1.1, 03/10/2026, 21 casos),
-`backend/tests/`, `docs/T19_criterios_desempenho.md` e `docs/evidencias_testes/2026-10-03/`.*
+*Seção redigida com base em `docs/plano_e_fluxo_de_testes_TCC.xlsx` (versão 1.2, 07/10/2026, 22 casos),
+`backend/tests/`, `docs/T19_criterios_desempenho.md`, `docs/evidencias_testes/2026-10-03/` e
+`docs/evidencias_testes/2026-10-07/`.*

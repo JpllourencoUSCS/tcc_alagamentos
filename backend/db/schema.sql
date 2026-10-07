@@ -7,6 +7,8 @@
 --     índice GiST (docs/T17_indexacao_espacial_fundamentacao.md) efetivamente indexa.
 --   - `fonte` (em ambas as tabelas) troca inmet/cemaden por ana/cptec, refletindo a
 --     decisão de arquitetura registrada em docs/T_arquitetura_fontes_dados_final.md.
+--     Em 07/10/2026 'cptec' virou 'inmet' em `ocorrencias` (CPTEC substituído pela API de
+--     previsão do INMET em 06/10/2026); bancos já criados: migracao_2026-10-07_fonte_inmet.sql.
 --   - nova tabela `reportes_colaborativos_agregado`: reservada na modelagem para não
 --     exigir migração extra; preenchida desde 03/10/2026 por
 --     backend/servicos/colaborativo.py (pendência de 17/08 no CRONOGRAMA_STATUS.md).
@@ -17,7 +19,8 @@ CREATE EXTENSION IF NOT EXISTS postgis;
 -- Tabela de apoio: estacoes_referencia
 -- Criada antes de `ocorrencias` porque esta a referencia via FK.
 -- Antes: fonte IN ('inmet', 'cemaden'). Hoje só existe estação física para 'ana'
--- (CPTEC não tem estações — é previsão por município, ver fusao_climatica.py).
+-- (o INMET, como antes o CPTEC, entra só com previsão por município, sem estação —
+-- ver fusao_climatica.py).
 -- ---------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS estacoes_referencia (
     id               BIGSERIAL PRIMARY KEY,
@@ -40,7 +43,7 @@ CREATE TABLE IF NOT EXISTS ocorrencias (
     data_hora        TIMESTAMPTZ NOT NULL DEFAULT now(),
     descricao        TEXT,
     nivel_risco      TEXT NOT NULL CHECK (nivel_risco IN ('Baixo', 'Médio', 'Alto')),
-    fonte            TEXT NOT NULL CHECK (fonte IN ('usuario', 'openweather', 'ana', 'cptec')),
+    fonte            TEXT NOT NULL CHECK (fonte IN ('usuario', 'openweather', 'ana', 'inmet')),
     chuva_mm         DOUBLE PRECISION,
     descricao_clima  TEXT,
     temperatura      DOUBLE PRECISION,

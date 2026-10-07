@@ -47,7 +47,8 @@ pendências de todos consolidadas na seção "Situação em 29/09/2026" do
 - **App testado contra a API real** pela primeira vez (emulador, também em pt-BR): 2
   defeitos achados e corrigidos; aba Previsão passou a mostrar o risco atual (`GET /risco`).
   **Mapa ainda bloqueado:** a chave do Google Maps está restrita a certificados Android que
-  não incluem o do APK gerado no notebook do João (ver seção `android/` abaixo).
+  não incluem o do APK gerado no notebook do João (ver seção `android/` abaixo) — liberado
+  em 07/10/2026.
 - **Relatório:** rascunhos de seção de arquitetura, app, metodologia de testes, benchmark e
   resultados/discussão; análise de sensibilidade do AHP; referências consolidadas; roteiro
   da apresentação.
@@ -66,6 +67,13 @@ precisa ser concluído até o **fim da semana de 12–16/10/2026** (antes, banca
   do João encontrou a API de previsão do INMET (`apiprevmet3`), integrada no mesmo papel.
 - **Avisos do INMET como piso da classificação (07/10, decisão do grupo):** ver "Decisões
   técnicas já fechadas".
+- **Mapa liberado (07/10, noite):** o João cadastrou o SHA-1 do APK de teste na chave do
+  Google Maps. CT-MAP-001/002 e o cadastro com o local marcado no mapa verificados contra a
+  API real (PT-001 v1.2, 22 casos, nenhum bloqueado; evidências em
+  `docs/evidencias_testes/2026-10-07/`); capturas do relatório refeitas (10 telas).
+- **Fonte `cptec` → `inmet` (07/10):** o enum de fonte das ocorrências acompanhou a troca do
+  CPTEC pelo INMET (backend, `schema.sql`, app); bancos existentes migrados com
+  `backend/db/migracao_2026-10-07_fonte_inmet.sql`.
 - **Ajustes de escopo ainda aguardando decisão** (seção 4 da análise): retirar a ANA e a
   estação da USCS; incluir a Open-Meteo como segunda fonte numérica com regra de fusão;
   AHP com 3 critérios (pesos 54/30/16, que mudariam os pesos fechados abaixo); contar um
@@ -84,8 +92,11 @@ investigação (03/09/2026)".
 - `backend/` — lógica de produção:
   - `algoritmo_risco.py`, `fusao_climatica.py` — modelo AHP e fusão de fontes climáticas
   - `constants.py` — enums `NivelRisco`/`FonteDado`, vocabulário único reusado pelo ORM e pela API
+    (`FonteDado`: `usuario`, `openweather`, `ana`, `inmet` — até 07/10/2026 era `cptec`;
+    espelhado em `schema.sql` e no `Ocorrencia.kt` do app)
   - `db/` — `models.py` (SQLAlchemy + GeoAlchemy2), `schema.sql` (DDL PostgreSQL/PostGIS),
-    `session.py` (engine/`get_db`), `repository.py` (acesso a dados de `ocorrencias`)
+    `session.py` (engine/`get_db`), `repository.py` (acesso a dados de `ocorrencias`),
+    `migracao_2026-10-07_fonte_inmet.sql` (para bancos criados antes da troca `cptec` → `inmet`)
   - `api/` — endpoints FastAPI (`ocorrencias.py`: `POST`/`GET /ocorrencias`, `GET /ocorrencias/{id}`;
     `risco.py`: `GET /risco`, risco atual num ponto, sem gravar nada; `schemas.py`); app
     principal em `backend/main.py`
@@ -124,7 +135,7 @@ investigação (03/09/2026)".
     depender do que já existe no banco (dados de demonstração ou de outra pessoa,
     no banco compartilhado por Tailscale): consultar só os dados que o próprio teste
     criou, por exemplo com um bbox pequeno em volta deles — até 03/10/2026 dois testes
-    assumiam o banco vazio e quebravam. 98 testes em 07/10/2026 (90 sem banco + 8 de
+    assumiam o banco vazio e quebravam. 99 testes em 07/10/2026 (91 sem banco + 8 de
     integração). Sem
     `DATABASE_URL` definida, os testes de integração são pulados (skip), não
     falham — mesmo critério do resto do projeto para "sem Postgres disponível".
@@ -148,16 +159,18 @@ investigação (03/09/2026)".
   ambíguas. A chave do Google Maps vem de `android/local.properties` (`MAPS_API_KEY=...`),
   arquivo não versionado e repassado por canal privado; **a chave é restrita por
   certificado**: o APK precisa ser assinado por um certificado cujo SHA-1 esteja nas
-  restrições da chave no Google Cloud — o certificado de depuração do notebook com Docker
-  (SHA-1 `35:BA:18:CE:CD:B4:F8:85:29:AD:A2:8B:4B:09:20:C8:57:D3:6B:72`) ainda não está,
-  então lá o mapa aparece em branco ("Authorization failure" no logcat). Build pelo
+  restrições da chave no Google Cloud, senão o mapa aparece em branco ("Authorization
+  failure" no logcat). O certificado de depuração do notebook com Docker (SHA-1
+  `35:BA:18:CE:CD:B4:F8:85:29:AD:A2:8B:4B:09:20:C8:57:D3:6B:72`) foi cadastrado em
+  07/10/2026 e o mapa funciona nos APKs gerados lá; outras máquinas precisam cadastrar o
+  SHA-1 do certificado delas. Build pelo
   Gradle (`android/gradlew assembleDebug`) exige JDK e Android SDK — confirmar na máquina
   da sessão. Com o repositório dentro do OneDrive, definir
   `ALAGAMENTOS_BUILD_DIR=C:\gradle-build\alagamentos` (lido por `android/build.gradle.kts`):
   sem isso o OneDrive trava os intermediários e o build falha com "Unable to delete
   directory". Testes de JVM: `gradlew testDebugUnitTest` (`FuncoesPurasTest.kt`).
   `android/scripts/`: `adb_app.py` (automação do app no emulador via adb, usada nos testes
-  de 03/10) e `roteiro_capturas.py` (capturas do relatório em `docs/capturas/`).
+  de 03/10 e 07/10) e `roteiro_capturas.py` (as 10 capturas do relatório em `docs/capturas/`).
 - `testes-api/` — scripts de teste de API, um por fonte, nomeados `teste_<fonte>.py`
   (`teste_inmet_apiprevmet3.py`: levantamento do João de 06/10/2026). Atenção:
   `teste_openweather.py` sobrescreve os JSONs do teste original de Santo André
@@ -165,7 +178,7 @@ investigação (03/09/2026)".
   não reescrever com conteúdo diferente do que realmente aconteceu). `T16_secao_*.md`
   são rascunhos de seções do relatório final e devem ser mantidos sincronizados com as
   decisões técnicas atuais. Material de teste (13/09/2026): `plano_e_fluxo_de_testes_TCC.xlsx`
-  (plano PT-001 + casos de teste; versão 1.1 com 21 casos em 03/10/2026),
+  (plano PT-001 + casos de teste; versão 1.2 com 22 casos em 07/10/2026),
   `questionario_teste_usabilidade.md` e `tcle_teste_usabilidade.md` (ambos dizem
   explicitamente que as ocorrências do teste são de demonstração). Desde 03/10/2026:
   `T19_criterios_desempenho.md` (RNF de latência + medições), `T16_secao_arquitetura.md`,
@@ -266,7 +279,12 @@ Tailscale `tcc-alagamentos-joao`, Windows 11, Ryzen 5 5600G, 16 GB):
   novos: `sdkmanager` virou o `android` CLI; usar `--no-metrics`), AVD `tcc_pixel`
   (Android 15, Google APIs), JDK em `C:\Program Files\Java\jdk-24`. Subir com
   `emulator -avd tcc_pixel -gpu host` — com `swiftshader` (renderização por software) o
-  emulador ficou lento a ponto de dar ANR. O emulador está em pt-BR e no fuso de São Paulo.
+  emulador ficou lento a ponto de dar ANR. O emulador está em pt-BR; o fuso de São Paulo
+  **pode voltar a GMT a cada boot** (horas 3 h adiantadas na tela; o banco fica certo) —
+  conferir com `adb shell date` e corrigir com `adb root`,
+  `adb shell settings put global auto_time_zone 0` e
+  `adb shell cmd time_zone_detector suggest_manual_time_zone --zone_id America/Sao_Paulo`
+  antes de capturas e evidências.
 - Pela porta publicada do Docker Desktop, um `POST` leva ~50–60 ms a mais do que dentro do
   contêiner (medido: 4,6 ms dentro, ~60 ms pela porta) — efeito do encaminhamento de porta
   do Docker Desktop no Windows, não da aplicação (ver T19).

@@ -50,13 +50,14 @@ quando também ordena por data.
 p95 < 17 ms mesmo com 1 milhão de registros; cadastro com risco automático ~0,5 s sem
 cache e ~50 ms com cache.
 
-**13. O app (demonstração ou capturas)** — `docs/capturas/`: alertas com filtros, detalhes,
-aba de risco com as fontes do cálculo, ajustes. Se possível, demonstração ao vivo do
+**13. O app (demonstração ou capturas)** — `docs/capturas/`: mapa com as ocorrências e o
+painel da ocorrência selecionada, alertas com filtros, detalhes, cadastro com o local no
+mapa, aba de risco com as fontes do cálculo e os avisos do INMET, ajustes e perfil. Se possível, demonstração ao vivo do
 cadastro com risco automático (ter as capturas como plano B). *Legendar como dados de
 demonstração.*
 
-**14. Qualidade e testes** — 61 testes automatizados no backend, 6 no app, CI no GitHub;
-plano PT-001 com 21 casos; defeitos encontrados na integração real e corrigidos.
+**14. Qualidade e testes** — 99 testes automatizados no backend, 6 no app, CI no GitHub;
+plano PT-001 com 22 casos; defeitos encontrados na integração real e corrigidos.
 
 **15. Usabilidade** — *preencher após as sessões:* participantes, taxa de conclusão, média
 Likert vs. limiar de 4, principais ajustes.

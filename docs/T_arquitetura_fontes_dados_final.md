@@ -158,6 +158,12 @@ Acumulado de Chuva (de chuva) e Baixa Umidade, Onda de Calor (ignorados). Pesos 
 AHP não mudam; o piso nunca reduz a classe. Detalhe em `T15_algoritmo_risco_fundamentacao.md`
 §6.5.
 
+**Vocabulário de fonte (07/10/2026):** o valor `cptec` do campo `fonte` das ocorrências
+(`FonteDado` em `backend/constants.py`, `CHECK` de `schema.sql`, enum do app) virou `inmet`,
+para o filtro de fontes do app não continuar oferecendo o CPTEC. Bancos já criados:
+`backend/db/migracao_2026-10-07_fonte_inmet.sql` (nenhuma ocorrência real usava `cptec`; só
+as linhas sintéticas do benchmark, relabeladas).
+
 ## Em investigação (03/09/2026) — estação meteorológica do campus da USCS
 
 Descoberta de que o campus da USCS possui uma **estação meteorológica própria**. O time

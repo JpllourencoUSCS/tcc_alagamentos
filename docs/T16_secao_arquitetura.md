@@ -121,7 +121,7 @@ hospedagem de contêineres, mudando só as variáveis de ambiente.
 
 ### 3.W.5 Qualidade e testes
 
-O backend tem uma suíte automatizada (pytest) com 98 testes em 07/10/2026, em duas
+O backend tem uma suíte automatizada (pytest) com 99 testes em 07/10/2026, em duas
 categorias:
 - **Testes de contrato**, que substituem banco e fontes externas por implementações em
   memória e verificam rotas, validação e regras.

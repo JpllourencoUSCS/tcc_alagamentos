@@ -22,7 +22,7 @@ diferencial tecnológico do sistema — que não deveria parecer uma "colagem de
 | Fusão de fontes climáticas | OpenWeather, ANA e INMET (previsão e avisos oficiais, no lugar do CPTEC) em paralelo, com cache e tolerância a falhas por fonte |
 | Classificação de risco | Modelo AHP com quatro critérios (CR = 0,0038), redistribuição de pesos para fontes ausentes e agregação dos reportes colaborativos |
 | Aplicativo Android | Kotlin + XML, integrado à API real: mapa, alertas com filtros, risco atual, cadastro colaborativo, detalhes, perfil e notificações |
-| Qualidade | 98 testes automatizados no backend e 6 no app; plano de testes PT-001 com 21 casos; benchmark e medição de latência reproduzíveis |
+| Qualidade | 99 testes automatizados no backend e 6 no app; plano de testes PT-001 com 22 casos; benchmark e medição de latência reproduzíveis |
 
 ### 5.X.2 Latência
 
@@ -100,9 +100,11 @@ problemas relatados e correções feitas).*
   passaram a funcionar como piso da classe (Perigo → Médio; Grande Perigo → Alto), no nível
   de risco de alagamento declarado pelo próprio INMET — uma regra conservadora, que pode
   elevar o risco de um ponto específico onde não chove.
-- **Mapa no ambiente de testes.** A chave do Google Maps do projeto está restrita aos
-  certificados Android cadastrados no Google Cloud; o mapa só aparece em builds assinados com
-  um desses certificados.
+- **Mapa e certificados.** A chave do Google Maps do projeto está restrita aos certificados
+  Android cadastrados no Google Cloud; o mapa só aparece em builds assinados com um desses
+  certificados. Isso bloqueou os testes do mapa de 03/10 a 07/10/2026, até o certificado
+  do ambiente de testes ser cadastrado, e vale para qualquer build distribuído (por exemplo,
+  aos participantes da avaliação de usabilidade).
 - **Pesos e parâmetros não calibrados com dados reais.** Os julgamentos da matriz AHP foram
   feitos pela equipe, sem especialistas em hidrologia ou defesa civil, e os parâmetros da
   agregação colaborativa (1 km, 3 h, mínimo de dois reportes) são escolhas de projeto. A

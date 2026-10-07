@@ -56,7 +56,7 @@ def _gerar_uma(rng: random.Random, agora: datetime) -> dict:
         linha["chuva_mm"] = round(rng.expovariate(1 / 4), 1)  # maioria baixa, cauda longa
         linha["temperatura"] = round(rng.uniform(15, 32), 1)
         linha["umidade"] = rng.randint(40, 100)
-    elif fonte == FonteDado.CPTEC:
+    elif fonte == FonteDado.INMET:  # previsão textual (até 07/10/2026, FonteDado.CPTEC)
         linha["descricao_clima"] = rng.choice(
             ["Chuvoso", "Parcialmente Nublado", "Pancadas de Chuva", "Céu Claro"]
         )

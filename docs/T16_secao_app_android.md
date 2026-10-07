@@ -103,14 +103,19 @@ automático indisponível, aba de risco atual conferida com a API, detalhes, per
 persistido e notificação local. Os testes foram repetidos com o aparelho em português do
 Brasil e no fuso de São Paulo. Foram encontrados e corrigidos no mesmo dia dois defeitos:
 o contador da lista ignorava o filtro de nível, e, em português, as coordenadas saíam com
-vírgula decimal ("-23,6148, -46,5435"), ambíguas. A metodologia e os resultados estão na
-seção de testes; as capturas de tela estão em `docs/capturas/`.
+vírgula decimal ("-23,6148, -46,5435"), ambíguas. O mapa só pôde ser testado em
+07/10/2026, depois de o certificado do APK de teste ser cadastrado na chave do Google Maps:
+os marcadores correspondem às ocorrências da API, o toque num marcador leva aos detalhes
+da mesma ocorrência, e o local marcado por toque no mapa do cadastro é o ponto gravado no
+banco. A metodologia e os resultados estão na seção de testes; as capturas de tela estão
+em `docs/capturas/`.
 
 **Limitações:** o mapa depende de uma chave do Google Maps cujas restrições incluam o
-certificado com que o APK foi assinado; as notificações só funcionam com o app aberto;
+certificado com que o APK foi assinado (cada máquina que gera APKs precisa ter o seu
+cadastrado); as notificações só funcionam com o app aberto;
 perfil e preferências não são sincronizados entre aparelhos.
 
 ---
 
 *Seção redigida com base em `android/app/src/main/` (estado de 03/10/2026) e em
-`docs/evidencias_testes/2026-10-03/`.*
+`docs/evidencias_testes/2026-10-03/`; testes do mapa em `docs/evidencias_testes/2026-10-07/`.*

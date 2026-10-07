@@ -21,4 +21,6 @@ class FonteDado(str, Enum):
     USUARIO = "usuario"
     OPENWEATHER = "openweather"
     ANA = "ana"
-    CPTEC = "cptec"
+    # Até 07/10/2026 era CPTEC = "cptec"; o CPTEC foi substituído pelo INMET em 06/10/2026
+    # (bancos existentes: backend/db/migracao_2026-10-07_fonte_inmet.sql)
+    INMET = "inmet"

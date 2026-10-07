@@ -1,7 +1,7 @@
 """
 Wrapper fino sobre fusao_climatica (Semana 5 — Henrique, reconstruído em
 18/08/2026): isola o endpoint de criação de ocorrências da chamada real às
-APIs externas (OpenWeather/ANA/CPTEC), pelo mesmo motivo de
+APIs externas (OpenWeather/ANA/INMET), pelo mesmo motivo de
 db/repository.py isolar o SQLAlchemy — fusao_climatica.obter_dados_consolidados
 faz requests HTTP de verdade, o que não pode rodar em teste automatizado sem
 rede e credenciais (ANA_IDENTIFICADOR/ANA_SENHA).
@@ -27,10 +27,11 @@ class ClassificadorRiscoProtocol(Protocol):
 class ClassificadorRiscoReal:
     """Implementação real: fusão de fontes + reportes colaborativos + AHP.
 
-    Devolve só o que o endpoint precisa gravar (classificação e a precipitação
-    atual usada no cálculo), mais o score final e o colaborativo para quem
-    quiser registrar/inspecionar — o resto do resultado da fusão (previsão,
-    fontes, validação CPTEC) não é persistido em `ocorrencias` hoje.
+    Devolve só o que o endpoint precisa gravar (classificação, a precipitação
+    atual usada no cálculo e a previsão textual do INMET), mais o score final e o
+    colaborativo para quem quiser registrar/inspecionar — o resto do resultado da
+    fusão (previsão numérica, fontes, avisos do INMET) não é persistido em
+    `ocorrencias` hoje.
 
     Lança fusao_climatica.FonteClimaticaIndisponivel se o OpenWeather (fonte
     principal) falhar — a API traduz em 503.

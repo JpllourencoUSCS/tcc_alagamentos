@@ -18,7 +18,7 @@ enum class FonteDado(val api: String, val rotulo: String) {
     USUARIO("usuario", "Relato de usuário"),
     OPENWEATHER("openweather", "OpenWeather"),
     ANA("ana", "ANA"),
-    CPTEC("cptec", "CPTEC/INPE");
+    INMET("inmet", "INMET"); // até 07/10/2026: CPTEC("cptec", "CPTEC/INPE")
 
     companion object {
         fun daApi(valor: String?): FonteDado? = entries.find { it.api == valor }
