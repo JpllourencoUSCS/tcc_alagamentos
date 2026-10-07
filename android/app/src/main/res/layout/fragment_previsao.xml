@@ -134,7 +134,47 @@
                             android:layout_height="wrap_content"
                             android:textColor="@color/text_secondary"
                             android:textSize="14sp" />
+
+                        <!-- Só quando um aviso do INMET elevou a classe acima da do índice -->
+                        <TextView
+                            android:id="@+id/txt_risco_piso"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:lineSpacingExtra="2dp"
+                            android:textColor="@color/text_primary"
+                            android:textSize="13sp"
+                            android:visibility="gone" />
                     </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Avisos meteorológicos oficiais do INMET para o município (só com aviso ativo) -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_avisos_inmet"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:visibility="gone"
+                app:cardBackgroundColor="@color/surface"
+                app:cardCornerRadius="16dp"
+                app:strokeColor="@color/divider"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:id="@+id/lista_avisos_inmet"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/previsao_avisos_titulo"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -168,7 +208,7 @@
                     <include android:id="@+id/info_pico_previsto" layout="@layout/item_info" />
                     <include android:id="@+id/info_pluviometro" layout="@layout/item_info" />
                     <include android:id="@+id/info_relatos" layout="@layout/item_info" />
-                    <include android:id="@+id/info_cptec" layout="@layout/item_info" />
+                    <include android:id="@+id/info_inmet" layout="@layout/item_info" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 

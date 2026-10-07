@@ -19,10 +19,10 @@ diferencial tecnológico do sistema — que não deveria parecer uma "colagem de
 |---|---|
 | API REST (FastAPI) | Ocorrências (criar, listar com filtros de fonte, nível, período e região, obter) e risco atual num ponto; em contêiner, com documentação OpenAPI |
 | Banco geoespacial | PostgreSQL 16 + PostGIS 3.4, índice GiST, *trigger* de sincronização do ponto geográfico |
-| Fusão de fontes climáticas | OpenWeather, ANA e CPTEC em paralelo, com cache e tolerância a falhas por fonte |
+| Fusão de fontes climáticas | OpenWeather, ANA e INMET (previsão e avisos oficiais, no lugar do CPTEC) em paralelo, com cache e tolerância a falhas por fonte |
 | Classificação de risco | Modelo AHP com quatro critérios (CR = 0,0038), redistribuição de pesos para fontes ausentes e agregação dos reportes colaborativos |
 | Aplicativo Android | Kotlin + XML, integrado à API real: mapa, alertas com filtros, risco atual, cadastro colaborativo, detalhes, perfil e notificações |
-| Qualidade | 61 testes automatizados; plano de testes PT-001 com 21 casos; benchmark e medição de latência reproduzíveis |
+| Qualidade | 98 testes automatizados no backend e 6 no app; plano de testes PT-001 com 21 casos; benchmark e medição de latência reproduzíveis |
 
 ### 5.X.2 Latência
 
@@ -58,7 +58,8 @@ O sistema não repassa ao usuário o que as APIs externas devolvem. Entre a cole
 tela há uma camada de processamento própria, com três contribuições:
 
 1. **Fusão de fontes heterogêneas num único indicador.** Medição instantânea
-   (OpenWeather), medição física institucional (ANA), previsão (OpenWeather e CPTEC) e
+   (OpenWeather), medição física institucional (ANA), previsão (OpenWeather, com o INMET como
+   referência qualitativa) e
    relato humano (usuários) têm naturezas e escalas diferentes. O modelo AHP converte cada
    uma numa escala comum, baseada na classificação de intensidade de chuva da Organização
    Meteorológica Mundial, e as combina com pesos derivados de uma matriz de comparação
@@ -91,7 +92,14 @@ problemas relatados e correções feitas).*
   segue em investigação como alternativa.
 - **Instabilidade de fontes públicas.** O CPTEC passou a negar acesso (HTTP 403) a partir da
   rede de testes em outubro de 2026; a BrasilAPI, que consulta o mesmo serviço por outra
-  infraestrutura, também falhou ao buscar a previsão no mesmo dia.
+  infraestrutura, também falhou ao buscar a previsão no mesmo dia. Foi substituído pela API
+  de previsão do INMET, também sem documentação oficial nem garantia de disponibilidade.
+- **Índice × avisos oficiais.** O índice reflete a chuva medida e a prevista numericamente
+  para o ponto; os avisos do INMET são alertas preventivos para áreas amplas e para o dia
+  inteiro. Para que as duas informações não se contradigam, os avisos de chuva vigentes
+  passaram a funcionar como piso da classe (Perigo → Médio; Grande Perigo → Alto), no nível
+  de risco de alagamento declarado pelo próprio INMET — uma regra conservadora, que pode
+  elevar o risco de um ponto específico onde não chove.
 - **Mapa no ambiente de testes.** A chave do Google Maps do projeto está restrita aos
   certificados Android cadastrados no Google Cloud; o mapa só aparece em builds assinados com
   um desses certificados.

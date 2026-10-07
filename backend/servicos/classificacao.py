@@ -49,6 +49,8 @@ class ClassificadorRiscoReal:
         return {
             "classificacao": resultado["classificacao"],
             "chuva_mm": dados.precipitacao_atual_mm_h,
+            # Previsão textual do INMET gravada como contexto da ocorrência (06/10/2026)
+            "descricao_clima": dados.previsao_inmet,
             "score_final": resultado["score_final"],
             "score_colaborativo": colaborativo.score if colaborativo else None,
         }
@@ -76,13 +78,17 @@ class ClassificadorRiscoReal:
             "latitude": lat,
             "longitude": lon,
             "classificacao": resultado["classificacao"],
+            # Classe do AHP antes do piso dos avisos do INMET, e o aviso que elevou (se algum)
+            "classificacao_indice": resultado["classificacao_indice"],
+            "piso_aviso_inmet": resultado["piso_aviso_inmet"],
             "score_final": resultado["score_final"],
             "componentes": componentes,
             "precipitacao_atual_mm_h": dados.precipitacao_atual_mm_h,
             "pico_previsto_mm_3h": dados.pico_previsto_mm_3h,
             "pluviometro_local_mm_h": dados.pluviometro_local_mm_h,
             "reportes_colaborativos": colaborativo.quantidade_reportes if colaborativo else 0,
-            "validacao_cptec": dados.validacao_cptec,
+            "previsao_inmet": dados.previsao_inmet,
+            "avisos_inmet": dados.avisos_inmet,
             "fontes": resultado["fontes"],
             "dados_em_cache": do_cache,
         }

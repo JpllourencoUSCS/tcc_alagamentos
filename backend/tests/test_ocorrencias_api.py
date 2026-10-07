@@ -189,6 +189,17 @@ def test_criar_ocorrencia_sem_nivel_risco_calcula_automaticamente():
     assert classificador.chamadas == 1
 
 
+def test_criar_ocorrencia_automatica_grava_previsao_inmet_como_descricao_clima():
+    class ClassificadorComClima(FakeClassificadorRisco):
+        def classificar(self, lat, lon):
+            return {**super().classificar(lat, lon), "descricao_clima": "Pancadas de chuva isoladas"}
+
+    client, _, _ = _cliente(ClassificadorComClima(classificacao="Baixo"))
+    payload = {k: v for k, v in PAYLOAD_BASE.items() if k != "nivel_risco"}
+    corpo = client.post("/ocorrencias", json=payload).json()
+    assert corpo["descricao_clima"] == "Pancadas de chuva isoladas"
+
+
 def test_criar_ocorrencia_com_nivel_risco_nao_chama_classificador():
     client, _, classificador = _cliente()
     resp = client.post("/ocorrencias", json=PAYLOAD_BASE)

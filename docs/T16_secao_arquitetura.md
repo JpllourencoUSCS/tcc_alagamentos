@@ -33,7 +33,9 @@ geoespacial**. O servidor também consulta três serviços climáticos externos.
                                             ┌──────────────────────┐  ┌────────────────────┐
                                             │ PostgreSQL 16        │  │ OpenWeather        │
                                             │ + PostGIS 3.4        │  │ ANA (HidroWebService)│
-                                            │ índice GiST em geom  │  │ CPTEC/INPE         │
+                                            │ índice GiST em geom  │  │ INMET (previsão e  │
+                                            │                      │  │ avisos; até 03/10, │
+                                            │                      │  │ CPTEC/INPE)        │
                                             └──────────────────────┘  └────────────────────┘
 ```
 
@@ -66,9 +68,11 @@ HTTP 503 com mensagem orientando o usuário a informar o nível manualmente.
   calcula o componente colaborativo e aplica o AHP.
 - `servicos/colaborativo.py` agrega os reportes de usuários vizinhos (1 km, últimas 3 h)
   num score de 0 a 100 (T15, seção 6.4).
-- `fusao_climatica.py` consulta OpenWeather (condição atual e previsão), ANA e CPTEC **em
-  paralelo**, com timeout de 10 s por fonte, e guarda o resultado em **cache** por 10
-  minutos para cada célula de ~1 km.
+- `fusao_climatica.py` consulta OpenWeather (condição atual e previsão), ANA e INMET
+  (previsão textual e avisos oficiais; no lugar do CPTEC desde 06/10/2026) **em paralelo**,
+  com timeout de 10 s por fonte, e guarda o resultado em **cache** por 10 minutos para cada
+  célula de ~1 km — e, no caso do INMET, por município, já que a resposta é a mesma para
+  qualquer ponto da cidade.
 - `algoritmo_risco.py` implementa o modelo AHP, incluindo a redistribuição de pesos quando
   uma fonte está indisponível.
 
@@ -94,13 +98,15 @@ lugar (`constants.py`), reutilizado pelo modelo do banco (restrições `CHECK`) 
    a. busca os dados climáticos da célula de ~1 km (do cache, se consultados há menos de
       10 minutos; senão, das quatro fontes em paralelo);
    b. calcula o score colaborativo a partir dos reportes vizinhos das últimas 3 horas;
-   c. aplica o AHP e obtém o nível (Baixo, Médio ou Alto).
+   c. aplica o AHP e obtém o nível (Baixo, Médio ou Alto);
+   d. aplica o piso dos avisos oficiais do INMET vigentes para o município (Perigo → no
+      mínimo Médio; Grande Perigo → Alto).
 4. A ocorrência é gravada com o nível calculado e a precipitação usada, na mesma transação
    do registro do score colaborativo.
 5. A API devolve a ocorrência criada, e o app abre a tela de detalhes com o risco
    calculado.
 
-A consulta `GET /risco` usa o mesmo caminho (itens a a c), sem gravar ocorrência nem
+A consulta `GET /risco` usa o mesmo caminho (itens a a d), sem gravar ocorrência nem
 registrar o score colaborativo, e alimenta a aba "Previsão" do aplicativo.
 
 ### 3.W.4 Implantação
@@ -115,7 +121,7 @@ hospedagem de contêineres, mudando só as variáveis de ambiente.
 
 ### 3.W.5 Qualidade e testes
 
-O backend tem uma suíte automatizada (pytest) com 61 testes em 03/10/2026, em duas
+O backend tem uma suíte automatizada (pytest) com 98 testes em 07/10/2026, em duas
 categorias:
 - **Testes de contrato**, que substituem banco e fontes externas por implementações em
   memória e verificam rotas, validação e regras.

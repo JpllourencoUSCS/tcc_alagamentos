@@ -195,6 +195,48 @@ Os parâmetros (1 km, 3 h, mínimo de 2) são escolhas de projeto do protótipo,
 calibradas com dados reais. Recalibrá-los a partir do histórico de uso fica como trabalho
 futuro, junto com a recalibração dos pesos (seção 8).
 
+### 6.5 Piso pelos avisos oficiais do INMET (decisão de 07/10/2026)
+
+Os avisos meteorológicos oficiais do INMET para o município (`apiprevmet3`, ver
+`T16_secao_relatorio_apis.md` §3.X.4.1) **não entram no AHP** — os pesos e o score não
+mudam —, mas funcionam como **piso** da classificação final: elevam a classe quando ela
+está abaixo do nível indicado pelo aviso, e nunca a reduzem.
+
+O piso segue a avaliação de risco de alagamento que o **próprio INMET** publica em cada
+nível dos avisos de chuva (textos oficiais do feed de avisos, observados em 06/10/2026):
+
+| Nível do aviso | Chuva prevista pelo INMET | Risco de alagamento declarado pelo INMET | Piso |
+|---|---|---|---|
+| Perigo Potencial | 20–30 mm/h ou até 50 mm/dia | "Baixo risco de alagamentos" | nenhum |
+| Perigo | 30–60 mm/h ou 50–100 mm/dia | "Risco de alagamentos" | **Médio** |
+| Grande Perigo | > 60 mm/h ou > 100 mm/dia | "Grande risco de grandes alagamentos" | **Alto** |
+
+Regras complementares:
+- **Só avisos de chuva:** Tempestade, Chuvas Intensas e Acumulado de Chuva (os tipos de
+  chuva observados nos 93 avisos do feed em 06/10/2026), ou qualquer outro tipo cujo texto
+  de riscos mencione alagamento. Avisos sem relação com alagamento (Baixa Umidade, Onda de
+  Calor...) são ignorados.
+- **Só avisos vigentes:** o instante do cálculo precisa estar entre o início e o fim do
+  aviso (horário de Brasília). Um aviso para amanhã não eleva o risco de hoje.
+- **Vários avisos:** vale o maior piso.
+- **Transparência:** a API devolve a classe do índice (`classificacao_indice`), a classe
+  final (`classificacao`) e o aviso que causou a elevação (`piso_aviso_inmet`); o
+  aplicativo exibe "Elevado de BAIXO para MÉDIO pelo aviso do INMET (Tempestade · Perigo)".
+
+**Justificativa.** O índice reflete a chuva medida no ponto e a previsão numérica de
+curto prazo; o aviso é a avaliação oficial, para a região, de um evento esperado. Sem o
+piso, o aplicativo podia mostrar risco Baixo ao lado de um aviso oficial de risco de
+alagamento — situação que um usuário leria como contradição. Adotar como piso o risco de
+alagamento declarado pelo próprio INMET evita introduzir um julgamento novo da equipe: o
+nível vem do órgão oficial. Por coerência, o aviso "Perigo Potencial" — para o qual o INMET
+declara *baixo* risco de alagamento — não eleva a classe; foi o caso observado em
+06/10/2026 (aviso de Tempestade, Perigo Potencial; classe Baixo).
+
+**Limitação.** O aviso vale para áreas amplas (vários municípios) e para o dia inteiro;
+o piso é, portanto, uma regra conservadora de alerta, não uma medida local. Implementação
+e testes: `backend/fusao_climatica.py` (`piso_por_avisos`, `aplicar_piso`) e
+`backend/tests/test_inmet.py`.
+
 ## 7. Exemplo com dado real
 
 Executando `backend/algoritmo_risco.py` com os dados reais coletados em `testes-api/`

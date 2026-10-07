@@ -32,9 +32,9 @@ o requisito funcional ou não funcional correspondente.
 
 ### 4.X.2 Testes automatizados do backend
 
-A suíte pytest (`backend/tests/`) tem **61 testes** em 03/10/2026, em dois níveis:
+A suíte pytest (`backend/tests/`) tem **98 testes** em 07/10/2026, em dois níveis:
 
-- **Testes de contrato (53).** Substituem o banco e as fontes climáticas por implementações
+- **Testes de contrato (90).** Substituem o banco e as fontes climáticas por implementações
   em memória, injetadas pelo mecanismo de dependências do FastAPI. Verificam rotas,
   validação, códigos de status, regras do algoritmo AHP, agregação colaborativa, cache,
   paralelismo das chamadas externas e a lógica pura dos scripts de benchmark. Rodam em
@@ -90,8 +90,9 @@ módulo.
 
 ### 4.X.6 Resultados
 
-**Testes automatizados:** 61 de 61 aprovados com o banco disponível; sem banco, 53
-aprovados e 8 pulados por desenho.
+**Testes automatizados:** 98 de 98 aprovados com o banco disponível; sem banco, 90
+aprovados e 8 pulados por desenho (07/10/2026, incluindo a integração com o INMET e a
+regra de piso dos avisos).
 
 **Casos do PT-001 (21 casos, em 03/10/2026):**
 

@@ -1,7 +1,8 @@
 # Levantamento de Fontes de Dados Climáticos — Arquitetura Final
 
 *Responsável: João | Semanas 2–3 do cronograma | Consolidado em 05/08/2026 | Atualizado em
-03/10/2026 (agregação colaborativa, integração atual e situação das fontes)*
+03/10/2026 (agregação colaborativa, integração atual e situação das fontes) e em 07/10/2026
+(CPTEC substituído pelo INMET `apiprevmet3`; avisos oficiais como piso da classificação)*
 
 ## Decisão
 
@@ -38,7 +39,8 @@ as credenciais chegarem.
 |---|---|---|---|
 | **OpenWeather** | Precipitação atual (principal) + previsão principal | Chave de API (gratuita) | Modelo/estimativa |
 | **ANA** | Pluviômetro local — papel que era do CEMADEN no AHP | E-mail de cadastro + token OAuth (60 min) | Estação física (rede hidrometeorológica nacional) |
-| **CPTEC/INPE** | Previsão municipal (4 dias) — validação cruzada qualitativa da previsão | Sem token | Modelo |
+| **CPTEC/INPE** | Previsão municipal (4 dias) — validação cruzada qualitativa da previsão (**até 03/10/2026**; substituído pelo INMET, ver seção "Substituição do CPTEC pelo INMET") | Sem token | Modelo |
+| **INMET (`apiprevmet3`)** | Desde 06/10/2026: previsão textual por município (validação qualitativa) + avisos meteorológicos oficiais (piso da classificação) | Sem token (User-Agent de navegador) | Previsão oficial / alerta oficial |
 
 Essa arquitetura é mais enxuta que as versões anteriores (que incluíam CEMADEN e/ou
 INMET), mas estruturalmente completa: uma fonte de precipitação atual + previsão
@@ -80,7 +82,9 @@ práticos de integração com dados públicos brasileiros.
   (ver `algoritmo_risco.py`).
 - **Previsão (25%):** OpenWeather forecast, com o CPTEC entrando como validação cruzada
   qualitativa (não numérica) — não altera o score, mas pode ser citado na documentação como
-  evidência de consistência entre modelos.
+  evidência de consistência entre modelos. *(Desde 06/10/2026, o papel qualitativo é do
+  INMET; os avisos oficiais do INMET passaram a funcionar como piso da classificação final
+  — ver seção abaixo.)*
 - **Colaborativo (15%):** agregação dos reportes de usuários do app — implementada em
   03/10/2026 (`backend/servicos/colaborativo.py`): relatos a até 1 km do ponto nas últimas
   3 h, cada um convertido no ponto médio da faixa de risco informada e ponderado pela
@@ -114,9 +118,45 @@ Como as fontes acima são combinadas hoje no backend (`backend/fusao_climatica.p
 |---|---|
 | OpenWeather | ✅ Chave configurada no `.env` do notebook com Docker; funcionando de ponta a ponta |
 | ANA | 🟡 Sem credencial — aguardando resposta do cadastro (sem novidade desde 03/09). O código usa a estação de Santo André (`21477000`); com a credencial, testar primeiro a de São Caetano do Sul (`21489000`), já que o escopo passou a ser São Caetano |
-| CPTEC/INPE | 🟡 Todos os endpoints respondendo **HTTP 403** a partir do notebook com Docker (inclusive o `4704`, que funcionava em agosto); a BrasilAPI, que consulta o mesmo serviço, também falhou no mesmo dia. O fail-safe cobre (só validação qualitativa). Verificar de novo antes da versão final do relatório |
+| CPTEC/INPE | 🔴 Todos os endpoints respondendo **HTTP 403** a partir do notebook com Docker (inclusive o `4704`, que funcionava em agosto); a BrasilAPI, que consulta o mesmo serviço, também falhou no mesmo dia. Persistiu até 06/10 → **substituído pelo INMET** (abaixo) |
+| INMET (`apiprevmet3`) | ✅ Desde 06/10/2026: previsão e avisos testados ao vivo para São Caetano do Sul; integrados ao backend e ao app |
 | Colaborativo | ✅ Agregação implementada e testada contra PostGIS real |
 | Estação da USCS | ⚪ Em investigação, sem novidade registrada desde 03/09 |
+
+## Substituição do CPTEC pelo INMET (06/10/2026) e avisos como piso (07/10/2026)
+
+**Decisão (06/10/2026):** com o CPTEC fora do ar desde 03/10, o papel de validação cruzada
+qualitativa passou para a **API de previsão do INMET** (`https://apiprevmet3.inmet.gov.br`),
+levantada pelo João (`testes-api/teste_inmet_apiprevmet3.py`). Não reabre o descarte de
+agosto: o INMET descartado era o dado **de estação em tempo real** (`apitempo`, com
+reCAPTCHA); esta é a API de previsão por município e de avisos oficiais, aberta.
+
+| Recurso | Endpoint | Uso no sistema |
+|---|---|---|
+| Previsão por município | `/previsao/3548807` (código IBGE de São Caetano do Sul) | Resumo textual do turno atual (manhã/tarde/noite nos dias 1–2; resumo diário nos dias 3–5) — validação qualitativa, **fora do AHP**; gravado como `descricao_clima` no cadastro com risco automático |
+| Avisos ativos | `/avisos/ativos` (nacional; filtrado pelo campo `geocodes`) | Exibidos no app; os de chuva vigentes funcionam como **piso** da classificação |
+
+Características verificadas em 06/10/2026: sem token; respondeu também sem User-Agent, mas
+o cabeçalho de navegador é enviado por segurança; ~0,8 s por chamada; respostas pesadas
+(~260 KB e ~440 KB, por ícones em base64) → cache de 10 min por município. Riscos: sem
+documentação oficial nem garantia (mesmo tipo de risco que tirou o CPTEC do ar); possível
+bloqueio de conexões de fora do Brasil (testar se a API do sistema for hospedada no
+exterior). Falha do INMET = campo vazio, sem efeito na classificação.
+
+**Decisão (07/10/2026, do grupo) — avisos como piso:** avisos de chuva vigentes para o
+município elevam a classe final no nível de risco de alagamento que o próprio INMET declara
+em cada severidade:
+
+| Severidade | Texto oficial (avisos de chuva) | Piso |
+|---|---|---|
+| Perigo Potencial | 20–30 mm/h ou até 50 mm/dia; "baixo risco de alagamentos" | — |
+| Perigo | 30–60 mm/h ou 50–100 mm/dia; "risco de alagamentos" | Médio |
+| Grande Perigo | > 60 mm/h ou > 100 mm/dia; "grande risco de grandes alagamentos" | Alto |
+
+Tipos de aviso observados no feed (93 avisos, 06/10/2026): Tempestade, Chuvas Intensas,
+Acumulado de Chuva (de chuva) e Baixa Umidade, Onda de Calor (ignorados). Pesos e score do
+AHP não mudam; o piso nunca reduz a classe. Detalhe em `T15_algoritmo_risco_fundamentacao.md`
+§6.5.
 
 ## Em investigação (03/09/2026) — estação meteorológica do campus da USCS
 

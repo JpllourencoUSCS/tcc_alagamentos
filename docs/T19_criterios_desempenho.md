@@ -122,7 +122,15 @@ Medido em 03/10/2026, depois de configurar a chave do OpenWeather, com a API rec
 
 O tempo sem cache (~0,5 s) é dominado pelas chamadas ao OpenWeather; no dia da medição a
 ANA não estava configurada e o CPTEC respondia 403 rapidamente, então nenhuma das duas
-segurou o tempo. O pior caso teórico continua sendo o timeout de 10 s de uma fonte lenta.
+segurou o tempo.
+
+**Remedição em 06/10/2026, com o INMET no lugar do CPTEC** (CSV
+`latencia_api_demo_com_clima_inmet.csv`, API reiniciada antes): cadastro automático sem
+cache com p50 de 602 ms e p95 de 1.628 ms (máximo 1.950 ms, na primeira chamada, que baixa
+a previsão e os avisos do INMET — ~700 KB); com cache, p50 de 60,6 ms e p95 de 162,4 ms;
+`GET /risco` com cache, p95 de 4,3 ms. O RNF-03 continua atendido. A previsão e os avisos
+do INMET ficam em cache por município: sem isso, cada célula de ~1 km baixava as duas
+respostas de novo, e a mediana sem cache tinha subido para 1,2 s numa primeira medição. O pior caso teórico continua sendo o timeout de 10 s de uma fonte lenta.
 O cache reduz o tempo do cadastro em ~10× (os ~50 ms restantes são, em boa parte, o
 encaminhamento de porta do Docker Desktop, ver nota em 5.1).
 
@@ -150,7 +158,7 @@ Verificado por teste automatizado:
 - As medições usam cliente e servidor na mesma máquina. A latência de rede móvel real
   (celular → internet → servidor) não foi medida e depende de onde a API for hospedada.
 - O RNF-03 depende de serviços externos fora do controle do projeto (OpenWeather, ANA,
-  CPTEC). Os critérios valem para o processamento do sistema, não para a disponibilidade
+  INMET; até 03/10, CPTEC). Os critérios valem para o processamento do sistema, não para a disponibilidade
   dessas fontes.
 - A carga foi de um cliente por vez. Testes de concorrência (vários usuários
   simultâneos) não fizeram parte do escopo.

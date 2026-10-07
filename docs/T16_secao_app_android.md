@@ -37,7 +37,7 @@ O app tem uma tela de entrada (`LoginActivity`) e, depois dela, uma atividade pr
 |---|---|
 | **Mapa** | Marcadores coloridos por nível de risco (verde, laranja, vermelho), com um círculo de 250 m em volta de cada ocorrência; cartão "Situação atual" com a contagem por nível e o registro mais recente; alerta em destaque quando há ocorrências de risco alto. |
 | **Alertas** | Lista das ocorrências, da mais recente para a mais antiga, com filtros de região (todas, São Caetano do Sul, "perto de mim"), período (todo, 24 h, 7 dias, 30 dias) e nível de risco. |
-| **Previsão** | Risco de alagamento calculado agora para a posição do usuário (ou o centro da cidade), com cada fonte que entrou no cálculo AHP (chuva atual, pico previsto, pluviômetro, relatos de usuários e previsão do CPTEC). |
+| **Previsão** | Risco de alagamento calculado agora para a posição do usuário (ou o centro da cidade), com cada fonte que entrou no cálculo AHP (chuva atual, pico previsto, pluviômetro, relatos de usuários) e os **avisos meteorológicos oficiais do INMET** para o município, coloridos pelo nível de perigo; quando um aviso eleva a classe (piso), a tela explica ("Elevado de BAIXO para MÉDIO pelo aviso do INMET"). A previsão textual do INMET aparece como referência. |
 | **Ajustes** | Preferências de alerta (ligar/desligar, nível mínimo, fontes e raio de 1 a 20 km) e acesso ao perfil. |
 | Detalhes *(sobre a aba)* | Informações completas de uma ocorrência; aberta pelo marcador do mapa, pela lista ou por uma notificação. |
 | Registrar ocorrência *(sobre a aba)* | Formulário de cadastro, aberto pelo botão "Registrar" do Mapa e dos Alertas. |

@@ -61,6 +61,13 @@ CENTRO DE PREVISÃO DE TEMPO E ESTUDOS CLIMÁTICOS (CPTEC/INPE). **Serviços web
 previsão de tempo para cidades. Cachoeira Paulista: INPE. Disponível em:
 http://servicos.cptec.inpe.br/XML/. Acesso em: 05 ago. 2026.
 
+INSTITUTO NACIONAL DE METEOROLOGIA (INMET). **Previsão do tempo** e **Avisos
+meteorológicos**: API de previsão por município (`apiprevmet3`). Brasília: INMET.
+Disponível em: https://apiprevmet3.inmet.gov.br e https://avisos.inmet.gov.br. Acesso em:
+06 out. 2026. [API sem documentação oficial; citar também o portal
+https://portal.inmet.gov.br e, se usado, o feed RSS de avisos, cuja licença permite
+reprodução com citação da fonte]
+
 FASTAPI. **FastAPI documentation**. Disponível em: https://fastapi.tiangolo.com/.
 Acesso em: 03 out. 2026.
 

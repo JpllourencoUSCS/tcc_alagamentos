@@ -24,8 +24,9 @@ sem "baixo custo") apontando o slide onde cada um é respondido.
 **5. Arquitetura** — diagrama app → API → serviços (fusão, colaborativo, AHP) → PostGIS +
 fontes externas (T16_secao_arquitetura, figura 3.W.1 redesenhada).
 
-**6. Fontes de dados** — OpenWeather, ANA, CPTEC e relatos dos usuários; CEMADEN e INMET
-descartados por proteção contra automação (achado metodológico). *Mensagem:* integrar dado
+**6. Fontes de dados** — OpenWeather, ANA, INMET (previsão e avisos oficiais, no lugar do
+CPTEC, fora do ar desde 03/10) e relatos dos usuários; CEMADEN e o dado de estação em tempo
+real do INMET descartados por proteção contra automação (achado metodológico). *Mensagem:* integrar dado
 público brasileiro é difícil, e o sistema foi desenhado para isso.
 
 **7. Diferencial: o modelo AHP** — 4 critérios, pesos 35/25/25/15, CR = 0,0038 (< 0,10),
@@ -60,7 +61,7 @@ plano PT-001 com 21 casos; defeitos encontrados na integração real e corrigido
 **15. Usabilidade** — *preencher após as sessões:* participantes, taxa de conclusão, média
 Likert vs. limiar de 4, principais ajustes.
 
-**16. Limitações** — ANA sem credencial, CPTEC instável, pesos não calibrados com
+**16. Limitações** — ANA sem credencial, CPTEC fora do ar (substituído pelo INMET), pesos não calibrados com
 especialistas, dados de demonstração, hospedagem não definitiva.
 
 **17. Trabalhos futuros** — ANA ou estação da USCS, calibração com histórico e Defesa

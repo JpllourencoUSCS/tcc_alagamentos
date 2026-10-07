@@ -22,7 +22,8 @@ classificação de risco (ver seção 3.Y — Algoritmo de Classificação de Ri
 |---|---|---|
 | OpenWeather | Precipitação atual (principal) + previsão principal | Chave de API (gratuita) |
 | ANA | Pluviômetro local — dado de medição física institucional | E-mail de cadastro + token OAuth (60 min) |
-| CPTEC/INPE | Previsão municipal de 4 dias — validação cruzada qualitativa | Sem token |
+| CPTEC/INPE | Previsão municipal de 4 dias — validação cruzada qualitativa (até 03/10/2026) | Sem token |
+| INMET (API de previsão `apiprevmet3`) | Previsão municipal textual e avisos meteorológicos oficiais — validação cruzada qualitativa, no lugar do CPTEC desde 06/10/2026 (seção 3.X.4.1) | Sem token |
 
 O INMET e o CEMADEN foram avaliados e **descartados** após testes de integração, não por falta
 de valor institucional, mas por proteção deliberada contra automação em seus canais de dado "ao
@@ -110,8 +111,43 @@ classificação não muda), o que confirma na prática o desenho de tolerância 
 fonte. No mesmo dia, a BrasilAPI — serviço público que consulta o CPTEC por outra
 infraestrutura — também falhou ao buscar a previsão de Santo André ("erro ao buscar
 previsões para a cidade"), o que indica um problema do lado do serviço do CPTEC, e não só
-da rede de testes. *(Verificar de novo antes da versão final; se persistir, registrar nas
-limitações.)*
+da rede de testes. O 403 persistiu nos dias seguintes (verificado de novo em 06/10/2026),
+e o CPTEC foi substituído pelo INMET no mesmo papel (seção 3.X.4.1).
+
+#### 3.X.4.1 Substituição do CPTEC pela API de previsão do INMET
+
+Em 06/10/2026, com o CPTEC indisponível, a equipe levantou a API de previsão do INMET
+(`https://apiprevmet3.inmet.gov.br`), usada pelo portal de previsão do próprio instituto.
+Ela não tem documentação oficial; o levantamento combinou testes diretos e o código de
+projetos públicos que já a consomem. Não exige cadastro nem token, responde em JSON e
+identifica o município pelo código IBGE (São Caetano do Sul: `3548807`).
+
+É um serviço diferente do INMET descartado em agosto: aquele era o dado **em tempo real
+das estações** (`apitempo`), protegido por reCAPTCHA. A API de previsão oferece dois
+recursos úteis ao sistema, ambos testados ao vivo em 06/10/2026 para São Caetano do Sul:
+
+- **Previsão por município** (`/previsao/{código IBGE}`): até 5 dias; os dois primeiros
+  divididos em manhã, tarde e noite, os demais com um resumo diário. Cada período traz um
+  resumo textual (ex.: "Muitas nuvens com pancadas de chuva e trovoadas isoladas"),
+  temperaturas, umidade e vento. **Não informa precipitação em milímetros**, por isso,
+  como o CPTEC, fica fora do modelo de risco e serve de validação qualitativa da previsão
+  numérica do OpenWeather.
+- **Avisos meteorológicos ativos** (`/avisos/ativos`): alertas oficiais para todo o país,
+  filtrados pelo código IBGE, com tipo de evento, severidade ("Perigo Potencial", "Perigo",
+  "Grande Perigo"), validade, riscos esperados e o polígono da área em GeoJSON. No dia do
+  teste havia dois avisos de "Tempestade — Perigo Potencial" para São Caetano do Sul (06 e
+  07/10), com "chuva entre 20 e 30 mm/h ou até 50 mm/dia... baixo risco de alagamentos".
+
+O sistema mostra a previsão e os avisos na aba de risco do aplicativo. A previsão textual
+não altera a classificação; os avisos de chuva vigentes funcionam como piso da classe
+final, no nível de risco de alagamento que o próprio INMET declara para cada severidade
+(Perigo → Médio; Grande Perigo → Alto; ver seção do algoritmo). As duas respostas são pesadas (~260 KB e ~440 KB, por causa de ícones em
+base64) e iguais para qualquer ponto do município, por isso ficam em cache de 10 minutos
+por município. Riscos registrados: a API não é documentada nem garantida (o mesmo tipo de
+risco que tirou o CPTEC do ar) e projetos que a usam relatam que o INMET pode recusar
+conexões de fora do Brasil — o que deve ser verificado se a API do sistema for hospedada
+no exterior. A falha do INMET é tratada como a de qualquer fonte secundária: o campo fica
+vazio e a classificação não muda.
 
 ### 3.X.5 API de Georreferenciamento
 
@@ -149,19 +185,19 @@ mapas do sistema, hoje implementada em XML (`Marlon`, Semana 3).
 ### 3.X.7 Integração das Fontes no Sistema
 
 O escopo do monitoramento foi definido como o município de **São Caetano do Sul** (decisão
-de 03/09/2026). O município não tem estação própria do CPTEC; os identificadores usados são
-os de Santo André (`4704`), município vizinho, e o código da ANA confirmado para São Caetano
-do Sul (`21489000`) fica disponível para quando o cadastro for aprovado. Está em
+de 03/09/2026). A previsão e os avisos do INMET são consultados pelo código IBGE do
+próprio município (`3548807`); o código da ANA confirmado para São Caetano do Sul
+(`21489000`) fica disponível para quando o cadastro for aprovado. Está em
 investigação, ainda sem decisão, o uso da estação meteorológica do campus da USCS como
 pluviômetro local.
 
 As fontes são combinadas pelo módulo de fusão climática do backend
 (`backend/fusao_climatica.py`), com quatro decisões de projeto:
 
-1. **Consultas em paralelo.** As quatro chamadas externas (OpenWeather condição atual,
-   OpenWeather previsão, ANA e CPTEC) são independentes e rodam ao mesmo tempo, cada uma com
+1. **Consultas em paralelo.** As chamadas externas (OpenWeather condição atual e previsão,
+   ANA, e previsão e avisos do INMET) são independentes e rodam ao mesmo tempo, cada uma com
    limite de 10 s. O tempo total fica limitado à fonte mais lenta, e não à soma de todas.
-2. **Tolerância a falhas por fonte.** ANA e CPTEC indisponíveis não interrompem o cálculo:
+2. **Tolerância a falhas por fonte.** ANA e INMET indisponíveis não interrompem o cálculo:
    o componente fica ausente e o peso do pluviômetro é redistribuído pelo modelo AHP. Só a
    falha do OpenWeather, fonte principal, impede o cálculo automático; nesse caso a API
    responde com um erro claro (HTTP 503) e o aplicativo orienta o usuário a informar o
@@ -183,7 +219,7 @@ de ambiente e nunca ficam no código-fonte nem no repositório.
 |---|---|---|
 | Precipitação atual + previsão principal | OpenWeather API | Documentação, plano gratuito, JSON padronizado |
 | Pluviômetro local (dado físico institucional) | ANA | Papel que era do CEMADEN no modelo de risco; processo de cadastro oficialmente documentado |
-| Previsão redundante (validação cruzada) | CPTEC/INPE | Sem autenticação; previsão de 4 dias funcional de ponta a ponta (em agosto; 403 em 03/10/2026, ver 3.X.4) |
+| Previsão redundante (validação cruzada) | INMET — previsão por município e avisos oficiais (desde 06/10/2026) | Sem autenticação; testado de ponta a ponta para São Caetano do Sul; substitui o CPTEC, indisponível desde 03/10/2026 (3.X.4) |
 | Dado colaborativo | Reportes dos usuários do app | Única fonte sob controle do projeto; agregação por proximidade no tempo e no espaço |
 | Geocoding | Nominatim (OpenStreetMap) | Gratuito, sem autenticação, testado com sucesso |
 | SDK de mapas (Android) | Google Maps SDK | Suporte nativo tanto a Compose quanto a XML Views; documentação extensa |
@@ -198,5 +234,6 @@ papéis de dado físico institucional e previsão redundante que essas duas font
 *Seção redigida com base nos testes realizados entre 23/05/2026 e 05/08/2026, e revisada em
 17/08/2026 para refletir a arquitetura final de fontes de dados (`docs/T_arquitetura_fontes_dados_final.md`).
 Atualizada em 03/10/2026 com o escopo de São Caetano do Sul, a integração atual das fontes
-(seção 3.X.7) e o comportamento do CPTEC nos testes integrados. Arquivos de resultado
+(seção 3.X.7) e o comportamento do CPTEC nos testes integrados; em 06/10/2026, com a
+substituição do CPTEC pelo INMET (seção 3.X.4.1). Arquivos de resultado
 disponíveis em `testes-api/` no repositório do projeto.*

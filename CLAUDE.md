@@ -54,6 +54,23 @@ pendências de todos consolidadas na seção "Situação em 29/09/2026" do
 - **Segurança:** a porta do banco (e a da API) não estava restrita ao Tailscale como este
   arquivo dizia — ver "Ambiente de desenvolvimento".
 
+**06–07/10/2026 (Semana 15) — prazo antecipado:** o projeto (app e documento teórico)
+precisa ser concluído até o **fim da semana de 12–16/10/2026** (antes, banca em 30/10).
+- **Documento teórico:** o grupo criou `docs/Documento Teórico/` com o template oficial da
+  USCS (PDF), a versão consolidada do texto (`.docx`, ainda escrita como proposta) e os
+  "15 pontos" do orientador. A análise completa — escopo, revisão do texto contra o template
+  e contra o sistema, avaliação dos 15 pontos e plano até a entrega — está em
+  `docs/Documento Teórico/Analise_escopo_e_revisao_do_TCC_2026-10-06.md`. O orientador
+  permite ajustar o escopo documentando o motivo.
+- **CPTEC substituído pelo INMET (06/10):** o CPTEC respondia 403 desde 03/10; levantamento
+  do João encontrou a API de previsão do INMET (`apiprevmet3`), integrada no mesmo papel.
+- **Avisos do INMET como piso da classificação (07/10, decisão do grupo):** ver "Decisões
+  técnicas já fechadas".
+- **Ajustes de escopo ainda aguardando decisão** (seção 4 da análise): retirar a ANA e a
+  estação da USCS; incluir a Open-Meteo como segunda fonte numérica com regra de fusão;
+  AHP com 3 critérios (pesos 54/30/16, que mudariam os pesos fechados abaixo); contar um
+  relato por usuário no colaborativo; registrar cada cálculo de risco.
+
 **03/09/2026:** descoberta de que o campus da USCS possui uma estação meteorológica
 própria. Time está investigando junto aos responsáveis a possibilidade de acesso aos
 dados — se viável, poderia "substituir" a ANA no papel de pluviômetro local do modelo AHP.
@@ -78,7 +95,14 @@ investigação (03/09/2026)".
     componente colaborativo e registra em `reportes_colaborativos_agregado`)
   - `fusao_climatica.py` lê `OPENWEATHER_API_KEY`/`ANA_IDENTIFICADOR`/`ANA_SENHA` do ambiente;
     falha do OpenWeather vira `FonteClimaticaIndisponivel` (a API responde 503); cache de
-    10 min por célula de 0,01° (`obter_dados_consolidados_em_cache`)
+    10 min por célula de 0,01° (`obter_dados_consolidados_em_cache`). Desde 06/10/2026
+    consulta o INMET (`apiprevmet3`, código IBGE `3548807`, sem token, com User-Agent de
+    navegador): previsão textual do turno atual e avisos oficiais do município, com cache
+    de 10 min **por município** (as respostas pesam ~700 KB). Desde 07/10/2026 aplica o
+    piso dos avisos (`piso_por_avisos`/`aplicar_piso`): a resposta traz
+    `classificacao_indice` (AHP), `classificacao` (final) e `piso_aviso_inmet`. Horário de
+    Brasília fixo em UTC−3 (`FUSO_BRASILIA`), sem `zoneinfo` — a imagem slim do Docker não
+    traz a base de fusos
   - `benchmark/` — massa sintética, medição de consultas e de latência
     (`gerar_dados.py`, `popular_banco.py`, `medir_consultas.py`, `gerar_graficos.py`,
     `medir_latencia_api.py`; resultados versionados em `benchmark/resultados/`). Gráficos
@@ -100,7 +124,7 @@ investigação (03/09/2026)".
     depender do que já existe no banco (dados de demonstração ou de outra pessoa,
     no banco compartilhado por Tailscale): consultar só os dados que o próprio teste
     criou, por exemplo com um bbox pequeno em volta deles — até 03/10/2026 dois testes
-    assumiam o banco vazio e quebravam. 61 testes em 03/10/2026 (53 sem banco + 8 de
+    assumiam o banco vazio e quebravam. 98 testes em 07/10/2026 (90 sem banco + 8 de
     integração). Sem
     `DATABASE_URL` definida, os testes de integração são pulados (skip), não
     falham — mesmo critério do resto do projeto para "sem Postgres disponível".
@@ -113,7 +137,8 @@ investigação (03/09/2026)".
   Cadastro e Perfil abrem por cima). Desde 30/09/2026 os dados vêm da API real via
   `ApiCliente.kt` (Retrofit) + `OcorrenciaRepository.kt` — `GET`/`POST /ocorrencias`, com os
   filtros de região/período do backend; a aba Previsão usa `GET /risco` (risco AHP atual +
-  fontes do cálculo). **Testado contra a API real em 03/10/2026** (emulador, inclusive em
+  fontes do cálculo + previsão e avisos oficiais do INMET; quando um aviso eleva a classe,
+  a tela diz "Elevado de BAIXO para MÉDIO pelo aviso do INMET"). **Testado contra a API real em 03/10/2026** (emulador, inclusive em
   pt-BR/fuso de São Paulo) — evidências em `docs/evidencias_testes/2026-10-03/`. Endereço
   da API em `API_BASE_URL` no `android/local.properties` (padrão `http://10.0.2.2:8000/`,
   o localhost do computador visto pelo emulador). Preferências, perfil e sessão ficam só
@@ -134,6 +159,8 @@ investigação (03/09/2026)".
   `android/scripts/`: `adb_app.py` (automação do app no emulador via adb, usada nos testes
   de 03/10) e `roteiro_capturas.py` (capturas do relatório em `docs/capturas/`).
 - `testes-api/` — scripts de teste de API, um por fonte, nomeados `teste_<fonte>.py`
+  (`teste_inmet_apiprevmet3.py`: levantamento do João de 06/10/2026). Atenção:
+  `teste_openweather.py` sobrescreve os JSONs do teste original de Santo André
 - `docs/` — documentação. `T05`–`T18` são o histórico de investigação (não apagar,
   não reescrever com conteúdo diferente do que realmente aconteceu). `T16_secao_*.md`
   são rascunhos de seções do relatório final e devem ser mantidos sincronizados com as
@@ -145,7 +172,11 @@ investigação (03/09/2026)".
   `T16_secao_app_android.md`, `T16_secao_metodologia_testes.md`, `T16_secao_benchmark.md`,
   `T16_secao_resultados_discussao.md`, `referencias_consolidadas.md` (ABNT, com
   pendências de verificação), `roteiro_apresentacao.md` (banca), `capturas/` e
-  `evidencias_testes/`.
+  `evidencias_testes/`. Desde 06/10/2026: `Documento Teórico/` (template USCS, texto
+  consolidado, pontos do orientador e a análise de escopo/revisão). O texto final segue a
+  estrutura do template (1 Introdução, 2 Referencial Teórico, 3 Pesquisa/Amostragem,
+  4 Desenvolvimento, 5 Testes, 6 Conclusão); os `T16_secao_*.md` são a matéria-prima dos
+  capítulos 4 a 6.
 - Raiz: `Dockerfile` (imagem da API), `docker-compose.yml` (serviços `db` e `api`),
   `.env.example` (variáveis esperadas no `.env`), `requirements.txt`,
   `requirements-benchmark.txt`, `.github/workflows/ci.yml` (pytest contra PostGIS real +
@@ -243,17 +274,28 @@ Tailscale `tcc-alagamentos-joao`, Windows 11, Ryzen 5 5600G, 16 GB):
 ## Decisões técnicas já fechadas (não propor de novo sem pedido explícito)
 
 - **CEMADEN**: descartado — autenticação (SGAA) sem URL pública documentada.
-- **INMET**: descartado — dado em tempo real protegido por Google reCAPTCHA v3;
-  endpoint histórico alternativo testado e sem retorno de dados.
+- **INMET — dado de estação em tempo real (`apitempo`)**: descartado — protegido por Google
+  reCAPTCHA v3; endpoint histórico alternativo testado e sem retorno de dados. Não confundir
+  com a API de **previsão e avisos** do INMET (`apiprevmet3`), que está em uso desde
+  06/10/2026 (ver CPTEC abaixo).
 - **ANA**: fonte ativa para o papel de "pluviômetro local" no modelo AHP. Exige
   cadastro por e-mail (`hidro@ana.gov.br`) — aguardando resposta. Ver `teste_ana.py`.
   Possível fonte alternativa/complementar em investigação desde 03/09/2026 (estação
   meteorológica do campus da USCS) — ainda não decidido, ver `docs/T_arquitetura_fontes_dados_final.md`.
-- **CPTEC/INPE**: fonte ativa só para previsão de 4 dias (validação cruzada qualitativa).
-  Condições atuais de aeroporto (METAR) foram testadas e descartadas. Em 03/10/2026 todos
-  os endpoints responderam 403 a partir do notebook com Docker, e a BrasilAPI (que consulta
-  o mesmo serviço) também falhou — tratado pelo fail-safe, registrado como limitação; a
-  decisão de usar o CPTEC não foi reaberta.
+- **CPTEC/INPE → substituído pelo INMET (`apiprevmet3`) em 06/10/2026.** O CPTEC era a
+  validação cruzada qualitativa (previsão de 4 dias, fora do AHP); METAR já tinha sido
+  descartado. A partir de 03/10/2026 todos os endpoints do CPTEC responderam 403 (a
+  BrasilAPI, que consulta o mesmo serviço, também falhou), e o 403 persistiu. No mesmo papel
+  entrou a API de previsão do INMET: previsão textual por município (`/previsao/{IBGE}`) e
+  avisos oficiais (`/avisos/ativos`, filtrados pelo código IBGE). A previsão textual **não
+  entra no AHP**. Riscos registrados: API sem documentação oficial; projetos relatam
+  bloqueio de conexões de fora do Brasil (testar se a API for hospedada no exterior).
+- **Avisos do INMET como piso da classificação (decisão do grupo, 07/10/2026):** avisos de
+  chuva (Tempestade, Chuvas Intensas, Acumulado de Chuva, ou texto que mencione alagamento)
+  **vigentes** para o município elevam a classe final, no nível de risco de alagamento que o
+  próprio INMET declara: **Perigo → no mínimo Médio; Grande Perigo → Alto; Perigo Potencial
+  → sem piso** ("baixo risco de alagamentos" no texto oficial). Não muda os pesos nem o
+  score; nunca reduz a classe. Detalhe em T15 §6.5.
 - **Modelo AHP**: pesos fixos — precipitação atual 35%, pluviômetro local 25%,
   previsão 25%, colaborativo 15%. Não alterar sem o usuário pedir explicitamente. A análise
   de sensibilidade de 03/10/2026 (`backend/analise_sensibilidade.py`, T15 seção 8.1) só mede

@@ -83,6 +83,17 @@ entra a redistribuição de peso descrita acima, para que um único reporte isol
 altere a classificação. A busca dos reportes vizinhos usa o mesmo índice espacial GiST
 avaliado no benchmark do sistema.
 
+Por fim, os avisos meteorológicos oficiais do INMET para o município funcionam como piso
+da classificação final, sem alterar os pesos nem o score do modelo. O nível do piso segue
+o risco de alagamento que o próprio INMET declara em cada nível de aviso de chuva: um
+aviso de "Perigo" (chuva de 30 a 60 mm/h, "risco de alagamentos") eleva a classe a, no
+mínimo, Médio; um aviso de "Grande Perigo" (acima de 60 mm/h, "grande risco de grandes
+alagamentos") a eleva a Alto; um aviso de "Perigo Potencial", para o qual o INMET declara
+baixo risco de alagamento, não altera a classe. Só contam avisos de chuva vigentes no
+momento do cálculo. A regra evita que o sistema indique risco baixo enquanto há um alerta
+oficial de alagamento para a cidade, e usa o julgamento do órgão oficial em vez de um
+critério novo da equipe. O aplicativo informa quando a classe foi elevada por um aviso.
+
 ### 3.Y.4 Teste com Dado Real
 
 O algoritmo foi validado com dados reais coletados para o município de Santo André, SP

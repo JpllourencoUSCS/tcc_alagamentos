@@ -105,14 +105,36 @@ data class OcorrenciaDto(
 // Formato JSON de RiscoOut (backend/api/schemas.py). Componente null = fonte sem
 // dado no momento (o peso dela foi redistribuído pelo AHP).
 data class RiscoDto(
+    // Classe final, já com o piso dos avisos do INMET (Perigo -> Médio, Grande Perigo -> Alto)
     @SerializedName("classificacao") val classificacao: String,
+    @SerializedName("classificacao_indice") val classificacaoIndice: String?,
+    @SerializedName("piso_aviso_inmet") val pisoAvisoInmet: PisoAvisoDto?,
     @SerializedName("score_final") val scoreFinal: Double,
     @SerializedName("componentes") val componentes: ComponentesRiscoDto,
     @SerializedName("precipitacao_atual_mm_h") val precipitacaoAtualMmH: Double,
     @SerializedName("pico_previsto_mm_3h") val picoPrevistoMm3h: Double,
     @SerializedName("pluviometro_local_mm_h") val pluviometroLocalMmH: Double?,
     @SerializedName("reportes_colaborativos") val reportesColaborativos: Int,
-    @SerializedName("validacao_cptec") val validacaoCptec: String?
+    // Validação qualitativa do INMET (no lugar do CPTEC desde 06/10/2026); fora do AHP
+    @SerializedName("previsao_inmet") val previsaoInmet: String?,
+    @SerializedName("avisos_inmet") val avisosInmet: List<AvisoInmetDto>?
+)
+
+// Aviso do INMET que elevou a classificação acima da classe do índice
+data class PisoAvisoDto(
+    @SerializedName("nivel") val nivel: String,
+    @SerializedName("evento") val evento: String?,
+    @SerializedName("severidade") val severidade: String?
+)
+
+// Aviso meteorológico oficial do INMET ativo para o município
+data class AvisoInmetDto(
+    @SerializedName("evento") val evento: String?,
+    @SerializedName("severidade") val severidade: String?,
+    @SerializedName("cor") val cor: String?,
+    @SerializedName("inicio") val inicio: String?,
+    @SerializedName("fim") val fim: String?,
+    @SerializedName("riscos") val riscos: String?
 )
 
 data class ComponentesRiscoDto(

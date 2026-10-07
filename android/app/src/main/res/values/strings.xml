@@ -70,13 +70,17 @@
     <string name="previsao_pico">Pico nas próximas 24 h</string>
     <string name="previsao_pluviometro">Pluviômetro local (ANA)</string>
     <string name="previsao_relatos">Relatos de usuários (1 km, 3 h)</string>
-    <string name="previsao_cptec">Previsão CPTEC/INPE</string>
+    <string name="previsao_inmet">Previsão INMET</string>
+    <string name="previsao_avisos_titulo">AVISOS OFICIAIS DO INMET</string>
+    <string name="previsao_piso">Elevado de %1$s para %2$s pelo aviso do INMET (%3$s · %4$s).</string>
+    <string name="previsao_aviso">%1$s · %2$s</string>
+    <string name="previsao_aviso_validade">De %1$s até %2$s</string>
     <string name="previsao_valor_mm_h">%1$s mm/h</string>
     <string name="previsao_valor_mm_3h">%1$s mm em 3 h</string>
     <string name="previsao_relatos_valor">%1$d relato(s)</string>
     <string name="previsao_relatos_poucos">Poucos relatos</string>
     <string name="previsao_sem_dado">Sem dado</string>
-    <string name="previsao_explicacao" formatted="false">O risco combina chuva atual (35%), pluviômetro local (25%), previsão (25%) e relatos de usuários próximos (15%). Fontes sem dado no momento têm o peso redistribuído entre as demais.</string>
+    <string name="previsao_explicacao" formatted="false">O risco combina chuva atual (35%), pluviômetro local (25%), previsão (25%) e relatos de usuários próximos (15%). Fontes sem dado no momento têm o peso redistribuído entre as demais. Avisos de chuva do INMET elevam a classificação: Perigo, no mínimo MÉDIO; Grande Perigo, ALTO. A previsão do INMET aparece só como referência.</string>
     <string name="previsao_atualizar">Atualizar</string>
     <string name="previsao_indisponivel_titulo">Dados climáticos indisponíveis</string>
     <string name="previsao_indisponivel_descricao">O servidor não conseguiu consultar as fontes de clima agora. Tente atualizar em alguns minutos.</string>

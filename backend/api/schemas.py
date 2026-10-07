@@ -40,19 +40,45 @@ class FontesRisco(BaseModel):
     pluviometro_local: str | None
 
 
+class AvisoInmetOut(BaseModel):
+    """Aviso meteorológico oficial do INMET ativo para o município."""
+
+    evento: str | None  # ex.: "Tempestade", "Chuvas Intensas"
+    severidade: str | None  # "Perigo Potencial", "Perigo" ou "Grande Perigo"
+    cor: str | None  # cor oficial do aviso (hex)
+    inicio: str | None
+    fim: str | None
+    riscos: str | None
+
+
+class PisoAvisoOut(BaseModel):
+    """Aviso do INMET que elevou a classificação (piso: Perigo -> Médio,
+    Grande Perigo -> Alto; ver T15, seção 6.5)."""
+
+    nivel: NivelRisco
+    evento: str | None
+    severidade: str | None
+
+
 class RiscoOut(BaseModel):
     """Risco de alagamento calculado agora para um ponto (GET /risco)."""
 
     latitude: float
     longitude: float
+    # Classe final, já com o piso dos avisos do INMET
     classificacao: NivelRisco
+    # Classe do índice AHP antes do piso; igual a `classificacao` quando nenhum aviso elevou
+    classificacao_indice: NivelRisco
+    piso_aviso_inmet: PisoAvisoOut | None
     score_final: float
     componentes: ComponentesRisco
     precipitacao_atual_mm_h: float
     pico_previsto_mm_3h: float
     pluviometro_local_mm_h: float | None
     reportes_colaborativos: int
-    validacao_cptec: str | None
+    # Validação cruzada qualitativa, fora do AHP (INMET no lugar do CPTEC desde 06/10/2026)
+    previsao_inmet: str | None
+    avisos_inmet: list[AvisoInmetOut]
     fontes: FontesRisco
     dados_em_cache: bool
 

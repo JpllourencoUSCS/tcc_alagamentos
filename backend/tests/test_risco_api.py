@@ -24,11 +24,12 @@ LAT, LON = -23.6229, -46.5548
 
 AVALIACAO_EXEMPLO = {
     "latitude": LAT, "longitude": LON, "classificacao": "Médio", "score_final": 42.0,
+    "classificacao_indice": "Médio", "piso_aviso_inmet": None,
     "componentes": {"precipitacao_atual": 50.0, "previsao": 30.0,
                     "pluviometro_local": None, "colaborativo": None},
     "precipitacao_atual_mm_h": 7.6, "pico_previsto_mm_3h": 9.0,
     "pluviometro_local_mm_h": None, "reportes_colaborativos": 0,
-    "validacao_cptec": None,
+    "previsao_inmet": None, "avisos_inmet": [],
     "fontes": {"precipitacao_atual": "OpenWeather", "previsao": "OpenWeather", "pluviometro_local": None},
     "dados_em_cache": False,
 }
@@ -82,7 +83,10 @@ def test_risco_integrado_inclui_colaborativo_e_nao_grava_nada(db_session):
     chuva_moderada = DadosClimaticosConsolidados(
         lat=LAT, lon=LON, precipitacao_atual_mm_h=5.0, pico_previsto_mm_3h=12.0,
         fonte_precipitacao_atual="OpenWeather", fonte_previsao="OpenWeather",
-        validacao_cptec="Chuvoso",
+        previsao_inmet="Muitas nuvens com pancadas de chuva e trovoadas isoladas",
+        avisos_inmet=[{"evento": "Tempestade", "severidade": "Perigo Potencial", "cor": "#FFFE00",
+                       "inicio": "2026-10-06 08:52", "fim": "2026-10-06 23:59",
+                       "riscos": "Chuva entre 20 e 30 mm/h"}],
     )
     with patch("servicos.classificacao.obter_dados_consolidados_em_cache",
                return_value=(chuva_moderada, True)):
@@ -93,7 +97,8 @@ def test_risco_integrado_inclui_colaborativo_e_nao_grava_nada(db_session):
     assert corpo["reportes_colaborativos"] == 2
     assert corpo["componentes"]["colaborativo"] == 80.0
     assert corpo["componentes"]["pluviometro_local"] is None   # ANA sem credencial
-    assert corpo["validacao_cptec"] == "Chuvoso"
+    assert corpo["previsao_inmet"].startswith("Muitas nuvens")
+    assert corpo["avisos_inmet"][0]["severidade"] == "Perigo Potencial"
     assert corpo["dados_em_cache"] is True
     # Consulta não registra agregado (só o POST de ocorrência registra)
     assert db_session.scalar(select(func.count()).select_from(ReporteColaborativoAgregado)) == 0

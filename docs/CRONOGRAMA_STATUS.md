@@ -2,7 +2,8 @@
 
 **Sistema de Monitoramento Colaborativo de Áreas com Risco de Alagamento**
 Período: 01/07/2026 a 30/10/2026 (17 semanas)
-*Última atualização de status: 03/10/2026 — Semana 14 (28/09 – 04/10)*
+*Última atualização de status: 07/10/2026 — Semana 15 (05/10 – 11/10). **Prazo antecipado:**
+projeto e documento teórico até o fim da semana de 12–16/10/2026.*
 
 ## Legenda de responsáveis
 - **Henrique** — backend / tech lead
@@ -23,7 +24,38 @@ enviada em 06/09/2026 (Semanas 5, 8, 9 e 10); e para as do Guilherme a partir do
 que ele enviou em 06/09/2026 (Semanas 1–10). Ambos os resumos são repasse direto, sem
 validação própria do time de integração.
 
+## Situação em 07/10/2026 — prazo antecipado
+
+**Prazo:** houve ajuste nos prazos — app e documento teórico precisam estar concluídos até
+o **fim da semana de 12–16/10/2026** (antes: rascunho ao orientador na S16 e banca em
+30/10). Restam cerca de 8 dias úteis.
+
+**Análise completa e plano dia a dia:** `docs/Documento Teórico/Analise_escopo_e_revisao_do_TCC_2026-10-06.md`.
+Resumo:
+1. **O sistema está praticamente pronto; o documento teórico não.** O texto consolidado
+   (`docs/Documento Teórico/TCC_Alagamentos_Versao_Consolidada_Orientador_2026.docx`) está
+   escrito como proposta e não tem os capítulos de Desenvolvimento, Testes e Conclusão que o
+   template da USCS exige; há divergências entre o texto e o sistema (fontes, faixas de
+   risco, modelo de dados, numeração de requisitos). É o maior trabalho da semana.
+2. **Feito em 06–07/10:** CPTEC (403 desde 03/10) substituído pela API de previsão do INMET
+   (levantamento do João) — previsão textual e avisos oficiais, no app e no backend; avisos
+   de chuva do INMET como **piso** da classificação (decisão do grupo: Perigo → Médio;
+   Grande Perigo → Alto); 98 testes no backend.
+3. **Ajustes de escopo aguardando o orientador:** retirar a ANA (sem resposta desde agosto)
+   e a estação da USCS; incluir a Open-Meteo para ter uma regra de fusão numérica (ponto 3
+   do orientador); AHP com 3 critérios (pesos 54/30/16); contar um relato por usuário no
+   colaborativo; registrar cada cálculo de risco.
+4. **Ainda trava:** testes de usabilidade (sem data); mapa do app (chave do Google Maps sem o
+   SHA-1 do APK de teste); firewall do notebook com Docker.
+
+**Plano até a entrega (resumo):** qua 07 — decisões de escopo com o orientador, chave do
+Maps, data da usabilidade; qua 07–qui 08 — ajustes de backend aprovados; qua 07–seg 12 —
+documento no template; sex 09–seg 12 — usabilidade; ter 13 — resultados e conclusão;
+qua 14 — revisão cruzada e ABNT; qui 15 — slides; sex 16 — entrega.
+
 ## Situação em 03/10/2026 — resumo atualizado
+
+*(Mantida como registro; substituída pela "Situação em 07/10/2026" acima.)*
 
 **Onde estamos:** fim da Semana 14 de 17. Rascunho completo ao orientador na Semana 16
 (12–18/10); banca em 30/10. Em 03/10 uma sessão de trabalho no notebook com Docker
@@ -156,7 +188,7 @@ sobre APIs e algoritmo de risco (`T16_secao_*.md`).
 | Responsável | Atividade | Status |
 |---|---|---|
 | Henrique | Integração do banco de dados com os endpoints (persistência real das ocorrências e classificações) | 🟡 `POST /ocorrencias` calcula `nivel_risco`/`chuva_mm` automaticamente via `fusao_climatica` quando o cliente não informa (`backend/servicos/classificacao.py`, T14 "Notas de projeto"); o `OcorrenciaRepository` já grava via SQLAlchemy desde a Semana 3. **Validado em 03/09/2026 num notebook específico do João** (com Docker, diferente do notebook usado no dia a dia das sessões — ver nota de 06/09 abaixo e `CLAUDE.md`) contra um Postgres/PostGIS real (Docker + `docker-compose.yml`, ver nota abaixo) — `schema.sql` aplica sem erro, PostGIS 3.4 ativo, 23/23 testes passam com `DATABASE_URL` apontando pro container. Segue 🟡 e não ✅ porque isso ainda não foi confirmado no ambiente do Henrique nem em CI — falta padronizar isso pro time todo. **03/10/2026:** API passou a rodar em contêiner (`Dockerfile`, serviço `api` no `docker-compose.yml`) contra o mesmo banco, usada pelo app nos testes do dia; criado CI no GitHub Actions que roda a suíte contra PostGIS real a cada push (`.github/workflows/ci.yml`) — vira ✅ quando o primeiro push rodar o CI com sucesso |
-| João | Testes de consistência dos dados climáticos consolidados (comparação entre fontes para a mesma região/horário) | 🔴 Bloqueada — depende da ANA responder o cadastro (único item fora do controle do time). **03/10/2026:** OpenWeather validado de ponta a ponta com chave real (centro de São Caetano do Sul → Baixo, 13,7); a comparação entre fontes continua impossível: ANA sem credencial e CPTEC respondendo 403 (BrasilAPI também falhou) |
+| João | Testes de consistência dos dados climáticos consolidados (comparação entre fontes para a mesma região/horário) | 🔴 Bloqueada — depende da ANA responder o cadastro (único item fora do controle do time). **03/10/2026:** OpenWeather validado de ponta a ponta com chave real (centro de São Caetano do Sul → Baixo, 13,7); a comparação entre fontes continua impossível: ANA sem credencial e CPTEC respondendo 403 (BrasilAPI também falhou). **06/10/2026:** CPTEC substituído pela API de previsão do INMET (só texto, sem mm) — a comparação numérica entre fontes depende de incluir a Open-Meteo (ajuste de escopo em análise) |
 | Marlon | Integração da tela de mapa com dados reais do backend (consumo da API) | 🟡 (era 🔴) Aguardando realização de teste com banco de dados contendo os dados reais **30/09/2026:** o consumo da API (GET /ocorrencias e /ocorrencias/{id}, `ApiCliente.kt`) já existia na cópia local do Marlon e passou ao `android/` com a unificação da base (ver nota "Tarefas do Guilherme e unificação da base Android"); mapa, alertas e detalhes não usam mais dados de exemplo. Validado só contra um servidor simulado — falta testar contra a API real, que ainda não está hospedada. Segue 🟡. **03/10/2026:** testado contra a API e o banco reais no emulador — mapa (cartão "Situação atual" com os 30 registros de demonstração), alertas e detalhes recebem os dados da API. Segue 🟡 só pelo desenho do mapa: a chave do Google Maps recusa o certificado do APK gerado no notebook do João ("Authorization failure"), então os marcadores não aparecem lá |
 | Guilherme | Integração da tela de cadastro com o backend (envio de ocorrências reais) | ✅ Concluída em 03/10/2026 (ver fim da célula). Histórico: 🟡 Em andamento — estrutura de integração preparada com o endpoint de ocorrências, mas a validação completa do fluxo com backend e banco reais depende do ambiente integrado do projeto. **30/09/2026:** implementado no `android/` — tela "Registrar ocorrência" (`CadastroFragment.kt`) envia `POST /ocorrencias` com `fonte=usuario` e o `id_usuario` do perfil; sem nível escolhido, o backend calcula o risco (AHP). Testado no emulador contra servidor simulado (envio, validação de local obrigatório e erro sem conexão). Falta validar contra a API real — segue 🟡. **03/10/2026:** validado contra a API real — nível manual (POST 201, gravado no PostGIS), nível automático com clima real do OpenWeather (POST 201, classificado pelo AHP), envio sem local bloqueado e mensagem específica quando o cálculo automático está indisponível (HTTP 503). Casos CT-CAD-001 a 004 no PT-001 |
 
@@ -238,7 +270,7 @@ sobre APIs e algoritmo de risco (`T16_secao_*.md`).
 | Marlon | Correções de interface apontadas pelos testes de usabilidade | 🔴 Não iniciada — depende da Semana 12 |
 | Guilherme | Apoio às correções de interface e testes de regressão | 🔴 Não iniciada — depende da Semana 12 |
 
-### Semana 14 (28/09 – 04/10) — **semana atual**
+### Semana 14 (28/09 – 04/10)
 | Responsável | Atividade | Status |
 |---|---|---|
 | Henrique | Redação da seção técnica sobre arquitetura final e algoritmo de classificação de risco | 🟡 Rascunho em 03/10/2026, revisão do Henrique pendente — `docs/T16_secao_arquitetura.md` (componentes, endpoints, fluxo do cadastro automático, implantação, testes, decisões); a parte do algoritmo (`T16_secao_algoritmo_risco.md`) foi atualizada com a agregação colaborativa e um exemplo real de São Caetano do Sul. Histórico: ⚪ Sem status reportado |
@@ -246,7 +278,7 @@ sobre APIs e algoritmo de risco (`T16_secao_*.md`).
 | Marlon | Redação da seção sobre desenvolvimento do aplicativo Android (XML) e decisões de UI | 🟡 Rascunho em 03/10/2026 a partir do código — `docs/T16_secao_app_android.md`; falta o Marlon complementar com o histórico de decisões de UI (wireframes, testes internos, padronização visual), que não está no repositório. Histórico: ⚪ Sem status reportado |
 | Guilherme | Levantamento de capturas de tela e evidências visuais do sistema para o relatório | 🟡 5 de 7 em 03/10/2026 (ver fim da célula). Histórico: ⚪ Sem status reportado — já dá para capturar o app do `android/` (compila), mas com dados mockados; capturas definitivas ficam melhores após a integração **30/09/2026:** não feito — as capturas devem ser tiradas com a API real rodando (hoje só há dados de um servidor simulado, que não servem como evidência no relatório). **03/10/2026:** 🟡 5 de 7 capturas feitas com a API real, clima real e o aparelho em pt-BR (`docs/capturas/`, script `android/scripts/roteiro_capturas.py`); faltam as do mapa e do cadastro, que dependem de liberar a chave do Google Maps |
 
-### Semana 15 (05/10 – 11/10)
+### Semana 15 (05/10 – 11/10) — **semana atual** (o prazo final passou a ser o fim da S16)
 | Responsável | Atividade | Status (adiantado em 03/10/2026) |
 |---|---|---|
 | Henrique | Redação da seção de benchmark de indexação espacial (resultados e discussão) | 🟡 Rascunho pronto (`docs/T16_secao_benchmark.md`), revisão do Henrique pendente |
@@ -481,6 +513,31 @@ deve partir desta base em vez de manter outra.
 - **Continua pendente do Guilherme:** corrigir os bugs dos testes internos (S8, aguarda a lista
   do Marlon), confirmar se a planilha PT-001 fecha a S11, e as tarefas que dependem dos testes
   com usuários (S12/S13) e da API real (capturas de tela da S14).
+
+**Sessões de 06–07/10/2026 — prazo antecipado, INMET e documento teórico (notebook com
+Docker, sessão do João):**
+- **Prazo:** app e documento teórico até o fim da semana de 12–16/10/2026.
+- **Análise do documento teórico** contra o template oficial da USCS e contra o sistema
+  implementado, avaliação dos 15 pontos do orientador e proposta de ajustes de escopo:
+  `docs/Documento Teórico/Analise_escopo_e_revisao_do_TCC_2026-10-06.md`. Achados
+  principais: documento escrito como proposta, sem os capítulos de Desenvolvimento, Testes e
+  Conclusão; não existe regra de fusão para uma mesma variável (ponto 3); a matriz AHP foi
+  reconstruída depois da escolha dos pesos, e os pesos usados diferem do autovetor; o mínimo
+  de 2 relatos do colaborativo conta relatos, não usuários (um usuário sozinho altera o
+  risco).
+- **INMET no lugar do CPTEC (06/10):** levantamento do João da API `apiprevmet3` (previsão
+  por município e avisos oficiais, sem token); testado ao vivo para São Caetano do Sul;
+  integrado ao backend (`fusao_climatica.py`, cache por município) e ao app (aba Previsão com
+  avisos coloridos por severidade). Latência do cadastro automático sem cache remedida:
+  p50 0,60 s e p95 1,63 s (RNF-03 atendido).
+- **Avisos como piso (07/10, decisão do grupo):** Perigo → no mínimo Médio; Grande Perigo →
+  Alto; Perigo Potencial → sem piso — no nível de risco de alagamento declarado pelo próprio
+  INMET (T15 §6.5). Pesos e score inalterados.
+- **Testes:** 98 no backend (90 sem banco + 8 de integração); app compila e passa nos 6
+  testes de JVM; evidência `docs/evidencias_testes/2026-10-03/11_previsao_inmet_avisos.png`
+  e captura `docs/capturas/06_previsao_risco.png` atualizadas.
+- **Ambiente:** depois de reiniciar o notebook, abrir o Docker Desktop (os contêineres sobem
+  sozinhos); o CPTEC continuava com 403 em 06/10.
 
 **Sessão de 03/10/2026 — recuperação dos atrasos (notebook com Docker, sessão do João):**
 o João pediu que tudo o que fosse possível fazer e testar naquele notebook fosse feito,

@@ -1,8 +1,10 @@
 package com.example.alagamentos
 
+import android.graphics.Typeface
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -77,6 +79,21 @@ class PrevisaoFragment : Fragment(R.layout.fragment_previsao) {
         view.findViewById<TextView>(R.id.txt_risco_score).text =
             getString(R.string.previsao_score, numero(risco.scoreFinal))
 
+        // Aviso do INMET elevou a classe: explica a diferença entre a pontuação do índice
+        // e a classe exibida (ex.: pontuação baixa com classe MÉDIO)
+        val piso = risco.pisoAvisoInmet
+        view.findViewById<TextView>(R.id.txt_risco_piso).apply {
+            visibility = if (piso == null) View.GONE else View.VISIBLE
+            if (piso != null) {
+                text = getString(
+                    R.string.previsao_piso,
+                    Severidade.daApi(risco.classificacaoIndice)?.rotulo ?: risco.classificacaoIndice ?: "-",
+                    severidade?.rotulo ?: risco.classificacao,
+                    piso.evento ?: "-", piso.severidade ?: "-"
+                )
+            }
+        }
+
         linha(view, R.id.info_chuva_agora, R.string.previsao_chuva_agora,
             getString(R.string.previsao_valor_mm_h, numero(risco.precipitacaoAtualMmH)))
         linha(view, R.id.info_pico_previsto, R.string.previsao_pico,
@@ -88,8 +105,51 @@ class PrevisaoFragment : Fragment(R.layout.fragment_previsao) {
             if (risco.componentes.colaborativo != null)
                 getString(R.string.previsao_relatos_valor, risco.reportesColaborativos)
             else getString(R.string.previsao_relatos_poucos))
-        linha(view, R.id.info_cptec, R.string.previsao_cptec,
-            risco.validacaoCptec ?: getString(R.string.previsao_sem_dado))
+        linha(view, R.id.info_inmet, R.string.previsao_inmet,
+            risco.previsaoInmet ?: getString(R.string.previsao_sem_dado))
+        mostrarAvisos(view, risco.avisosInmet.orEmpty())
+    }
+
+    // Avisos oficiais do INMET para o município: um bloco por aviso, na cor do nível
+    // de perigo (amarelo/laranja/vermelho nos tons do app). Sem aviso, o cartão some.
+    private fun mostrarAvisos(view: View, avisos: List<AvisoInmetDto>) {
+        val cartao = view.findViewById<View>(R.id.card_avisos_inmet)
+        val lista = view.findViewById<LinearLayout>(R.id.lista_avisos_inmet)
+        while (lista.childCount > 1) lista.removeViewAt(1) // mantém só o título
+        cartao.visibility = if (avisos.isEmpty()) View.GONE else View.VISIBLE
+        val ctx = requireContext()
+        avisos.forEach { aviso ->
+            val cor = ContextCompat.getColor(ctx, when (aviso.severidade) {
+                "Grande Perigo" -> R.color.status_high
+                "Perigo" -> R.color.status_medium
+                else -> R.color.status_yellow
+            })
+            lista.addView(TextView(ctx).apply {
+                text = getString(R.string.previsao_aviso, aviso.evento ?: "-", aviso.severidade ?: "-")
+                setTextColor(cor)
+                textSize = 16f
+                setTypeface(typeface, Typeface.BOLD)
+                setPadding(0, (10 * resources.displayMetrics.density).toInt(), 0, 0)
+            })
+            lista.addView(TextView(ctx).apply {
+                text = getString(R.string.previsao_aviso_validade, dataHoraAviso(aviso.inicio), dataHoraAviso(aviso.fim))
+                setTextColor(ContextCompat.getColor(ctx, R.color.text_secondary))
+                textSize = 13f
+            })
+            aviso.riscos?.takeIf { it.isNotBlank() }?.let { riscos ->
+                lista.addView(TextView(ctx).apply {
+                    text = riscos
+                    setTextColor(ContextCompat.getColor(ctx, R.color.text_primary))
+                    textSize = 13f
+                })
+            }
+        }
+    }
+
+    // "2026-10-06 08:52" (horário de Brasília, como o INMET envia) -> "06/10 08:52"
+    private fun dataHoraAviso(texto: String?): String {
+        val partes = texto?.split(" ", "-", ":") ?: return "-"
+        return if (partes.size >= 5) "${partes[2]}/${partes[1]} ${partes[3]}:${partes[4]}" else texto
     }
 
     private fun mostrarErro(view: View, titulo: String, descricao: String) {

@@ -70,7 +70,8 @@ def test_falha_nao_entra_no_cache():
 def test_sem_chave_openweather_falha_com_erro_claro():
     with patch.object(fc, "OPENWEATHER_API_KEY", ""), \
          patch.object(fc, "_buscar_ana", return_value=None), \
-         patch.object(fc, "_buscar_cptec_previsao", return_value=None):
+         patch.object(fc, "_buscar_inmet_previsao", return_value=None), \
+         patch.object(fc, "_buscar_inmet_avisos", return_value=None):
         with pytest.raises(fc.FonteClimaticaIndisponivel, match="OPENWEATHER_API_KEY"):
             fc.obter_dados_consolidados(-23.62, -46.55)
 
@@ -79,7 +80,8 @@ def test_erro_de_rede_do_openweather_vira_fonte_indisponivel():
     with patch.object(fc, "_buscar_openweather_atual", side_effect=ConnectionError("sem rede")), \
          patch.object(fc, "_buscar_openweather_previsao", return_value={"list": []}), \
          patch.object(fc, "_buscar_ana", return_value=None), \
-         patch.object(fc, "_buscar_cptec_previsao", return_value=None):
+         patch.object(fc, "_buscar_inmet_previsao", return_value=None), \
+         patch.object(fc, "_buscar_inmet_avisos", return_value=None):
         with pytest.raises(fc.FonteClimaticaIndisponivel, match="sem rede"):
             fc.obter_dados_consolidados(-23.62, -46.55)
 

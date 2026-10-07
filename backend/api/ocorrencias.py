@@ -60,6 +60,8 @@ def criar_ocorrencia(
         valores["nivel_risco"] = resultado["classificacao"]
         if valores.get("chuva_mm") is None:
             valores["chuva_mm"] = resultado["chuva_mm"]
+        if valores.get("descricao_clima") is None:
+            valores["descricao_clima"] = resultado.get("descricao_clima")
 
     ocorrencia = repo.criar(valores)
     return OcorrenciaOut.model_validate(ocorrencia)
