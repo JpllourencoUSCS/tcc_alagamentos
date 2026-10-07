@@ -193,8 +193,8 @@ investigação (03/09/2026)".
 - Raiz: `Dockerfile` (imagem da API), `docker-compose.yml` (serviços `db` e `api`),
   `.env.example` (variáveis esperadas no `.env`), `requirements.txt`,
   `requirements-benchmark.txt`, `.github/workflows/ci.yml` (pytest contra PostGIS real +
-  build e testes do app a cada push — criado em 03/10/2026, ainda não executado no GitHub
-  até o primeiro push).
+  build e testes do app a cada push — criado em 03/10/2026; primeira execução no GitHub em
+  07/10/2026, com os dois jobs aprovados).
 
 ## Ambiente de desenvolvimento
 

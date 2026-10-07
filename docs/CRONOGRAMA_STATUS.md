@@ -544,6 +544,9 @@ deve partir desta base em vez de manter outra.
   bancos do benchmark: as linhas sintéticas `cptec` viraram `inmet`, mesmas contagens). Novo
   teste de contrato (`fonte=inmet` aceito, `fonte=cptec` → 422): **99 testes** no backend
   (91 sem banco + 8 de integração). App recompilado (6 testes de JVM) e capturas refeitas.
+- **Push e primeiro CI:** commits de 03/10 e 07/10 enviados ao GitHub; a primeira execução
+  do CI (`.github/workflows/ci.yml`) passou nos dois jobs — backend (pytest contra PostGIS
+  real, com o `schema.sql` aplicado) e app (APK de debug + testes de JVM).
 
 **Sessões de 06–07/10/2026 — prazo antecipado, INMET e documento teórico (notebook com
 Docker, sessão do João):**

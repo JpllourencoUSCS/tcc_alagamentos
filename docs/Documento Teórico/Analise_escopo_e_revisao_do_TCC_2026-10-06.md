@@ -71,7 +71,7 @@ com o fim de semana (17–18/10) como margem. São ~8 dias úteis.
 | Ajustes de escopo da seção 4 (Open-Meteo + fusão, AHP 3 critérios, deduplicação do colaborativo) | backend (João/Henrique) | aprovação do orientador |
 | Completar o benchmark com as consultas que o documento promete (raio com `ST_DWithin`, vizinhos mais próximos, `EXPLAIN (ANALYZE, BUFFERS)`) e percentis | Henrique | — |
 | Separar a latência por etapa dentro da API (fontes externas, banco, cálculo do índice) — ponto 13 | Henrique | — |
-| Corrigir o firewall do notebook com Docker; primeiro push (para o CI rodar) | João | administrador |
+| Corrigir o firewall do notebook com Docker; primeiro push (para o CI rodar) | João | administrador — **push feito em 07/10**: primeiro CI aprovado (backend e app); firewall ainda pendente |
 | Slides (roteiro pronto em `docs/roteiro_apresentacao.md`) | Marlon, Guilherme | resultados finais |
 | Conferir as citações pendentes (`docs/referencias_consolidadas.md`), incluindo a origem dos limiares de chuva | Guilherme | — |
 
