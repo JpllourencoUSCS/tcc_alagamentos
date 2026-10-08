@@ -69,11 +69,21 @@ precisa ser concluído até o **fim da semana de 12–16/10/2026** (antes, banca
   técnicas já fechadas".
 - **Mapa liberado (07/10, noite):** o João cadastrou o SHA-1 do APK de teste na chave do
   Google Maps. CT-MAP-001/002 e o cadastro com o local marcado no mapa verificados contra a
-  API real (PT-001 v1.2, 22 casos, nenhum bloqueado; evidências em
-  `docs/evidencias_testes/2026-10-07/`); capturas do relatório refeitas (10 telas).
+  API real (evidências em `docs/evidencias_testes/2026-10-07/`); capturas do relatório
+  refeitas (11 telas, em `docs/capturas/`).
 - **Fonte `cptec` → `inmet` (07/10):** o enum de fonte das ocorrências acompanhou a troca do
   CPTEC pelo INMET (backend, `schema.sql`, app); bancos existentes migrados com
   `backend/db/migracao_2026-10-07_fonte_inmet.sql`.
+- **Ajustes de interface pedidos pelo João (07/10, noite):** aba Previsão com a origem de
+  cada dado e a explicação do cálculo em ícones ⓘ; cadastro com mapa arrastável, busca por
+  endereço (geocodificador do Android) e **locais fora de São Caetano do Sul recusados** —
+  no app e, depois da revisão geral, também na API (422); **o mapa mostra só as ocorrências
+  das últimas 24 h** (esmaecidas depois de 3 h; nada é apagado do banco) — ver "Decisões
+  técnicas já fechadas". Revisão geral no mesmo dia: 6 defeitos do app e 5 inconsistências
+  da documentação corrigidos (lista na nota de 07/10 do `docs/CRONOGRAMA_STATUS.md`).
+  PT-001 v1.3: 28 casos (20 aprovados, 8 aguardando só a avaliação de usabilidade).
+  `README.md` da raiz reescrito (repositório público). Pendência registrada sem mudança: o
+  filtro "Fontes de dados" dos Ajustes lista fontes que hoje não criam ocorrências.
 - **Ajustes de escopo ainda aguardando decisão** (seção 4 da análise): retirar a ANA e a
   estação da USCS; incluir a Open-Meteo como segunda fonte numérica com regra de fusão;
   AHP com 3 critérios (pesos 54/30/16, que mudariam os pesos fechados abaixo); contar um
@@ -93,13 +103,16 @@ investigação (03/09/2026)".
   - `algoritmo_risco.py`, `fusao_climatica.py` — modelo AHP e fusão de fontes climáticas
   - `constants.py` — enums `NivelRisco`/`FonteDado`, vocabulário único reusado pelo ORM e pela API
     (`FonteDado`: `usuario`, `openweather`, `ana`, `inmet` — até 07/10/2026 era `cptec`;
-    espelhado em `schema.sql` e no `Ocorrencia.kt` do app)
+    espelhado em `schema.sql` e no `Ocorrencia.kt` do app) e a área monitorada
+    (`AREA_SAO_CAETANO_DO_SUL`/`dentro_de_sao_caetano`: retângulo aproximado do município,
+    o mesmo do app)
   - `db/` — `models.py` (SQLAlchemy + GeoAlchemy2), `schema.sql` (DDL PostgreSQL/PostGIS),
     `session.py` (engine/`get_db`), `repository.py` (acesso a dados de `ocorrencias`),
     `migracao_2026-10-07_fonte_inmet.sql` (para bancos criados antes da troca `cptec` → `inmet`)
   - `api/` — endpoints FastAPI (`ocorrencias.py`: `POST`/`GET /ocorrencias`, `GET /ocorrencias/{id}`;
     `risco.py`: `GET /risco`, risco atual num ponto, sem gravar nada; `schemas.py`); app
-    principal em `backend/main.py`
+    principal em `backend/main.py`. Desde 07/10/2026 o `POST /ocorrencias` recusa (422)
+    pontos fora de São Caetano do Sul — os testes usam coordenadas dentro da cidade
   - `servicos/` — camada de integração entre API e lógica de domínio (`classificacao.py`
     liga os endpoints à fusão climática + agregador colaborativo + algoritmo de risco;
     `colaborativo.py` agrega relatos de usuário — 1 km, 3 h, mínimo 2 — no score 0–100 do
@@ -135,7 +148,7 @@ investigação (03/09/2026)".
     depender do que já existe no banco (dados de demonstração ou de outra pessoa,
     no banco compartilhado por Tailscale): consultar só os dados que o próprio teste
     criou, por exemplo com um bbox pequeno em volta deles — até 03/10/2026 dois testes
-    assumiam o banco vazio e quebravam. 99 testes em 07/10/2026 (91 sem banco + 8 de
+    assumiam o banco vazio e quebravam. 100 testes em 07/10/2026 (92 sem banco + 8 de
     integração). Sem
     `DATABASE_URL` definida, os testes de integração são pulados (skip), não
     falham — mesmo critério do resto do projeto para "sem Postgres disponível".
@@ -149,7 +162,14 @@ investigação (03/09/2026)".
   `ApiCliente.kt` (Retrofit) + `OcorrenciaRepository.kt` — `GET`/`POST /ocorrencias`, com os
   filtros de região/período do backend; a aba Previsão usa `GET /risco` (risco AHP atual +
   fontes do cálculo + previsão e avisos oficiais do INMET; quando um aviso eleva a classe,
-  a tela diz "Elevado de BAIXO para MÉDIO pelo aviso do INMET"). **Testado contra a API real em 03/10/2026** (emulador, inclusive em
+  a tela diz "Elevado de BAIXO para MÉDIO pelo aviso do INMET"; a origem de cada dado fica
+  em ícones ⓘ). O mapa mostra só as ocorrências ativas — últimas 24 h, esmaecidas depois de
+  3 h — e a aba Alertas abre em "Últimas 24 h" (regra em `JanelaOcorrencia`, `Ocorrencia.kt`).
+  O cadastro marca o local por endereço (`Geocodificacao.kt`, geocodificador do próprio
+  Android, sem chave; busca com ", São Caetano do Sul - SP" no texto e, sem resultado, o
+  texto original), toque no mapa (arrastável: `MapaArrastavel.kt`) ou GPS, e só aceita
+  pontos do município (`Municipio.kt`: cidade informada pelo geocodificador, com o retângulo
+  como plano B). **Testado contra a API real em 03/10/2026** (emulador, inclusive em
   pt-BR/fuso de São Paulo) — evidências em `docs/evidencias_testes/2026-10-03/`. Endereço
   da API em `API_BASE_URL` no `android/local.properties` (padrão `http://10.0.2.2:8000/`,
   o localhost do computador visto pelo emulador). Preferências, perfil e sessão ficam só
@@ -168,9 +188,13 @@ investigação (03/09/2026)".
   da sessão. Com o repositório dentro do OneDrive, definir
   `ALAGAMENTOS_BUILD_DIR=C:\gradle-build\alagamentos` (lido por `android/build.gradle.kts`):
   sem isso o OneDrive trava os intermediários e o build falha com "Unable to delete
-  directory". Testes de JVM: `gradlew testDebugUnitTest` (`FuncoesPurasTest.kt`).
+  directory". Testes de JVM: `gradlew testDebugUnitTest` (`FuncoesPurasTest.kt`, 10 em
+  07/10/2026). `gradlew lintDebug`: 0 erros em 07/10/2026 (os avisos restantes são versões
+  novas de bibliotecas, plurais e falsos positivos).
   `android/scripts/`: `adb_app.py` (automação do app no emulador via adb, usada nos testes
-  de 03/10 e 07/10) e `roteiro_capturas.py` (as 10 capturas do relatório em `docs/capturas/`).
+  de 03/10 e 07/10) e `roteiro_capturas.py` (as 11 capturas do relatório em `docs/capturas/`;
+  o toque em "mapa com ocorrência selecionada" usa uma posição fixa de marcador, que depende
+  dos dados de demonstração recarregados no dia).
 - `testes-api/` — scripts de teste de API, um por fonte, nomeados `teste_<fonte>.py`
   (`teste_inmet_apiprevmet3.py`: levantamento do João de 06/10/2026). Atenção:
   `teste_openweather.py` sobrescreve os JSONs do teste original de Santo André
@@ -178,7 +202,7 @@ investigação (03/09/2026)".
   não reescrever com conteúdo diferente do que realmente aconteceu). `T16_secao_*.md`
   são rascunhos de seções do relatório final e devem ser mantidos sincronizados com as
   decisões técnicas atuais. Material de teste (13/09/2026): `plano_e_fluxo_de_testes_TCC.xlsx`
-  (plano PT-001 + casos de teste; versão 1.2 com 22 casos em 07/10/2026),
+  (plano PT-001 + casos de teste; versão 1.3 com 28 casos em 07/10/2026),
   `questionario_teste_usabilidade.md` e `tcle_teste_usabilidade.md` (ambos dizem
   explicitamente que as ocorrências do teste são de demonstração). Desde 03/10/2026:
   `T19_criterios_desempenho.md` (RNF de latência + medições), `T16_secao_arquitetura.md`,
@@ -314,6 +338,12 @@ Tailscale `tcc-alagamentos-joao`, Windows 11, Ryzen 5 5600G, 16 GB):
   próprio INMET declara: **Perigo → no mínimo Médio; Grande Perigo → Alto; Perigo Potencial
   → sem piso** ("baixo risco de alagamentos" no texto oficial). Não muda os pesos nem o
   score; nunca reduz a classe. Detalhe em T15 §6.5.
+- **Área monitorada e janela das ocorrências (decisões do João, 07/10/2026):** só
+  ocorrências em São Caetano do Sul — o app confere a cidade pelo geocodificador e a API
+  recusa (422) pontos fora do retângulo aproximado do município. O mapa, a "Situação atual"
+  e a faixa de alerta mostram só as ocorrências das **últimas 24 h** (mesma janela das
+  notificações); as com mais de **3 h** aparecem esmaecidas (janela do componente
+  colaborativo); nada é apagado do banco, o histórico fica na aba Alertas.
 - **Modelo AHP**: pesos fixos — precipitação atual 35%, pluviômetro local 25%,
   previsão 25%, colaborativo 15%. Não alterar sem o usuário pedir explicitamente. A análise
   de sensibilidade de 03/10/2026 (`backend/analise_sensibilidade.py`, T15 seção 8.1) só mede

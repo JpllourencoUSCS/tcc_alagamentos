@@ -129,8 +129,8 @@ importância de comparar condições medidas na mesma sessão, como foi feito na
 seção 4.Y.2.
 
 Também no escopo da Semana 10, foi implementado um **cache de dados climáticos** de 10
-minutos por célula de ~1 km no backend. Ele evita repetir as quatro chamadas às APIs
-externas quando vários usuários reportam ocorrências na mesma região em sequência, o que
+minutos por célula de ~1 km no backend. Ele evita repetir as chamadas às APIs
+externas (quatro na época; cinco desde 06/10/2026, com a previsão e os avisos do INMET) quando vários usuários reportam ocorrências na mesma região em sequência, o que
 afeta diretamente a latência do cadastro com risco automático (RNF-03 em T19). A
 paginação dos resultados já existia (`skip`/`limit` no endpoint, limitado a 500).
 

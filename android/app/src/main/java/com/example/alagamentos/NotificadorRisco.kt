@@ -9,7 +9,6 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.edit
-import java.time.ZonedDateTime
 
 // Notificação local de risco (Semana 7): chamada sempre que o app recebe
 // ocorrências da API. Segue as preferências da aba Ajustes (liga/desliga,
@@ -22,15 +21,14 @@ object NotificadorRisco {
     private const val MAX_GUARDADAS = 500
     const val EXTRA_OCORRENCIA_ID = "ocorrencia_id"
 
-    // Ocorrências mais antigas que isso não geram aviso (evita notificar o histórico)
-    private const val JANELA_HORAS = 24L
+    // Ocorrências mais antigas que a janela de ativas não geram aviso (evita notificar o histórico)
 
     fun verificar(context: Context, ocorrencias: List<Ocorrencia>) {
         val prefs = Preferencias(context)
         if (!prefs.notificacoesAtivas) return
 
         val local = Localizacao.ultimaConhecida(context)
-        val limite = ZonedDateTime.now().minusHours(JANELA_HORAS)
+        val limite = JanelaOcorrencia.inicioAtivas()
         val jaAvisadas = avisadas(context)
 
         val novas = ocorrencias.filter { o ->

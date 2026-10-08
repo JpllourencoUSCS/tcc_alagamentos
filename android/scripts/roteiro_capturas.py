@@ -32,9 +32,11 @@ from pathlib import Path
 import adb_app as a
 
 CENTRO_SCS = ("-46.5548", "-23.6229")  # longitude, latitude (ordem do "geo fix")
-# Marcador isolado (oeste da cidade) no enquadramento das 30 ocorrências de demonstração
-MARCADOR_DEMO = (199, 880)
+# Marcador vermelho (norte, Av. do Estado) no enquadramento das ocorrências de demonstração das
+# últimas 24 h (o mapa só mostra essas desde 07/10/2026); dados_demo usa semente fixa
+MARCADOR_DEMO = (454, 868)
 SENHA_FICTICIA = "teste123"  # o login não valida credenciais (CT-LOG-001)
+ENDERECO_DEMO = "Rua Alegre, 100"  # em São Caetano do Sul; sem acentos (o "input text" do adb não aceita)
 
 
 def main(destino: Path) -> None:
@@ -73,13 +75,18 @@ def main(destino: Path) -> None:
 
     a.tocar("nav_mapa", espera=2)
     a.tocar("fab_registrar", espera=4)
-    a.tocar("btn_minha_localizacao", espera=4)
+    a.digitar("edt_busca_endereco", ENDERECO_DEMO)  # busca por endereço (07/10/2026)
+    a.fechar_teclado()
+    a.tocar(texto="Buscar endereço", espera=5)      # lupa do campo
     a.tocar("chip_risco_alto", espera=0.5)
     foto("05_cadastro")
     a.voltar()
 
     a.tocar("nav_previsao", espera=1)
     foto("06_previsao_risco", espera=5)  # risco, avisos do INMET e fontes do cálculo
+    a.tocar(texto="Sobre: Pluviômetro local", espera=1)  # cartão ⓘ com a origem do dado
+    foto("10_previsao_info_fonte", espera=1)
+    a.tocar(texto="Entendi", espera=1)
 
     a.tocar("nav_ajustes", espera=1)
     foto("07_ajustes")

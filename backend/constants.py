@@ -17,6 +17,17 @@ class NivelRisco(str, Enum):
     ALTO = "Alto"
 
 
+# Área monitorada (escopo do projeto desde 03/09/2026): retângulo aproximado de São Caetano
+# do Sul, com folga nas bordas — o mesmo do app (AreaBusca.SAO_CAETANO_DO_SUL, Localizacao.kt).
+# O app confere a cidade pelo geocodificador; a API só garante este limite (07/10/2026).
+AREA_SAO_CAETANO_DO_SUL = {"lat_min": -23.650, "lon_min": -46.600, "lat_max": -23.595, "lon_max": -46.535}
+
+
+def dentro_de_sao_caetano(latitude: float, longitude: float) -> bool:
+    a = AREA_SAO_CAETANO_DO_SUL
+    return a["lat_min"] <= latitude <= a["lat_max"] and a["lon_min"] <= longitude <= a["lon_max"]
+
+
 class FonteDado(str, Enum):
     USUARIO = "usuario"
     OPENWEATHER = "openweather"

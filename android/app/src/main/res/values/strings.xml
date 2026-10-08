@@ -9,15 +9,16 @@
 
     <!-- Mapa -->
     <string name="status_alto_titulo">ALERTA — Risco alto de alagamento</string>
-    <string name="status_alto_descricao">%1$d ocorrência(s) com risco alto registrada(s).</string>
+    <string name="status_alto_descricao">%1$d ocorrência(s) com risco alto nas últimas 24 h.</string>
     <string name="status_medio_titulo">ATENÇÃO — Risco médio de alagamento</string>
-    <string name="status_medio_descricao">%1$d ocorrência(s) com risco médio registrada(s).</string>
+    <string name="status_medio_descricao">%1$d ocorrência(s) com risco médio nas últimas 24 h.</string>
     <string name="status_baixo_titulo">NORMAL — Somente risco baixo</string>
-    <string name="status_baixo_descricao">%1$d ocorrência(s) com risco baixo registrada(s).</string>
-    <string name="status_vazio_titulo">Nenhuma ocorrência registrada</string>
-    <string name="status_vazio_descricao">O servidor não retornou ocorrências.</string>
+    <string name="status_baixo_descricao">%1$d ocorrência(s) com risco baixo nas últimas 24 h.</string>
+    <string name="status_vazio_titulo">Nenhuma ocorrência nas últimas 24 h</string>
+    <string name="status_vazio_descricao">O histórico completo está na aba Alertas.</string>
 
-    <string name="situacao_atual">Situação atual</string>
+    <string name="situacao_atual">Situação atual (últimas 24 h)</string>
+    <string name="resumo_legenda">Marcadores esmaecidos: registrados há mais de 3 h.</string>
     <string name="resumo_alto">• %1$d com risco alto</string>
     <string name="resumo_medio">• %1$d com risco médio</string>
     <string name="resumo_baixo">• %1$d com risco baixo</string>
@@ -40,7 +41,7 @@
     <string name="rotulo_estacao">Estação de referência</string>
     <string name="rotulo_fonte">Fonte</string>
     <string name="rotulo_coordenadas">Coordenadas</string>
-    <string name="valor_chuva">%1$.1f mm</string>
+    <string name="valor_chuva">%1$.1f mm/h</string>
     <string name="valor_temperatura">%1$.1f °C</string>
     <string name="valor_coordenadas">%1$s</string>
     <string name="valor_percentual">%1$d%%</string>
@@ -51,6 +52,7 @@
     <string name="tempo_dias">há %1$d d</string>
 
     <!-- Alertas -->
+    <string name="mapa_titulo">Mapa</string>
     <string name="alertas_titulo">Alertas</string>
     <string name="alertas_contagem">%1$d ocorrência(s) registrada(s)</string>
     <string name="alertas_vazio">Nenhuma ocorrência neste filtro.</string>
@@ -66,10 +68,10 @@
     <string name="previsao_risco_agora">RISCO DE ALAGAMENTO AGORA</string>
     <string name="previsao_score">Pontuação %1$s de 100</string>
     <string name="previsao_fontes_titulo">O QUE ENTROU NO CÁLCULO</string>
-    <string name="previsao_chuva_agora">Chuva agora (OpenWeather)</string>
-    <string name="previsao_pico">Pico nas próximas 24 h</string>
-    <string name="previsao_pluviometro">Pluviômetro local (ANA)</string>
-    <string name="previsao_relatos">Relatos de usuários (1 km, 3 h)</string>
+    <string name="previsao_chuva_agora">Chuva agora</string>
+    <string name="previsao_pico">Pico nas próximas 24&#160;h</string>
+    <string name="previsao_pluviometro">Pluviômetro local</string>
+    <string name="previsao_relatos">Relatos de usuários</string>
     <string name="previsao_inmet">Previsão INMET</string>
     <string name="previsao_avisos_titulo">AVISOS OFICIAIS DO INMET</string>
     <string name="previsao_piso">Elevado de %1$s para %2$s pelo aviso do INMET (%3$s · %4$s).</string>
@@ -82,6 +84,17 @@
     <string name="previsao_sem_dado">Sem dado</string>
     <string name="previsao_explicacao" formatted="false">O risco combina chuva atual (35%), pluviômetro local (25%), previsão (25%) e relatos de usuários próximos (15%). Fontes sem dado no momento têm o peso redistribuído entre as demais. Avisos de chuva do INMET elevam a classificação: Perigo, no mínimo MÉDIO; Grande Perigo, ALTO. A previsão do INMET aparece só como referência.</string>
     <string name="previsao_atualizar">Atualizar</string>
+    <!-- Cartões de informação (ícone ⓘ) da aba Previsão: de onde vem cada dado (07/10/2026) -->
+    <string name="previsao_info_descricao">Sobre: %1$s</string>
+    <string name="previsao_info_padrao">Sobre este dado</string>
+    <string name="previsao_info_risco_titulo">Como o risco é calculado</string>
+    <string name="previsao_info_risco_descricao">Como o risco é calculado</string>
+    <string name="previsao_info_chuva_agora" formatted="false">Chuva medida agora no seu local, informada pelo OpenWeather, serviço meteorológico internacional. É o critério de maior peso no cálculo do risco (35%).</string>
+    <string name="previsao_info_pico" formatted="false">Maior volume de chuva previsto para um intervalo de 3 horas nas próximas 24 horas, segundo a previsão do OpenWeather. Peso no cálculo do risco: 25%.</string>
+    <string name="previsao_info_pluviometro" formatted="false">Medição de pluviômetro da ANA (Agência Nacional de Águas e Saneamento Básico), da rede hidrometeorológica nacional. Peso no cálculo do risco: 25%. Enquanto o acesso aos dados da ANA não é liberado, aparece \"Sem dado\" e esse peso é redistribuído entre as demais fontes.</string>
+    <string name="previsao_info_relatos" formatted="false">Ocorrências registradas por usuários deste app num raio de 1 km nas últimas 3 horas. Só entram no cálculo a partir de 2 relatos, para que um registro isolado não altere o risco. Peso no cálculo do risco: 15%.</string>
+    <string name="previsao_info_inmet">Texto descritivo do INMET (Instituto Nacional de Meteorologia) para o período do dia. É apenas descritivo: não é utilizado no cálculo do risco.</string>
+    <string name="entendi">Entendi</string>
     <string name="previsao_indisponivel_titulo">Dados climáticos indisponíveis</string>
     <string name="previsao_indisponivel_descricao">O servidor não conseguiu consultar as fontes de clima agora. Tente atualizar em alguns minutos.</string>
 
@@ -142,9 +155,19 @@
     <string name="registrar_ocorrencia">Registrar</string>
     <string name="cadastro_titulo">Registrar ocorrência</string>
     <string name="cadastro_local">LOCAL DA OCORRÊNCIA</string>
-    <string name="cadastro_local_instrucao">Toque no mapa para marcar o local ou use sua localização.</string>
+    <string name="cadastro_local_instrucao">Busque o endereço, toque no mapa ou use sua localização.</string>
     <string name="cadastro_local_escolhido">Local marcado: %1$s</string>
-    <string name="cadastro_local_fora">Local marcado: %1$s — fora de São Caetano do Sul</string>
+    <string name="cadastro_local_endereco">Local marcado: %1$s (%2$s)</string>
+    <string name="cadastro_local_conferindo">Conferindo o local…</string>
+    <string name="cadastro_local_aguarde">Aguarde: o local ainda está sendo conferido.</string>
+    <string name="cadastro_busca_hint">Buscar endereço</string>
+    <string name="cadastro_busca_acao">Buscar endereço</string>
+    <string name="cadastro_busca_buscando">Buscando endereço…</string>
+    <string name="cadastro_busca_vazia">Digite um endereço (rua e número, ou um ponto conhecido).</string>
+    <string name="cadastro_busca_nao_encontrado">Endereço não encontrado. Confira o texto ou marque o local no mapa.</string>
+    <string name="cadastro_busca_erro">Não foi possível buscar o endereço agora. Marque o local no mapa.</string>
+    <string name="cadastro_fora_titulo">Local fora da área</string>
+    <string name="cadastro_fora_mensagem">Localização informada não pertence a São Caetano do Sul. O app registra apenas ocorrências no município.</string>
     <string name="cadastro_erro_local">Marque o local da ocorrência antes de enviar.</string>
     <string name="cadastro_usar_localizacao">Usar minha localização</string>
     <string name="cadastro_buscando_localizacao">Buscando localização…</string>

@@ -3,17 +3,17 @@
     <item
         android:id="@+id/nav_mapa"
         android:icon="@drawable/ic_mapa"
-        android:title="Mapa" />
+        android:title="@string/mapa_titulo" />
     <item
         android:id="@+id/nav_alertas"
         android:icon="@drawable/ic_alertas"
-        android:title="Alertas" />
+        android:title="@string/alertas_titulo" />
     <item
         android:id="@+id/nav_previsao"
         android:icon="@drawable/ic_previsao"
-        android:title="Previsão" />
+        android:title="@string/previsao_titulo" />
     <item
         android:id="@+id/nav_ajustes"
         android:icon="@drawable/ic_ajustes"
-        android:title="Ajustes" />
+        android:title="@string/ajustes_titulo" />
 </menu>

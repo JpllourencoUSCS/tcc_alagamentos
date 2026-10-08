@@ -23,7 +23,7 @@ geoespacial**. O servidor também consulta três serviços climáticos externos.
 │  Google Maps SDK       │ ◀─────────────────────── │  api/        rotas e validação       │
 │  Retrofit              │                          │  servicos/   classificação de risco  │
 └────────────────────────┘                          │              agregação colaborativa  │
-                                                    │  fusao_climatica  (4 chamadas em     │
+                                                    │  fusao_climatica  (5 chamadas em     │
                                                     │                    paralelo + cache) │
                                                     │  algoritmo_risco  (AHP)              │
                                                     │  db/         repositório (SQLAlchemy)│
@@ -54,7 +54,7 @@ Expõe três operações sobre ocorrências e uma de consulta de risco:
 
 | Método e rota | Função |
 |---|---|
-| `POST /ocorrencias` | Registra uma ocorrência. Sem `nivel_risco`, o risco é calculado automaticamente. |
+| `POST /ocorrencias` | Registra uma ocorrência. Sem `nivel_risco`, o risco é calculado automaticamente. Pontos fora de São Caetano do Sul (retângulo aproximado do município) são recusados com 422. |
 | `GET /ocorrencias` | Lista ocorrências, com filtros de fonte, nível de risco, período (`data_inicio`/`data_fim`) e região (bbox), paginação (`skip`/`limit`) e ordenação da mais recente para a mais antiga. |
 | `GET /ocorrencias/{id}` | Detalhes de uma ocorrência. |
 | `GET /risco` | Risco de alagamento calculado agora para uma coordenada, com o score de cada componente do AHP e os dados usados. Não grava nada. |
@@ -121,7 +121,7 @@ hospedagem de contêineres, mudando só as variáveis de ambiente.
 
 ### 3.W.5 Qualidade e testes
 
-O backend tem uma suíte automatizada (pytest) com 99 testes em 07/10/2026, em duas
+O backend tem uma suíte automatizada (pytest) com 100 testes em 07/10/2026, em duas
 categorias:
 - **Testes de contrato**, que substituem banco e fontes externas por implementações em
   memória e verificam rotas, validação e regras.

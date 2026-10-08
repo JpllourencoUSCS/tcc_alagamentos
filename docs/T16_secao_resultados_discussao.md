@@ -22,7 +22,7 @@ diferencial tecnológico do sistema — que não deveria parecer uma "colagem de
 | Fusão de fontes climáticas | OpenWeather, ANA e INMET (previsão e avisos oficiais, no lugar do CPTEC) em paralelo, com cache e tolerância a falhas por fonte |
 | Classificação de risco | Modelo AHP com quatro critérios (CR = 0,0038), redistribuição de pesos para fontes ausentes e agregação dos reportes colaborativos |
 | Aplicativo Android | Kotlin + XML, integrado à API real: mapa, alertas com filtros, risco atual, cadastro colaborativo, detalhes, perfil e notificações |
-| Qualidade | 99 testes automatizados no backend e 6 no app; plano de testes PT-001 com 22 casos; benchmark e medição de latência reproduzíveis |
+| Qualidade | 100 testes automatizados no backend e 10 no app; plano de testes PT-001 com 28 casos; benchmark e medição de latência reproduzíveis |
 
 ### 5.X.2 Latência
 

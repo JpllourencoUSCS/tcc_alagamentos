@@ -33,7 +33,8 @@ class AlertasFragment : Fragment(R.layout.fragment_alertas) {
     // (filtro null = todos os níveis de risco)
     private var filtro: Severidade? = null
     private var regiao = FiltroRegiao.TODAS
-    private var periodo = FiltroPeriodo.TODO
+    // Abre nas últimas 24 h, como o mapa; os outros períodos são o histórico (07/10/2026)
+    private var periodo = FiltroPeriodo.DIA
     private var ocorrencias: List<Ocorrencia>? = null
     private var localAtual: Location? = null
     private var carregamento: Job? = null

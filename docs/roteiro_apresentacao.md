@@ -56,8 +56,8 @@ mapa, aba de risco com as fontes do cálculo e os avisos do INMET, ajustes e per
 cadastro com risco automático (ter as capturas como plano B). *Legendar como dados de
 demonstração.*
 
-**14. Qualidade e testes** — 99 testes automatizados no backend, 6 no app, CI no GitHub;
-plano PT-001 com 22 casos; defeitos encontrados na integração real e corrigidos.
+**14. Qualidade e testes** — 100 testes automatizados no backend, 10 no app, CI no GitHub;
+plano PT-001 com 28 casos; defeitos encontrados na integração real e corrigidos.
 
 **15. Usabilidade** — *preencher após as sessões:* participantes, taxa de conclusão, média
 Likert vs. limiar de 4, principais ajustes.

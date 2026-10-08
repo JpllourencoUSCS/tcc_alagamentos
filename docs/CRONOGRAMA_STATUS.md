@@ -40,10 +40,12 @@ Resumo:
 2. **Feito em 06–07/10:** CPTEC (403 desde 03/10) substituído pela API de previsão do INMET
    (levantamento do João) — previsão textual e avisos oficiais, no app e no backend; avisos
    de chuva do INMET como **piso** da classificação (decisão do grupo: Perigo → Médio;
-   Grande Perigo → Alto); 99 testes no backend. **Mapa liberado (07/10, noite):** o João
+   Grande Perigo → Alto); 100 testes no backend. **Mapa liberado (07/10, noite):** o João
    cadastrou o SHA-1 do APK de teste na chave do Google Maps; CT-MAP-001/002 e o cadastro
    com o local marcado no mapa verificados contra a API real, e as capturas do relatório
-   refeitas (10 telas, inclusive login, perfil e avisos do INMET).
+   refeitas (10 telas, inclusive login, perfil e avisos do INMET). Depois, a pedido do João:
+   busca por endereço e mapa arrastável no cadastro, locais fora de São Caetano do Sul
+   recusados, e a origem dos dados da Previsão em ícones ⓘ (detalhe nas notas de 07/10).
 3. **Ajustes de escopo aguardando o orientador:** retirar a ANA (sem resposta desde agosto)
    e a estação da USCS; incluir a Open-Meteo para ter uma regra de fusão numérica (ponto 3
    do orientador); AHP com 3 critérios (pesos 54/30/16); contar um relato por usuário no
@@ -249,7 +251,7 @@ sobre APIs e algoritmo de risco (`T16_secao_*.md`).
 | Henrique | Medição formal de latência end-to-end (app → backend → banco → resposta) em diferentes cenários | ✅ Concluída em 03/10/2026 — `backend/benchmark/medir_latencia_api.py` (50 requisições HTTP por cenário, p50/p95) no banco de demonstração, no banco de 1M registros e com clima real: leituras p95 ≤ 16,5 ms; cadastro com risco automático p95 560 ms sem cache e 56,5 ms com cache. Cliente e servidor na mesma máquina (rede móvel real não medida — limitação registrada em T19). Histórico: 🔴 Não iniciada |
 | João | Consolidação dos critérios de avaliação de desempenho (RNF de latência, com base científica) | ✅ Concluída em 03/10/2026 — `docs/T19_criterios_desempenho.md`: RNF-01 a 05 baseados em Miller/Card/Nielsen, RAIL e ISO/IEC 25010, com verificação contra as medições (todos atendidos). Histórico: ⚪ Sem status reportado |
 | Marlon | Preparação do roteiro de teste de usabilidade com usuários externos | ✅ (revisão do Marlon pendente) — **03/10/2026:** roteiro e TCLE alinhados ao app integrado: as 5 tarefas existem no app; texto corrigido para "ocorrências de demonstração" (antes dizia "dados reais", o que seria inverídico para os participantes); adicionada a lista de preparação do ambiente antes de cada sessão. Histórico: 🟡 Material pronto, falta alinhar ao app — commit `22791a7` ("AF - QA", 13/09, conta do João) adicionou `docs/questionario_teste_usabilidade.md` (roteiro de 5 tarefas guiadas + questionário para Google Forms) e `docs/tcle_teste_usabilidade.md`. O roteiro assume app integrado ao backend real e inclui tarefas (login, cadastro, filtro por região/período) cujas telas não estão no `android/` versionado — ajustar quando a base do app for unificada. Autoria (Marlon ou outro) não registrada |
-| Guilherme | Organização da documentação de testes realizados até o momento | ✅ (confirmar com o Guilherme) — **03/10/2026:** PT-001 v1.1 (21 casos: 14 aprovados, 5 com a parte funcional aprovada aguardando usabilidade, 2 bloqueados pelo mapa) e evidências em `docs/evidencias_testes/2026-10-03/`. **07/10/2026:** PT-001 v1.2 (22 casos: 15 aprovados, 7 com a parte funcional aprovada aguardando usabilidade, nenhum bloqueado) — CT-MAP-001/002 desbloqueados, CT-CAD-001 refeito com o local marcado no mapa e novo CT-PRV-002 (avisos do INMET); evidências em `docs/evidencias_testes/2026-10-07/`. Histórico: 🟡 Base entregue em 13/09 (commit `22791a7`) — `docs/plano_e_fluxo_de_testes_TCC.xlsx`: plano PT-001 (escopo, critérios, responsáveis por módulo) e fluxo com 16 casos de teste; os de backend/algoritmo (`CT-API-*`, `CT-AHP-*`) registrados como executados, os 11 do app como "Não Executado" aguardando a integração. Confirmar com o Guilherme se é a entrega dele e se considera concluída |
+| Guilherme | Organização da documentação de testes realizados até o momento | ✅ (confirmar com o Guilherme) — **03/10/2026:** PT-001 v1.1 (21 casos: 14 aprovados, 5 com a parte funcional aprovada aguardando usabilidade, 2 bloqueados pelo mapa) e evidências em `docs/evidencias_testes/2026-10-03/`. **07/10/2026:** PT-001 v1.2 (22 casos: 15 aprovados, 7 com a parte funcional aprovada aguardando usabilidade, nenhum bloqueado) — CT-MAP-001/002 desbloqueados, CT-CAD-001 refeito com o local marcado no mapa e novo CT-PRV-002 (avisos do INMET); evidências em `docs/evidencias_testes/2026-10-07/`. No mesmo dia, PT-001 v1.3 (28 casos: 20 aprovados, 8 aguardando usabilidade), com a busca por endereço, o bloqueio de locais fora do município (no app e na API, CT-API-006), o mapa arrastável, os ícones ⓘ da Previsão e o mapa só com as ocorrências das últimas 24 h (CT-MAP-003). Histórico: 🟡 Base entregue em 13/09 (commit `22791a7`) — `docs/plano_e_fluxo_de_testes_TCC.xlsx`: plano PT-001 (escopo, critérios, responsáveis por módulo) e fluxo com 16 casos de teste; os de backend/algoritmo (`CT-API-*`, `CT-AHP-*`) registrados como executados, os 11 do app como "Não Executado" aguardando a integração. Confirmar com o Guilherme se é a entrega dele e se considera concluída |
 
 **Entregável da fase:** sistema integrado, com métricas de desempenho documentadas e o diferencial tecnológico (algoritmo de risco + benchmark espacial) validado.
 
@@ -516,6 +518,74 @@ deve partir desta base em vez de manter outra.
 - **Continua pendente do Guilherme:** corrigir os bugs dos testes internos (S8, aguarda a lista
   do Marlon), confirmar se a planilha PT-001 fecha a S11, e as tarefas que dependem dos testes
   com usuários (S12/S13) e da API real (capturas de tela da S14).
+
+**Ocorrências com prazo no mapa (07/10/2026, pedido do João):** até aqui nada expirava — o mapa
+mostrava as 500 ocorrências mais recentes de qualquer data, e a faixa "ALERTA — Risco alto"
+contava ocorrências de dias atrás (com os dados de demonstração, "9 com risco alto", várias de
+uma semana antes). Agora: **nada é apagado do banco**; o mapa, a "Situação atual" e a faixa
+mostram só as **ativas — últimas 24 h** (a mesma janela das notificações); as com **mais de
+3 h aparecem esmaecidas** (a janela do componente colaborativo do AHP); a aba Alertas abre em
+"Últimas 24 h" e guarda o histórico nos outros períodos. Regra única em `JanelaOcorrencia`
+(`Ocorrencia.kt`), com teste de JVM (10 no app); sem mudança no backend (o filtro `data_inicio`
+já existia). Verificado contra a API (10 ocorrências nas últimas 24 h: 5 alto, 2 médio,
+3 baixo — CT-MAP-003); capturas refeitas. Trabalho futuro: o usuário marcar "a água já
+baixou" para encerrar a ocorrência antes do prazo.
+
+**Revisão geral de 07/10/2026 (a pedido do João, depois dos ajustes de interface):**
+- **Defeitos corrigidos no app:** (1) uma busca de endereço feita enquanto um toque no mapa
+  ainda era conferido deixava o pino provisório e o texto "Conferindo o local…" na tela sem
+  local aceito; (2) uma busca interrompida deixava "Buscando endereço…" no campo; (3) ao girar
+  a tela, o endereço do local sumia (só voltavam as coordenadas); (4) a chuva da ocorrência
+  aparecia como "mm" em Detalhes/Alertas e "mm/h" na Previsão — é a mesma grandeza (precipitação
+  atual), agora "mm/h" em todas; (5) margem dos rótulos de filtro da aba Alertas usava um
+  atributo do Android 8 (o app aceita Android 7, onde ela seria ignorada); (6) nomes das abas
+  escritos direto no menu, fora do `strings.xml`; ícone ⓘ sem descrição padrão no layout.
+  Lint do Android: de 2 erros para 0 (o outro era o `local.properties` desta máquina, não
+  versionado); os 35 avisos restantes são versões novas de bibliotecas (não atualizadas a uma
+  semana da entrega), plurais "ocorrência(s)", cores sem uso e falsos positivos.
+- **Inconsistências corrigidas na documentação:** `T16_secao_relatorio_apis.md` dizia que "o
+  INMET" foi descartado logo abaixo da tabela que o lista como fonte em uso (o descartado foi
+  só o dado de estação em tempo real); "4 chamadas" na fusão em `T16_secao_arquitetura.md`, no
+  benchmark, no `T_arquitetura` e num comentário de `fusao_climatica.py` (são 5 desde 06/10);
+  PT-001 sem a linha do módulo Previsão e com o objetivo ainda "antes da integração final".
+- **Verificado sem achado:** 99 testes do backend, pyflakes (só 2 detalhes cosméticos no
+  script antigo `testes-api/teste_openweather.py`), variáveis do `.env.example` × código ×
+  `docker-compose.yml` × CI, textos antigos da tela citados nos documentos.
+- **Decisões do João sobre os pontos levantados:** (1) **feito** — a API passou a recusar
+  ocorrências fora de São Caetano do Sul (422, mesmo retângulo do app, em
+  `constants.AREA_SAO_CAETANO_DO_SUL`); testes que usavam Santo André/Fortaleza e os pontos
+  "sem cache" de `benchmark/medir_latencia_api.py` (4 caíam fora) movidos para dentro da
+  cidade; novo CT-API-006; **100 testes** no backend (92 sem banco + 8 de integração);
+  (2) **pendência registrada, sem mudança por enquanto** — o filtro "Fontes de dados" dos
+  Ajustes lista fontes (OpenWeather, ANA, INMET) que hoje não criam ocorrências: só existem
+  relatos de usuário e os dados de demonstração (que usam `openweather`); decidir se o filtro
+  é simplificado ou se o texto do TCC o apresenta como previsto para quando as fontes gerarem
+  ocorrências automáticas; (3) **feito** — `README.md` da raiz reescrito (o que é o sistema,
+  estrutura, como rodar API, testes e app). Limitação registrada: o app busca até 500
+  ocorrências por consulta, sem paginar.
+
+**Sessão de 07/10/2026 (noite, continuação) — ajustes de interface pedidos pelo João:**
+- **Previsão:** os dados de "O que entrou no cálculo" mostram só o nome (sem a fonte entre
+  parênteses); a origem de cada um abre num cartão pelo ícone ⓘ ao lado (a ANA com o nome por
+  extenso; a previsão do INMET como "apenas descritiva, não utilizada no cálculo"). O texto de
+  explicação do risco saiu do fim da tela e foi para um ícone ⓘ no canto do cartão de risco.
+- **Cadastro:** (1) mapa arrastável e com pinça — antes os gestos ficavam desligados porque o
+  arrasto rolava a tela; uma moldura (`MapaArrastavel.kt`) segura a rolagem enquanto o dedo
+  está no mapa; (2) busca por endereço, entre o título "Local da ocorrência" e o mapa, pelo
+  geocodificador do próprio Android (sem chave nem custo; o Places Autocomplete exigiria outra
+  API paga no Google Cloud); (3) **local fora de São Caetano do Sul passa a ser recusado** nas
+  três formas de marcar (endereço, toque, GPS) com o aviso "Localização informada não pertence
+  a São Caetano do Sul" — antes, um ponto fora só gerava um aviso amarelo e o envio era
+  permitido. A cidade vem do geocodificador; sem resposta dele, vale o retângulo aproximado.
+- **Achados no teste:** com o retângulo da cidade como limite, o geocodificador não achava
+  "Rua Alegre, 100" e escondia endereços de fora (que deveriam gerar o aviso); a busca passou a
+  ter duas etapas (com ", São Caetano do Sul - SP" no texto e, sem resultado, o texto
+  original). O Material trocava a lupa pelo ícone de erro depois de um "não encontrado" —
+  corrigido.
+- **Testes:** 9 testes de JVM no app (3 novos, da regra do município); PT-001 v1.3 com 26
+  casos (18 aprovados, 8 aguardando só a usabilidade): CT-CAD-005 (busca), CT-CAD-006
+  (bloqueio fora da cidade), CT-CAD-007 (mapa arrastável) e CT-PRV-003 (ícones ⓘ). Evidências
+  07 a 13 em `docs/evidencias_testes/2026-10-07/`; capturas `05`, `06` e a nova `10` refeitas.
 
 **Sessão de 07/10/2026 (noite) — mapa liberado, testes do mapa e capturas refeitas
 (notebook com Docker, sessão do João):**

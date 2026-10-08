@@ -51,7 +51,7 @@ def test_criar_e_obter_ocorrencia(client):
     assert resp.json()["latitude"] == PAYLOAD_BASE["latitude"]
 
 
-# Janela de ~110 m em volta do ponto de PAYLOAD_BASE (Santo André). Os testes
+# Janela de ~110 m em volta do ponto de PAYLOAD_BASE (São Caetano do Sul). Os testes
 # consultam só essa janela, e não a tabela inteira: o banco compartilhado pode
 # ter dados de outras pessoas ou as ocorrências de demonstração
 # (backend/dados_demo.py, em São Caetano do Sul) — até 03/10/2026 estes testes
@@ -67,10 +67,10 @@ def test_listar_filtra_por_regiao_bbox_usando_indice_geoespacial(client):
     # Exercita o caminho real de db/repository.py (ST_MakeEnvelope + geom &&),
     # não a versão em Python puro do fake — prova que o filtro compila e
     # retorna certo contra o PostGIS de verdade.
-    client.post("/ocorrencias", json=PAYLOAD_BASE)  # Santo André (~ -23.66, -46.54)
+    client.post("/ocorrencias", json=PAYLOAD_BASE)
     client.post(
         "/ocorrencias",
-        json={**PAYLOAD_BASE, "latitude": -3.7319, "longitude": -38.5267},  # Fortaleza
+        json={**PAYLOAD_BASE, "latitude": -23.6229, "longitude": -46.5548},  # centro, fora da janela
     )
 
     resp = client.get("/ocorrencias", params=BBOX_TESTE)

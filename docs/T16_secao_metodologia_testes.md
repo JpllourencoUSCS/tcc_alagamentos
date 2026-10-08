@@ -32,9 +32,9 @@ o requisito funcional ou não funcional correspondente.
 
 ### 4.X.2 Testes automatizados do backend
 
-A suíte pytest (`backend/tests/`) tem **99 testes** em 07/10/2026, em dois níveis:
+A suíte pytest (`backend/tests/`) tem **100 testes** em 07/10/2026, em dois níveis:
 
-- **Testes de contrato (91).** Substituem o banco e as fontes climáticas por implementações
+- **Testes de contrato (92).** Substituem o banco e as fontes climáticas por implementações
   em memória, injetadas pelo mecanismo de dependências do FastAPI. Verificam rotas,
   validação, códigos de status, regras do algoritmo AHP, agregação colaborativa, cache,
   paralelismo das chamadas externas e a lógica pura dos scripts de benchmark. Rodam em
@@ -90,16 +90,16 @@ módulo.
 
 ### 4.X.6 Resultados
 
-**Testes automatizados:** 99 de 99 aprovados com o banco disponível; sem banco, 91
+**Testes automatizados:** 100 de 100 aprovados com o banco disponível; sem banco, 92
 aprovados e 8 pulados por desenho (07/10/2026, incluindo a integração com o INMET e a
 regra de piso dos avisos).
 
-**Casos do PT-001 (22 casos, em 07/10/2026):**
+**Casos do PT-001 (28 casos, em 07/10/2026):**
 
 | Status | Casos |
 |---|---|
-| Aprovado | 15 — CT-API-001 a 005, CT-AHP-001 a 003, CT-CAD-002 a 004, CT-LST-002, CT-NOT-001, CT-PRV-001 e 002 |
-| Em execução (parte funcional aprovada; falta a avaliação com participantes) | 7 — CT-CAD-001, CT-LST-001, CT-MAP-001, CT-MAP-002, CT-DET-001, CT-CFG-001, CT-LOG-001 |
+| Aprovado | 20 — CT-API-001 a 006, CT-AHP-001 a 003, CT-CAD-002 a 007, CT-LST-002, CT-MAP-003, CT-NOT-001, CT-PRV-001 e 002 |
+| Em execução (parte funcional aprovada; falta a avaliação com participantes) | 8 — CT-CAD-001, CT-LST-001, CT-MAP-001, CT-MAP-002, CT-DET-001, CT-CFG-001, CT-LOG-001, CT-PRV-003 |
 
 Os casos do mapa (CT-MAP-001 e 002) ficaram bloqueados de 03/10 a 07/10/2026: a chave do
 Google Maps só aceita os certificados Android cadastrados no Google Cloud, e o APK de teste
@@ -138,6 +138,6 @@ registrados).*
 
 ---
 
-*Seção redigida com base em `docs/plano_e_fluxo_de_testes_TCC.xlsx` (versão 1.2, 07/10/2026, 22 casos),
+*Seção redigida com base em `docs/plano_e_fluxo_de_testes_TCC.xlsx` (versão 1.3, 07/10/2026, 28 casos),
 `backend/tests/`, `docs/T19_criterios_desempenho.md`, `docs/evidencias_testes/2026-10-03/` e
 `docs/evidencias_testes/2026-10-07/`.*

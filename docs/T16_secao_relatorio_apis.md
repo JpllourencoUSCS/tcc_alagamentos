@@ -25,9 +25,10 @@ classificação de risco (ver seção 3.Y — Algoritmo de Classificação de Ri
 | CPTEC/INPE | Previsão municipal de 4 dias — validação cruzada qualitativa (até 03/10/2026) | Sem token |
 | INMET (API de previsão `apiprevmet3`) | Previsão municipal textual e avisos meteorológicos oficiais — validação cruzada qualitativa, no lugar do CPTEC desde 06/10/2026 (seção 3.X.4.1) | Sem token |
 
-O INMET e o CEMADEN foram avaliados e **descartados** após testes de integração, não por falta
-de valor institucional, mas por proteção deliberada contra automação em seus canais de dado "ao
-vivo":
+O CEMADEN e os **dados de estação em tempo real do INMET** foram avaliados e **descartados**
+após testes de integração, não por falta de valor institucional, mas por proteção deliberada
+contra automação em seus canais de dado "ao vivo" (a API de previsão e avisos do INMET, outro
+serviço do mesmo instituto, é usada desde 06/10/2026 — seção 3.X.4.1):
 
 - **CEMADEN**: o acesso à API de pluviômetros automáticos (PED) depende de um fluxo de
   autenticação em duas etapas — cadastro de e-mail junto ao órgão e geração de token via um
@@ -224,10 +225,12 @@ de ambiente e nunca ficam no código-fonte nem no repositório.
 | Geocoding | Nominatim (OpenStreetMap) | Gratuito, sem autenticação, testado com sucesso |
 | SDK de mapas (Android) | Google Maps SDK | Suporte nativo tanto a Compose quanto a XML Views; documentação extensa |
 
-O INMET e o CEMADEN foram testados e descartados por proteção documentada contra automação
-(reCAPTCHA v3 e fluxo de autenticação sem URL pública, respectivamente) — não por limitação de
-documentação, como avaliado preliminarmente. A ANA e o CPTEC assumiram, respectivamente, os
-papéis de dado físico institucional e previsão redundante que essas duas fontes ocupariam.
+Os dados de estação em tempo real do INMET e o CEMADEN foram testados e descartados por
+proteção documentada contra automação (reCAPTCHA v3 e fluxo de autenticação sem URL pública,
+respectivamente) — não por limitação de documentação, como avaliado preliminarmente. A ANA e o
+CPTEC assumiram, respectivamente, os papéis de dado físico institucional e previsão redundante
+que essas duas fontes ocupariam; desde 06/10/2026, o papel do CPTEC é da API de previsão e
+avisos do INMET.
 
 ---
 

@@ -97,7 +97,8 @@ Como as fontes acima são combinadas hoje no backend (`backend/fusao_climatica.p
 `backend/servicos/`). Não muda nenhuma decisão de fonte — só registra o desenho em uso:
 
 - **Chamadas em paralelo** às quatro consultas externas (OpenWeather atual e previsão, ANA,
-  CPTEC), com timeout de 10 s cada (desde 03/09/2026).
+  CPTEC), com timeout de 10 s cada (desde 03/09/2026). *Desde 06/10/2026 são cinco: o CPTEC
+  deu lugar à previsão e aos avisos do INMET (duas consultas, com cache por município).*
 - **Credenciais por variável de ambiente:** `OPENWEATHER_API_KEY`, `ANA_IDENTIFICADOR`,
   `ANA_SENHA` (no `.env`). Até 03/10/2026 a chave do OpenWeather era o texto fixo
   `"sua_chave_aqui"` no código, o que faria o cálculo automático falhar contra a API real.

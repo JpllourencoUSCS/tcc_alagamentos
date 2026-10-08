@@ -61,7 +61,8 @@ class MapaFragment : Fragment(R.layout.fragment_mapa), OnMapReadyCallback {
         )
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                val lista = OcorrenciaRepository.listar()
+                // Só as ativas (últimas 24 h); o histórico fica na aba Alertas
+                val lista = OcorrenciaRepository.listar(desde = JanelaOcorrencia.inicioAtivas())
                 ocorrencias = lista
                 preencherStatusGeral()
                 desenharOcorrencias()
@@ -169,10 +170,13 @@ class MapaFragment : Fragment(R.layout.fragment_mapa), OnMapReadyCallback {
             val posicao = LatLng(o.latitude, o.longitude)
             val cor = ContextCompat.getColor(requireContext(), o.corRes())
 
+            // Mais de 3 h: esmaecida (já não entra no componente colaborativo do risco)
+            val recente = JanelaOcorrencia.recente(o.dataHora)
             val marcador = map.addMarker(
                 MarkerOptions()
                     .position(posicao)
                     .icon(BitmapDescriptorFactory.defaultMarker(o.hue()))
+                    .alpha(if (recente) 1f else ALFA_ESMAECIDA)
             )
             marcador?.tag = o.id
 
@@ -181,8 +185,8 @@ class MapaFragment : Fragment(R.layout.fragment_mapa), OnMapReadyCallback {
                 CircleOptions()
                     .center(posicao)
                     .radius(250.0)
-                    .fillColor(ColorUtils.setAlphaComponent(cor, 60))
-                    .strokeColor(cor)
+                    .fillColor(ColorUtils.setAlphaComponent(cor, if (recente) 60 else 20))
+                    .strokeColor(if (recente) cor else ColorUtils.setAlphaComponent(cor, 90))
                     .strokeWidth(2f)
             )
             limites.include(posicao)
@@ -228,5 +232,6 @@ class MapaFragment : Fragment(R.layout.fragment_mapa), OnMapReadyCallback {
         private val SAO_CAETANO_DO_SUL = LatLng(-23.6229, -46.5548)
         private const val ZOOM_CIDADE = 13f
         private const val ZOOM_PONTO = 15f
+        private const val ALFA_ESMAECIDA = 0.45f
     }
 }

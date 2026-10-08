@@ -25,6 +25,20 @@ enum class FonteDado(val api: String, val rotulo: String) {
     }
 }
 
+// Por quanto tempo uma ocorrência aparece como atual (07/10/2026). Nada é apagado do
+// banco: depois da janela ela sai do mapa e da "Situação atual", mas continua no
+// histórico da aba Alertas.
+object JanelaOcorrencia {
+    const val ATIVA_HORAS = 24L   // mapa, "Situação atual" e notificações
+    const val RECENTE_HORAS = 3L  // mesma janela do componente colaborativo do AHP (T15 §6.4)
+
+    fun inicioAtivas(agora: ZonedDateTime = ZonedDateTime.now()): ZonedDateTime =
+        agora.minusHours(ATIVA_HORAS)
+
+    fun recente(dataHora: ZonedDateTime, agora: ZonedDateTime = ZonedDateTime.now()): Boolean =
+        dataHora.isAfter(agora.minusHours(RECENTE_HORAS))
+}
+
 // Espelha OcorrenciaOut (backend/api/schemas.py)
 data class Ocorrencia(
     val id: Long,

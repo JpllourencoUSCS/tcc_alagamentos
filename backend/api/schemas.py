@@ -2,9 +2,9 @@
 
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-from constants import FonteDado, NivelRisco
+from constants import FonteDado, NivelRisco, dentro_de_sao_caetano
 
 
 class OcorrenciaCreate(BaseModel):
@@ -22,6 +22,14 @@ class OcorrenciaCreate(BaseModel):
     umidade: int | None = Field(default=None, ge=0, le=100)
     id_usuario: str | None = None
     id_estacao_ref: int | None = None
+
+    # O sistema monitora só São Caetano do Sul: fora da área, 422 (07/10/2026). Antes só o
+    # app recusava; qualquer outro cliente gravava pontos fora do escopo.
+    @model_validator(mode="after")
+    def dentro_da_area_monitorada(self):
+        if not dentro_de_sao_caetano(self.latitude, self.longitude):
+            raise ValueError("Localização fora de São Caetano do Sul (área monitorada pelo sistema).")
+        return self
 
 
 class ComponentesRisco(BaseModel):

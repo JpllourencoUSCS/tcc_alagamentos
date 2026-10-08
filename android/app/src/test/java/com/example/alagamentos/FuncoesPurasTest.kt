@@ -1,10 +1,12 @@
 package com.example.alagamentos
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.time.ZonedDateTime
 import java.util.Locale
 
 // Testes de JVM (sem emulador) das funções puras do app (03/10/2026):
@@ -71,5 +73,42 @@ class FuncoesPurasTest {
             descricaoClima = null, temperatura = null, umidade = null, idUsuario = null, idEstacaoRef = null
         )
         assertNull(dto.paraModelo())
+    }
+
+    // Municipio (cadastro, 07/10/2026): só aceita locais em São Caetano do Sul
+    @Test
+    fun municipioComparaSemAcentoNemMaiuscula() {
+        assertTrue(Municipio.ehSaoCaetano("São Caetano do Sul"))
+        assertTrue(Municipio.ehSaoCaetano("Sao Caetano do Sul"))
+        assertTrue(Municipio.ehSaoCaetano(" SÃO CAETANO DO SUL "))
+        assertFalse(Municipio.ehSaoCaetano("São Paulo"))
+        assertFalse(Municipio.ehSaoCaetano("Santo André"))
+        assertFalse(Municipio.ehSaoCaetano(null))
+    }
+
+    @Test
+    fun municipioDecidePelaCidadeInformadaQuandoHa() {
+        // Ponto dentro do retângulo aproximado, mas o geocodificador diz São Paulo: recusa
+        assertFalse(Municipio.pertence(listOf("São Paulo", null), -23.6000, -46.5900))
+        // Cidade informada só em locality (subAdminArea ausente): aceita
+        assertTrue(Municipio.pertence(listOf(null, "São Caetano do Sul"), -23.6229, -46.5548))
+        // Avenida Paulista, informada como São Paulo: recusa
+        assertFalse(Municipio.pertence(listOf("São Paulo", "São Paulo"), -23.5614, -46.6559))
+    }
+
+    @Test
+    fun municipioSemCidadeInformadaUsaORetangulo() {
+        assertTrue(Municipio.pertence(emptyList(), -23.6229, -46.5548))  // centro de São Caetano
+        assertTrue(Municipio.pertence(listOf(null, " "), -23.6229, -46.5548))
+        assertFalse(Municipio.pertence(emptyList(), -23.5614, -46.6559)) // Av. Paulista
+    }
+
+    // JanelaOcorrencia (07/10/2026): ativa por 24 h; esmaecida depois de 3 h
+    @Test
+    fun janelaDeOcorrenciasAtivasERecentes() {
+        val agora = ZonedDateTime.parse("2026-10-07T20:00:00-03:00")
+        assertEquals(ZonedDateTime.parse("2026-10-06T20:00:00-03:00"), JanelaOcorrencia.inicioAtivas(agora))
+        assertTrue(JanelaOcorrencia.recente(agora.minusMinutes(170), agora))   // 2 h 50 min
+        assertFalse(JanelaOcorrencia.recente(agora.minusMinutes(190), agora))  // 3 h 10 min
     }
 }

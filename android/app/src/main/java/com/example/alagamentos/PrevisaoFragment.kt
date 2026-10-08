@@ -9,6 +9,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -16,12 +17,16 @@ import java.util.Locale
 
 // Risco de alagamento calculado agora pelo backend (GET /risco) para a posição do
 // usuário — ou para o centro de São Caetano do Sul, sem permissão de localização —
-// com cada fonte que entrou no cálculo do AHP
+// com cada fonte que entrou no cálculo do AHP. A origem de cada dado e a explicação do
+// cálculo ficam em cartões abertos pelos ícones ⓘ (07/10/2026), não mais no texto da tela.
 class PrevisaoFragment : Fragment(R.layout.fragment_previsao) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         view.findViewById<View>(R.id.btn_previsao_atualizar).setOnClickListener { carregar(view) }
+        view.findViewById<View>(R.id.btn_info_risco).setOnClickListener {
+            mostrarInfo(getString(R.string.previsao_info_risco_titulo), getString(R.string.previsao_explicacao))
+        }
         carregar(view)
     }
 
@@ -94,18 +99,18 @@ class PrevisaoFragment : Fragment(R.layout.fragment_previsao) {
             }
         }
 
-        linha(view, R.id.info_chuva_agora, R.string.previsao_chuva_agora,
+        linha(view, R.id.info_chuva_agora, R.string.previsao_chuva_agora, R.string.previsao_info_chuva_agora,
             getString(R.string.previsao_valor_mm_h, numero(risco.precipitacaoAtualMmH)))
-        linha(view, R.id.info_pico_previsto, R.string.previsao_pico,
+        linha(view, R.id.info_pico_previsto, R.string.previsao_pico, R.string.previsao_info_pico,
             getString(R.string.previsao_valor_mm_3h, numero(risco.picoPrevistoMm3h)))
-        linha(view, R.id.info_pluviometro, R.string.previsao_pluviometro,
+        linha(view, R.id.info_pluviometro, R.string.previsao_pluviometro, R.string.previsao_info_pluviometro,
             risco.pluviometroLocalMmH?.let { getString(R.string.previsao_valor_mm_h, numero(it)) }
                 ?: getString(R.string.previsao_sem_dado))
-        linha(view, R.id.info_relatos, R.string.previsao_relatos,
+        linha(view, R.id.info_relatos, R.string.previsao_relatos, R.string.previsao_info_relatos,
             if (risco.componentes.colaborativo != null)
                 getString(R.string.previsao_relatos_valor, risco.reportesColaborativos)
             else getString(R.string.previsao_relatos_poucos))
-        linha(view, R.id.info_inmet, R.string.previsao_inmet,
+        linha(view, R.id.info_inmet, R.string.previsao_inmet, R.string.previsao_info_inmet,
             risco.previsaoInmet ?: getString(R.string.previsao_sem_dado))
         mostrarAvisos(view, risco.avisosInmet.orEmpty())
     }
@@ -159,10 +164,24 @@ class PrevisaoFragment : Fragment(R.layout.fragment_previsao) {
         view.findViewById<TextView>(R.id.txt_previsao_erro_descricao).text = descricao
     }
 
-    private fun linha(view: View, linhaId: Int, rotuloRes: Int, valor: String) {
+    private fun linha(view: View, linhaId: Int, rotuloRes: Int, infoRes: Int, valor: String) {
         val linha = view.findViewById<View>(linhaId)
-        linha.findViewById<TextView>(R.id.txt_rotulo).setText(rotuloRes)
+        val rotulo = getString(rotuloRes)
+        linha.findViewById<TextView>(R.id.txt_rotulo).text = rotulo
         linha.findViewById<TextView>(R.id.txt_valor).text = valor
+        linha.findViewById<View>(R.id.btn_info).apply {
+            contentDescription = getString(R.string.previsao_info_descricao, rotulo)
+            setOnClickListener { mostrarInfo(rotulo, getString(infoRes)) }
+        }
+    }
+
+    // Cartão com a origem do dado (ou a explicação do cálculo), aberto pelo ícone ⓘ
+    private fun mostrarInfo(titulo: String, texto: String) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(titulo)
+            .setMessage(texto)
+            .setPositiveButton(R.string.entendi, null)
+            .show()
     }
 
     // Uma casa decimal com vírgula (pt-BR)

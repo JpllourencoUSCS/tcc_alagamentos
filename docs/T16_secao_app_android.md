@@ -35,9 +35,9 @@ O app tem uma tela de entrada (`LoginActivity`) e, depois dela, uma atividade pr
 
 | Aba / tela | Função |
 |---|---|
-| **Mapa** | Marcadores coloridos por nível de risco (verde, laranja, vermelho), com um círculo de 250 m em volta de cada ocorrência; cartão "Situação atual" com a contagem por nível e o registro mais recente; alerta em destaque quando há ocorrências de risco alto. |
-| **Alertas** | Lista das ocorrências, da mais recente para a mais antiga, com filtros de região (todas, São Caetano do Sul, "perto de mim"), período (todo, 24 h, 7 dias, 30 dias) e nível de risco. |
-| **Previsão** | Risco de alagamento calculado agora para a posição do usuário (ou o centro da cidade), com cada fonte que entrou no cálculo AHP (chuva atual, pico previsto, pluviômetro, relatos de usuários) e os **avisos meteorológicos oficiais do INMET** para o município, coloridos pelo nível de perigo; quando um aviso eleva a classe (piso), a tela explica ("Elevado de BAIXO para MÉDIO pelo aviso do INMET"). A previsão textual do INMET aparece como referência. |
+| **Mapa** | Ocorrências **ativas** — as das últimas 24 h — como marcadores coloridos por nível de risco (verde, laranja, vermelho), com um círculo de 250 m em volta de cada uma; as registradas há mais de 3 h aparecem esmaecidas (já não entram no componente colaborativo do risco). Cartão "Situação atual" com a contagem por nível e o registro mais recente; alerta em destaque quando há ocorrências de risco alto. Nada é apagado: o histórico fica na aba Alertas. |
+| **Alertas** | Lista das ocorrências, da mais recente para a mais antiga, com filtros de região (todas, São Caetano do Sul, "perto de mim"), período (24 h — o padrão, como o mapa —, 7 dias, 30 dias ou todo o histórico) e nível de risco. |
+| **Previsão** | Risco de alagamento calculado agora para a posição do usuário (ou o centro da cidade), com cada fonte que entrou no cálculo AHP (chuva atual, pico previsto, pluviômetro, relatos de usuários) e os **avisos meteorológicos oficiais do INMET** para o município, coloridos pelo nível de perigo; quando um aviso eleva a classe (piso), a tela explica ("Elevado de BAIXO para MÉDIO pelo aviso do INMET"). A previsão textual do INMET aparece como referência. A origem de cada dado (por exemplo, "ANA — Agência Nacional de Águas e Saneamento Básico") e a explicação do cálculo ficam em cartões abertos por ícones de informação, para a tela mostrar só os valores. |
 | **Ajustes** | Preferências de alerta (ligar/desligar, nível mínimo, fontes e raio de 1 a 20 km) e acesso ao perfil. |
 | Detalhes *(sobre a aba)* | Informações completas de uma ocorrência; aberta pelo marcador do mapa, pela lista ou por uma notificação. |
 | Registrar ocorrência *(sobre a aba)* | Formulário de cadastro, aberto pelo botão "Registrar" do Mapa e dos Alertas. |
@@ -65,8 +65,12 @@ orientando o usuário a escolher o nível manualmente).
 ### 3.V.4 Cadastro colaborativo
 
 O cadastro é o que torna o sistema colaborativo. O usuário:
-1. marca o local tocando no mapa ou usando a localização do aparelho (obrigatório; o app
-   avisa se o ponto estiver fora de São Caetano do Sul);
+1. marca o local digitando o endereço, tocando no mapa (que pode ser arrastado e
+   ampliado) ou usando a localização do aparelho. O local é obrigatório e precisa estar em
+   São Caetano do Sul: a cidade é conferida pelo geocodificador do próprio Android (sem
+   chave nem custo extra), e um endereço ou ponto de outra cidade é recusado com o aviso
+   "Localização informada não pertence a São Caetano do Sul" (a API também recusa pontos
+   fora do município, para clientes que não sejam o app);
 2. escolhe o nível de risco — **Automático** (o servidor calcula pelo AHP) ou Baixo, Médio
    ou Alto, quando ele está vendo a situação na rua;
 3. descreve a situação, opcionalmente (até 300 caracteres).
@@ -107,7 +111,8 @@ vírgula decimal ("-23,6148, -46,5435"), ambíguas. O mapa só pôde ser testado
 07/10/2026, depois de o certificado do APK de teste ser cadastrado na chave do Google Maps:
 os marcadores correspondem às ocorrências da API, o toque num marcador leva aos detalhes
 da mesma ocorrência, e o local marcado por toque no mapa do cadastro é o ponto gravado no
-banco. A metodologia e os resultados estão na seção de testes; as capturas de tela estão
+banco. Na mesma data foram verificados a busca por endereço, o bloqueio de locais fora do
+município e o mapa arrastável do cadastro. A metodologia e os resultados estão na seção de testes; as capturas de tela estão
 em `docs/capturas/`.
 
 **Limitações:** o mapa depende de uma chave do Google Maps cujas restrições incluam o

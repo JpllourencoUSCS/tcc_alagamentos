@@ -85,10 +85,12 @@ def _cliente(classificador: FakeClassificadorRisco | None = None):
     return TestClient(app), fake_repo, fake_classificador
 
 
+# Ponto em São Caetano do Sul, longe das ocorrências de demonstração (backend/dados_demo.py).
+# Até 07/10/2026 era Santo André (-23.6639, -46.5383), que a API passou a recusar (fora da área).
 PAYLOAD_BASE = {
-    "latitude": -23.6639,
-    "longitude": -46.5383,
-    "descricao": "Alagamento na Av. Industrial",
+    "latitude": -23.6420,
+    "longitude": -46.5420,
+    "descricao": "Alagamento na rua (teste)",
     "nivel_risco": "Alto",
     "fonte": "usuario",
 }
@@ -132,17 +134,27 @@ def test_listar_ocorrencias_filtra_por_fonte():
 
 def test_listar_ocorrencias_filtra_por_regiao_bbox():
     client, _, _ = _cliente()
-    client.post("/ocorrencias", json=PAYLOAD_BASE)  # Santo André (~ -23.66, -46.54)
-    client.post("/ocorrencias", json={**PAYLOAD_BASE, "latitude": -3.7319, "longitude": -38.5267})  # Fortaleza
+    client.post("/ocorrencias", json=PAYLOAD_BASE)
+    client.post("/ocorrencias", json={**PAYLOAD_BASE, "latitude": -23.6229, "longitude": -46.5548})  # centro
 
     resp = client.get(
         "/ocorrencias",
-        params={"lat_min": -24, "lon_min": -47, "lat_max": -23, "lon_max": -46},
+        params={"lat_min": -23.645, "lon_min": -46.545, "lat_max": -23.640, "lon_max": -46.540},
     )
     assert resp.status_code == 200
     corpo = resp.json()
     assert len(corpo) == 1
     assert corpo[0]["latitude"] == PAYLOAD_BASE["latitude"]
+
+
+def test_criar_ocorrencia_fora_de_sao_caetano_e_422():
+    # 07/10/2026: a API só aceita pontos da área monitorada (antes, só o app recusava)
+    client, _, _ = _cliente()
+    for lat, lon in ((-23.6639, -46.5383), (-3.7319, -38.5267)):  # Santo André, Fortaleza
+        resp = client.post("/ocorrencias", json={**PAYLOAD_BASE, "latitude": lat, "longitude": lon})
+        assert resp.status_code == 422
+        assert "São Caetano do Sul" in resp.text
+    assert client.get("/ocorrencias").json() == []
 
 
 def test_listar_ocorrencias_bbox_incompleto_e_422():

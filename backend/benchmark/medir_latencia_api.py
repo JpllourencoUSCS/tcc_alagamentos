@@ -83,9 +83,14 @@ def _cenarios(cliente: httpx.Client, incluir_auto: bool) -> dict:
 
 
 # Pontos em células de cache diferentes (passo > 0,01°, a resolução do cache de
-# fusao_climatica), todos na região de São Caetano do Sul / ABC: cada POST
-# nesses pontos consulta as fontes climáticas externas de verdade.
-PONTOS_SEM_CACHE = [{"latitude": -23.595 - 0.011 * i, "longitude": -46.575} for i in range(10)]
+# fusao_climatica): cada POST nesses pontos consulta as fontes climáticas externas de
+# verdade. Grade 5 x 2 dentro de São Caetano do Sul — desde 07/10/2026 a API recusa
+# pontos fora da área (antes a coluna descia até -23,694, já em Santo André).
+PONTOS_SEM_CACHE = [
+    {"latitude": lat, "longitude": lon}
+    for lat in (-23.598, -23.608, -23.618, -23.628, -23.638)
+    for lon in (-46.548, -46.578)
+]
 
 
 def _registrar(linhas, nome, i, ms, resp):

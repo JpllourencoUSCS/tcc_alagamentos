@@ -70,7 +70,9 @@ Equipe: Henrique, João, Marlon e Guilherme
 > observar e esclarecer dúvidas, mas não vai indicar como resolver os passos."
 
 - **Tarefa 1:** Abra o aplicativo e acesse a tela inicial/login.
-- **Tarefa 2:** Cadastre uma nova ocorrência de alagamento (dados fictícios).
+- **Tarefa 2:** Cadastre uma nova ocorrência de alagamento (dados fictícios). *(Desde
+  07/10/2026 o local pode ser marcado pelo endereço, pelo mapa ou pela localização; observar
+  qual o participante escolhe. Endereços fora de São Caetano do Sul são recusados.)*
 - **Tarefa 3:** Acesse a listagem/histórico de ocorrências e aplique um filtro (região ou período).
 - **Tarefa 4:** Abra o mapa e toque em um dos marcadores exibidos.
 - **Tarefa 5:** A partir do marcador, acesse a tela de detalhes da ocorrência.
@@ -148,8 +150,8 @@ Atualizado em 03/10/2026, depois do primeiro teste do app contra a API real:
    Tailscale do notebook com o app Tailscale no celular, ou hospedagem definitiva) — o APK
    precisa ser gerado de novo depois de mudar esse valor.
 2. **Ocorrências de demonstração carregadas**: `python -m dados_demo` (em `backend/`). Elas
-   têm datas relativas ao momento da carga; para as tarefas com filtro "Últimas 24 h"
-   mostrarem resultados, recarregar no dia da sessão (`python -m dados_demo --limpar` e
+   têm datas relativas ao momento da carga; como o mapa e a aba Alertas mostram as últimas
+   24 h (desde 07/10/2026), recarregar no dia da sessão (`python -m dados_demo --limpar` e
    depois `python -m dados_demo`).
 3. **Chave do Google Maps** no `android/local.properties` (`MAPS_API_KEY=...`) **e liberada
    para o certificado que assina o APK**: a chave do projeto é restrita a apps Android

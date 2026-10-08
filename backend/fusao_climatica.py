@@ -421,7 +421,7 @@ def obter_dados_consolidados(
 # ---------- Cache de dados climáticos (Semana 10, otimização — 03/10/2026) ----------
 
 # OpenWeather atualiza a condição atual a cada ~10 min; buscar de novo antes
-# disso só repete o mesmo dado pagando 4 chamadas externas (latência de
+# disso só repete o mesmo dado pagando 5 chamadas externas (latência de
 # segundos no POST). A chave arredonda lat/lon em 2 casas (~1,1 km), escala
 # compatível com a resolução das fontes (OpenWeather é por grade, ANA/INMET
 # por estação/município) — dois reportes no mesmo bairro em poucos minutos
