@@ -106,6 +106,8 @@ https://docs.sqlalchemy.org/en/20/orm/session_transaction.html. Acesso em: 03 ou
    violenta. **Não é preciso mudar o modelo** — só citar corretamente: por exemplo,
    "limiares baseados na classificação da American Meteorological Society (leve, moderada
    e forte) e da OMM (violenta)". Conferir nas duas fontes antes de escrever.
+   **17/10/2026:** citação corrigida dessa forma no T15 (seção 6.1) e no rascunho do
+   documento teórico (seção 2.7); falta só conferir a edição e a tabela do WMO-No. 8.
 2. **Manual da ANA:** título exato, versão e URL.
 3. **Referências do levantamento de APIs (T05–T07, T12):** os documentos citam testes e
    documentação de cada fonte, mas não trazem referências formais; incluir aqui as que

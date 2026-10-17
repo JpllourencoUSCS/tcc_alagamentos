@@ -113,16 +113,25 @@ Implementado em [`backend/algoritmo_risco.py`](../backend/algoritmo_risco.py).
 ### 6.1 Conversão de mm/h em score (0–100)
 
 A função `score_precipitacao()` converte intensidade de chuva (mm/h) em um score 0–100,
-usando os limiares de intensidade de chuva da OMM/WMO:
+usando limiares de intensidade de chuva:
 
-| Classificação OMM | mm/h | Faixa de score |
+| Classificação | mm/h | Faixa de score |
 |---|---|---|
 | Leve | < 2,5 | 0 – 25 |
 | Moderada | 2,5 – 7,6 | 25 – 50 |
 | Forte | 7,6 – 50 | 50 – 80 |
-| Violenta | > 50 | 80 – 100 |
+| Violenta | ≥ 50 | 100 (sem interpolação) |
 
-A interpolação dentro de cada faixa é linear. A previsão (`score_previsao()`) usa a
+A interpolação dentro das três primeiras faixas é linear; a partir de 50 mm/h o score é
+100 direto (`score_precipitacao()` devolve 100,0). *Correção de 17/10/2026:* até esta data
+a tabela dizia "80 – 100" para a faixa violenta, o que não corresponde ao código.
+
+**Origem dos limiares (corrigida em 17/10/2026).** O código e as versões anteriores deste
+documento atribuíam as quatro faixas à OMM. Os limites de 2,5 e 7,6 mm/h (leve, moderada,
+forte) vêm do *Glossary of Meteorology* da American Meteorological Society; o de 50 mm/h
+(violenta) vem do guia de instrumentos da OMM (WMO-No. 8), que usa 10 mm/h, e não 7,6, como
+limite entre moderada e forte. O modelo não muda — só a citação. Edição e tabela do
+WMO-No. 8 ainda a conferir (`docs/referencias_consolidadas.md`, pendência 1). A previsão (`score_previsao()`) usa a
 mesma função, convertendo o pico de precipitação previsto (mm em 3h) para uma taxa
 equivalente em mm/h antes de aplicar a mesma escala.
 
@@ -360,5 +369,8 @@ chuva atual × previsão × colaborativo):
 
 - SAATY, T. L. *The Analytic Hierarchy Process: Planning, Priority Setting, Resource
   Allocation.* New York: McGraw-Hill, 1980.
-- World Meteorological Organization (WMO/OMM) — classificação de intensidade de
-  precipitação em mm/h, usada em `LIMIARES_CHUVA_MM_H`.
+- American Meteorological Society. *Glossary of Meteorology*: Rain — limites de chuva leve
+  (2,5 mm/h) e moderada (7,6 mm/h), usados em `LIMIARES_CHUVA_MM_H`.
+- World Meteorological Organization (WMO/OMM). *Guide to Instruments and Methods of
+  Observation* (WMO-No. 8) — limite de chuva violenta (50 mm/h), usado em
+  `LIMIARES_CHUVA_MM_H` (edição a confirmar).

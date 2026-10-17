@@ -2,7 +2,7 @@
 
 **Sistema de Monitoramento Colaborativo de Áreas com Risco de Alagamento**
 Período: 01/07/2026 a 30/10/2026 (17 semanas)
-*Última atualização de status: 16/10/2026 — Semana 16 (12/10 – 18/10). **Prazo antecipado:**
+*Última atualização de status: 17/10/2026 (rascunho do documento teórico) — Semana 16 (12/10 – 18/10). **Prazo antecipado:**
 projeto e documento teórico até o fim da semana de 12–16/10/2026.*
 
 ## Legenda de responsáveis
@@ -34,9 +34,11 @@ validação própria do time de integração.
    114 testes no backend, 10 de JVM no app, lint sem erros; PT-001 v1.4 com 29 casos (21
    aprovados, 8 aguardando usabilidade). Latência remedida (cadastro automático sem cache:
    p95 de 809 ms). Detalhe na nota de 16/10, no fim do documento.
-2. **Documento teórico: não iniciado** (confirmado pelo João em 16/10). É o trabalho que
-   resta; matéria-prima nos `T16_secao_*.md` (atualizados em 16/10) e o mapa por capítulo na
-   seção 3.5 de `docs/Documento Teórico/Analise_escopo_e_revisao_do_TCC_2026-10-06.md`.
+2. **Documento teórico: rascunho completo gerado em 16–17/10**
+   (`docs/Documento Teórico/TCC_Alagamentos_Rascunho_2026-10-16.docx`, 63 páginas, estrutura
+   do template USCS), para o João enviar ao orientador em 17/10. Pendências marcadas em
+   amarelo no próprio arquivo (usabilidade, IBGE, ficha catalográfica, banca, referências a
+   conferir). Detalhe na nota de 17/10, no fim do documento.
 3. **Usabilidade:** o grupo aplicou um formulário de pesquisa (Google Forms); o João aguarda
    do Marlon as respostas. Falta saber se os respondentes usaram o app (avaliação de
    usabilidade por questionário) ou não (pesquisa de opinião/validação do problema).
@@ -45,7 +47,8 @@ validação própria do time de integração.
    de preferência na região de São Paulo por causa do INMET —, para depois do documento).
    Não escolhidos e registrados como limitação/trabalho futuro: contar um relato por usuário
    (F) e registrar cada cálculo (G).
-5. **Ainda pendentes:** slides, referências (limiares de chuva OMM × AMS), firewall do
+5. **Ainda pendentes:** slides, retorno do orientador sobre o rascunho, edição do WMO-No. 8
+   (a citação AMS × OMM dos limiares de chuva já foi corrigida em 17/10), firewall do
    notebook com Docker.
 
 ## Situação em 07/10/2026 — prazo antecipado
@@ -544,6 +547,32 @@ deve partir desta base em vez de manter outra.
 - **Continua pendente do Guilherme:** corrigir os bugs dos testes internos (S8, aguarda a lista
   do Marlon), confirmar se a planilha PT-001 fecha a S11, e as tarefas que dependem dos testes
   com usuários (S12/S13) e da API real (capturas de tela da S14).
+
+**Sessão de 16–17/10/2026 (noite) — rascunho do documento teórico (sessão do João):**
+- **Arquivo:** `docs/Documento Teórico/TCC_Alagamentos_Rascunho_2026-10-16.docx` (63 páginas),
+  na estrutura do template USCS: capa, folha com nomes e RA dos quatro autores, folha de
+  rosto, ficha catalográfica provisória, página da reitoria, folha de aprovação, agradecimentos
+  (rascunho), resumo e abstract com os resultados, listas de ilustrações (10 figuras), tabelas
+  (22) e siglas, sumário; capítulos 1 a 6, referências (ABNT, só as citadas) e apêndices
+  (casos do PT-001; roteiro de usabilidade). Título provisório: "RISCO DE ALAGAMENTO URBANO:
+  sistema colaborativo com fusão de dados meteorológicos e PostGIS" (13 palavras; o orientador
+  valida).
+- **Conteúdo:** capítulos 1–3 adaptados da versão consolidada (passado, escopo de 16/10,
+  ajustes de escopo com data e motivo); capítulos 4–6 a partir dos `T16_secao_*.md`, T15, T19,
+  PT-001 e capturas. Requisitos com numeração única (RF-01 a RF-09 do PT-001, RNF-01 a RNF-10)
+  e casos de teste por requisito. Figuras novas (arquitetura, etapas do cálculo com os caminhos
+  de falha, DER, Gantt executado, painéis de telas) em `docs/Documento Teórico/figuras/`, com o
+  script `gerar_figuras.py`. Daqui em diante o .docx é editado direto no Word (o gerador ficou
+  fora do repositório).
+- **Pendências marcadas em amarelo no arquivo:** resultados de usabilidade (aguardando o
+  Marlon); área e população de São Caetano do Sul (IBGE); edição do WMO-No. 8 e endereços da
+  API do INMET nas referências; trabalhos correlatos concretos (CGE, Waze, SMS 40199) com
+  referência; escola na ficha catalográfica ("Politécnica" × "de Tecnologias"); banca e data;
+  nomes da reitoria (copiados do template); agradecimentos (opcionais).
+- **Correções achadas na redação:** T15 seção 6.1 — a faixa violenta dava score "80 – 100",
+  mas o código dá 100 direto a partir de 50 mm/h; e os limiares passaram a ser citados como AMS
+  (2,5 e 7,6 mm/h) e OMM (50 mm/h). Não há teste automatizado de monotonicidade do índice: o
+  texto diz que ela vale por construção (função não decrescente, pesos positivos).
 
 **Sessão de 16/10/2026 — ajuste de escopo: ANA retirada, Open-Meteo e fusão, AHP de três
 critérios (notebook com Docker, sessão do João):**

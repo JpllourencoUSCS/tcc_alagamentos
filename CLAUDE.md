@@ -89,10 +89,17 @@ implementado:** ANA e estação da USCS **retiradas**; **Open-Meteo** como segun
 chuva atual e previsão, com **regra de fusão** (maior valor; divergência registrada); **AHP
 com três critérios, 54/30/16** (autovetor, CR = 0,0079); filtro "Fontes de dados" retirado dos
 Ajustes. Não escolhidos (limitação/trabalho futuro): contar um relato por usuário e registrar
-cada cálculo. 114 testes no backend, PT-001 v1.4 (29 casos). **O documento teórico ainda não
-foi iniciado** — é o que resta para a entrega; resultados do formulário de usabilidade
-(Google Forms) aguardados do Marlon. Hospedagem no Supabase em aberto, para depois do
-documento. Detalhe em "Situação em 16/10/2026" no `docs/CRONOGRAMA_STATUS.md`.
+cada cálculo. 114 testes no backend, PT-001 v1.4 (29 casos). Resultados do formulário de
+usabilidade (Google Forms) aguardados do Marlon. Hospedagem no Supabase em aberto, para
+depois do documento. Detalhe em "Situação em 16/10/2026" no `docs/CRONOGRAMA_STATUS.md`.
+
+**16–17/10/2026 — rascunho do documento teórico:**
+`docs/Documento Teórico/TCC_Alagamentos_Rascunho_2026-10-16.docx` (63 páginas, template USCS,
+capítulos 1–6, título provisório "RISCO DE ALAGAMENTO URBANO: sistema colaborativo com fusão
+de dados meteorológicos e PostGIS"), para o João enviar ao orientador em 17/10 para
+validação. Pendências marcadas em amarelo no arquivo (usabilidade, IBGE, ficha, banca,
+referências). A partir daqui o .docx é editado direto no Word; as figuras estão em
+`docs/Documento Teórico/figuras/` (`gerar_figuras.py`).
 
 **03/09/2026:** descoberta de que o campus da USCS possui uma estação meteorológica
 própria. Time está investigando junto aos responsáveis a possibilidade de acesso aos
