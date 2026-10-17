@@ -2,14 +2,15 @@
 Análise de sensibilidade dos pesos do modelo AHP (03/10/2026) — trabalho futuro
 listado em docs/T15_algoritmo_risco_fundamentacao.md, seção 8.
 
-Não altera os pesos do modelo (35/25/25/15 continuam os de algoritmo_risco.py):
+Não altera os pesos do modelo (os de algoritmo_risco.PESOS — desde 16/10/2026,
+54/30/16 com três critérios; até então, 35/25/25/15 com o pluviômetro da ANA):
 mede o quanto a classificação mudaria se cada peso fosse um pouco diferente.
 Para cada critério e cada perturbação (±10% e ±20% do próprio peso), o peso
-perturbado é fixado e os outros três são reescalados proporcionalmente para a
-soma continuar 1 — o procedimento usual de análise de sensibilidade "um fator
-por vez" em AHP. Cada conjunto de pesos é aplicado a uma grade de cenários
-(chuva atual × pico previsto × pluviômetro × colaborativo, incluindo fontes
-ausentes) e comparado com a classificação com os pesos originais.
+perturbado é fixado e os outros são reescalados proporcionalmente para a soma
+continuar 1 — o procedimento usual de análise de sensibilidade "um fator por vez"
+em AHP. Cada conjunto de pesos é aplicado a uma grade de cenários (chuva atual ×
+pico previsto × colaborativo, incluindo o colaborativo ausente) e comparado com a
+classificação com os pesos originais.
 
 Uso (de backend/):  python analise_sensibilidade.py
 """
@@ -22,7 +23,6 @@ from algoritmo_risco import PESOS, EntradaRisco, calcular_risco
 
 CHUVA_ATUAL_MM_H = [0.0, 1.0, 2.5, 5.0, 7.6, 15.0, 30.0, 60.0]
 PICO_MM_3H = [0.0, 3.0, 7.5, 15.0, 30.0, 90.0, 150.0]
-PLUVIOMETRO_MM_H = [None, 0.0, 5.0, 20.0, 60.0]
 COLABORATIVO = [None, 0.0, 15.0, 45.0, 80.0]
 PERTURBACOES = [-0.20, -0.10, 0.10, 0.20]
 
@@ -38,8 +38,8 @@ def pesos_perturbados(pesos: dict, criterio: str, variacao: float) -> dict:
 
 def cenarios() -> list[EntradaRisco]:
     return [
-        EntradaRisco(c, p, l, col)
-        for c, p, l, col in itertools.product(CHUVA_ATUAL_MM_H, PICO_MM_3H, PLUVIOMETRO_MM_H, COLABORATIVO)
+        EntradaRisco(c, p, col)
+        for c, p, col in itertools.product(CHUVA_ATUAL_MM_H, PICO_MM_3H, COLABORATIVO)
     ]
 
 

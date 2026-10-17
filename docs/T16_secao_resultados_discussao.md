@@ -19,10 +19,10 @@ diferencial tecnológico do sistema — que não deveria parecer uma "colagem de
 |---|---|
 | API REST (FastAPI) | Ocorrências (criar, listar com filtros de fonte, nível, período e região, obter) e risco atual num ponto; em contêiner, com documentação OpenAPI |
 | Banco geoespacial | PostgreSQL 16 + PostGIS 3.4, índice GiST, *trigger* de sincronização do ponto geográfico |
-| Fusão de fontes climáticas | OpenWeather, ANA e INMET (previsão e avisos oficiais, no lugar do CPTEC) em paralelo, com cache e tolerância a falhas por fonte |
-| Classificação de risco | Modelo AHP com quatro critérios (CR = 0,0038), redistribuição de pesos para fontes ausentes e agregação dos reportes colaborativos |
+| Fusão de fontes climáticas | OpenWeather e Open-Meteo fundidas (maior valor, divergência registrada) e INMET (previsão e avisos oficiais, no lugar do CPTEC), em paralelo, com cache e tolerância a falhas por fonte |
+| Classificação de risco | Modelo AHP com três critérios, pesos do autovetor sem ajuste (54/30/16, CR = 0,0079), redistribuição de peso sem reportes e agregação dos reportes colaborativos |
 | Aplicativo Android | Kotlin + XML, integrado à API real: mapa, alertas com filtros, risco atual, cadastro colaborativo, detalhes, perfil e notificações |
-| Qualidade | 100 testes automatizados no backend e 10 no app; plano de testes PT-001 com 28 casos; benchmark e medição de latência reproduzíveis |
+| Qualidade | 114 testes automatizados no backend e 10 no app; plano de testes PT-001 com 29 casos; benchmark e medição de latência reproduzíveis |
 
 ### 5.X.2 Latência
 
@@ -57,22 +57,24 @@ latência.
 O sistema não repassa ao usuário o que as APIs externas devolvem. Entre a coleta e a
 tela há uma camada de processamento própria, com três contribuições:
 
-1. **Fusão de fontes heterogêneas num único indicador.** Medição instantânea
-   (OpenWeather), medição física institucional (ANA), previsão (OpenWeather, com o INMET como
-   referência qualitativa) e
-   relato humano (usuários) têm naturezas e escalas diferentes. O modelo AHP converte cada
-   uma numa escala comum, baseada na classificação de intensidade de chuva da Organização
-   Meteorológica Mundial, e as combina com pesos derivados de uma matriz de comparação
-   pareada consistente (CR = 0,0038, bem abaixo do limite de 0,10 de Saaty).
-2. **Robustez a fontes ausentes.** Fontes públicas brasileiras se mostraram instáveis ou
-   protegidas contra automação (CEMADEN, INMET e, nos testes de outubro, o CPTEC). Em vez
-   de falhar ou subestimar o risco, o modelo redistribui o peso da fonte ausente e
-   continua classificando. A análise de sensibilidade mostrou que a classificação é
-   estável: variar um peso em ±10% muda a classe em no máximo 3,7% de 1.400 cenários.
+1. **Fusão de fontes heterogêneas num único indicador.** A chuva atual e a previsão vêm de
+   duas fontes (OpenWeather e Open-Meteo), combinadas por uma regra explícita — vale o maior
+   valor, critério conservador, e a divergência entre elas é registrada —; o INMET contribui
+   com avisos oficiais, que funcionam como piso da classe; e o relato humano (usuários) entra
+   como critério próprio. O modelo AHP converte cada componente numa escala comum, baseada na
+   classificação de intensidade de chuva da Organização Meteorológica Mundial, e os combina
+   com os pesos do autovetor de uma matriz de comparação pareada consistente (CR = 0,0079,
+   bem abaixo do limite de 0,10 de Saaty), sem ajuste manual.
+2. **Robustez a fontes ausentes.** Fontes públicas brasileiras se mostraram instáveis,
+   protegidas contra automação ou de acesso não liberado (CEMADEN, o dado de estação do
+   INMET, a ANA e, nos testes de outubro, o CPTEC). Com duas fontes numéricas, a falha de uma
+   não interrompe o cálculo; sem reportes de usuários, o peso deles é redistribuído em vez
+   de subestimar o risco. A análise de sensibilidade mostrou que a classificação é estável:
+   variar um peso em ±10% muda a classe em no máximo 7,1% de 280 cenários.
 3. **O dado colaborativo como fonte de primeira classe.** Os reportes dos usuários não
    ficam só no mapa: são agregados por proximidade no tempo (3 h) e no espaço (1 km),
    com o mesmo índice espacial avaliado no benchmark, e entram no modelo com peso próprio
-   (15%). Um único reporte isolado não altera a classificação. É a fonte que só este
+   (16%). Um único reporte isolado não altera a classificação. É a fonte que só este
    sistema tem e que não depende de nenhum órgão externo.
 
 A soma dessas três camadas — e não cada API isoladamente — é o que o usuário vê na aba de
@@ -86,10 +88,10 @@ problemas relatados e correções feitas).*
 
 ### 5.X.6 Limitações
 
-- **Credenciais externas pendentes.** A ANA não respondeu ao pedido de cadastro até esta
-  data; o componente de pluviômetro local foi validado só com dados simulados e, em
-  produção, opera pela redistribuição de peso. A estação meteorológica do campus da USCS
-  segue em investigação como alternativa.
+- **Sem pluviômetro físico.** A ANA não respondeu ao pedido de cadastro, e a estação
+  meteorológica do campus da USCS não teve resposta; as duas foram retiradas do projeto em
+  16/10/2026. As fontes numéricas (OpenWeather e Open-Meteo) são modelos meteorológicos, não
+  medições de chuva em solo.
 - **Instabilidade de fontes públicas.** O CPTEC passou a negar acesso (HTTP 403) a partir da
   rede de testes em outubro de 2026; a BrasilAPI, que consulta o mesmo serviço por outra
   infraestrutura, também falhou ao buscar a previsão no mesmo dia. Foi substituído pela API
@@ -117,8 +119,8 @@ problemas relatados e correções feitas).*
 
 ### 5.X.7 Trabalhos futuros
 
-- Integrar a ANA (assim que as credenciais forem liberadas) ou a estação do campus da USCS
-  como pluviômetro local, e validar o modelo com as quatro fontes reais.
+- Integrar um pluviômetro físico — a ANA, se o acesso for liberado, ou a estação do campus
+  da USCS — como critério adicional do modelo.
 - Recalibrar pesos e parâmetros da agregação colaborativa com histórico real de
   ocorrências e com apoio de especialistas (por exemplo, a Defesa Civil municipal).
 - Notificações por *push* do servidor, para alertar com o aplicativo fechado.

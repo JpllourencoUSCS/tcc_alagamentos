@@ -20,14 +20,14 @@ aplicativo Android e por uma API que consulta as fontes, calcula o risco por um 
   perfil. Capturas em [`docs/capturas/`](docs/capturas/).
 - **API REST** (Python, FastAPI): `POST`/`GET /ocorrencias`, `GET /ocorrencias/{id}` e
   `GET /risco`. Documentação interativa em `/docs` com a API no ar.
-- **Classificação de risco**: modelo AHP com quatro critérios — chuva atual (35%),
-  pluviômetro local (25%), previsão (25%) e relatos de usuários próximos (15%). Fontes sem
-  dado têm o peso redistribuído entre as demais, e avisos de chuva do INMET funcionam como
-  piso da classe. Fundamentação em [`docs/T15_algoritmo_risco_fundamentacao.md`](docs/T15_algoritmo_risco_fundamentacao.md).
+- **Classificação de risco**: modelo AHP com três critérios — chuva atual (54%), previsão
+  (30%) e relatos de usuários próximos (16%), pesos do autovetor da matriz de comparação
+  pareada (CR = 0,0079). Sem relatos suficientes, o peso deles é redistribuído, e avisos de
+  chuva do INMET funcionam como piso da classe. Fundamentação em [`docs/T15_algoritmo_risco_fundamentacao.md`](docs/T15_algoritmo_risco_fundamentacao.md).
 - **Banco de dados**: PostgreSQL 16 com PostGIS 3.4 e índice espacial GiST; o benchmark de
   indexação espacial está em [`backend/benchmark/`](backend/benchmark/).
-- **Fontes de dados**: OpenWeather (chuva atual e previsão), ANA (pluviômetro; acesso ainda
-  não liberado) e INMET (previsão textual e avisos oficiais). As decisões sobre fontes estão
+- **Fontes de dados**: OpenWeather e Open-Meteo (chuva atual e previsão, fundidas: vale o
+  maior valor e a divergência é registrada) e INMET (previsão textual e avisos oficiais). As decisões sobre fontes estão
   em [`docs/T_arquitetura_fontes_dados_final.md`](docs/T_arquitetura_fontes_dados_final.md).
 
 ## Estrutura do repositório
@@ -52,8 +52,8 @@ docker exec -i alagamentos_db psql -U alagamentos -d alagamentos < backend/db/sc
 docker compose exec api python -m dados_demo   # opcional: 30 ocorrências de demonstração
 ```
 
-Sem a chave do OpenWeather, o cálculo automático de risco responde 503 e o app pede que o
-nível seja escolhido à mão. Bancos criados antes de 07/10/2026 precisam também de
+Sem a chave do OpenWeather, o cálculo usa só a Open-Meteo; sem nenhuma das duas fontes
+respondendo, o cálculo automático responde 503 e o app pede que o nível seja escolhido à mão. Bancos criados antes de 07/10/2026 precisam também de
 `backend/db/migracao_2026-10-07_fonte_inmet.sql`.
 
 ### Testes do backend

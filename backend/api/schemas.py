@@ -38,14 +38,29 @@ class ComponentesRisco(BaseModel):
 
     precipitacao_atual: float | None
     previsao: float | None
-    pluviometro_local: float | None
     colaborativo: float | None
 
 
 class FontesRisco(BaseModel):
     precipitacao_atual: str | None
     previsao: str | None
-    pluviometro_local: str | None
+
+
+class MedidaFundidaOut(BaseModel):
+    """Uma variável medida por duas fontes (16/10/2026): o valor de cada uma (null =
+    fonte sem resposta), o valor usado no índice (o maior) e se elas divergem (caem em
+    faixas diferentes da escala de intensidade da OMM)."""
+
+    openweather: float | None
+    open_meteo: float | None
+    valor: float
+    fonte: str
+    divergente: bool
+
+
+class FusaoOut(BaseModel):
+    precipitacao_atual: MedidaFundidaOut  # mm/h
+    previsao: MedidaFundidaOut  # maior acumulado de 3 h nas próximas 24 h (mm)
 
 
 class AvisoInmetOut(BaseModel):
@@ -82,12 +97,12 @@ class RiscoOut(BaseModel):
     componentes: ComponentesRisco
     precipitacao_atual_mm_h: float
     pico_previsto_mm_3h: float
-    pluviometro_local_mm_h: float | None
     reportes_colaborativos: int
     # Validação cruzada qualitativa, fora do AHP (INMET no lugar do CPTEC desde 06/10/2026)
     previsao_inmet: str | None
     avisos_inmet: list[AvisoInmetOut]
     fontes: FontesRisco
+    fusao: FusaoOut
     dados_em_cache: bool
 
 

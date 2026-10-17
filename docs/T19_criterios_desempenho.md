@@ -134,6 +134,13 @@ respostas de novo, e a mediana sem cache tinha subido para 1,2 s numa primeira m
 O cache reduz o tempo do cadastro em ~10× (os ~50 ms restantes são, em boa parte, o
 encaminhamento de porta do Docker Desktop, ver nota em 5.1).
 
+**Remedição em 16/10/2026, com a Open-Meteo no lugar da ANA** (CSV
+`latencia_api_demo_com_clima_openmeteo.csv`, API reiniciada antes; as 5 consultas externas
+agora são OpenWeather atual e previsão, Open-Meteo, previsão e avisos do INMET): cadastro
+automático sem cache com p50 de 695 ms e p95 de 809 ms (máximo 848 ms); com cache, p50 de
+50,0 ms e p95 de 53,6 ms; `GET /risco` com cache, p95 de 5,3 ms; leituras com p95 de até
+5,0 ms. Todos os critérios continuam atendidos.
+
 ### 5.3 RNF-04 — consulta espacial no banco
 
 Ver `T16_secao_benchmark.md` e `backend/benchmark/resultados/resumo.md`. Com 100 mil
@@ -157,8 +164,8 @@ Verificado por teste automatizado:
   É um efeito esperado de qualquer grade fixa e só custa uma consulta extra.
 - As medições usam cliente e servidor na mesma máquina. A latência de rede móvel real
   (celular → internet → servidor) não foi medida e depende de onde a API for hospedada.
-- O RNF-03 depende de serviços externos fora do controle do projeto (OpenWeather, ANA,
-  INMET; até 03/10, CPTEC). Os critérios valem para o processamento do sistema, não para a disponibilidade
+- O RNF-03 depende de serviços externos fora do controle do projeto (OpenWeather,
+  Open-Meteo, INMET; até 03/10, CPTEC; até 16/10, ANA). Os critérios valem para o processamento do sistema, não para a disponibilidade
   dessas fontes.
 - A carga foi de um cliente por vez. Testes de concorrência (vários usuários
   simultâneos) não fizeram parte do escopo.

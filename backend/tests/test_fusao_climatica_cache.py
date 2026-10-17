@@ -67,22 +67,37 @@ def test_falha_nao_entra_no_cache():
     assert busca.call_count == 2
 
 
-def test_sem_chave_openweather_falha_com_erro_claro():
+def test_sem_chave_openweather_e_sem_open_meteo_falha_com_erro_claro():
+    # Desde 16/10/2026 só falha quando as duas fontes numéricas faltam
     with patch.object(fc, "OPENWEATHER_API_KEY", ""), \
-         patch.object(fc, "_buscar_ana", return_value=None), \
+         patch.object(fc, "_buscar_open_meteo", return_value=None), \
          patch.object(fc, "_buscar_inmet_previsao", return_value=None), \
          patch.object(fc, "_buscar_inmet_avisos", return_value=None):
-        with pytest.raises(fc.FonteClimaticaIndisponivel, match="OPENWEATHER_API_KEY"):
+        with pytest.raises(fc.FonteClimaticaIndisponivel, match="OpenWeather e Open-Meteo"):
             fc.obter_dados_consolidados(-23.62, -46.55)
 
 
-def test_erro_de_rede_do_openweather_vira_fonte_indisponivel():
-    with patch.object(fc, "_buscar_openweather_atual", side_effect=ConnectionError("sem rede")), \
-         patch.object(fc, "_buscar_openweather_previsao", return_value={"list": []}), \
-         patch.object(fc, "_buscar_ana", return_value=None), \
+def test_sem_chave_openweather_calcula_com_a_open_meteo():
+    open_meteo = {
+        "current": {"time": "2026-10-16T10:15", "interval": 900, "precipitation": 0.25},
+        "hourly": {"time": [f"2026-10-16T{h:02d}:00" for h in range(24)], "precipitation": [0.0] * 24},
+    }
+    with patch.object(fc, "OPENWEATHER_API_KEY", ""), \
+         patch.object(fc, "_buscar_open_meteo", return_value=open_meteo), \
          patch.object(fc, "_buscar_inmet_previsao", return_value=None), \
          patch.object(fc, "_buscar_inmet_avisos", return_value=None):
-        with pytest.raises(fc.FonteClimaticaIndisponivel, match="sem rede"):
+        dados = fc.obter_dados_consolidados(-23.62, -46.55)
+    assert dados.precipitacao_atual_mm_h == pytest.approx(1.0)
+    assert dados.fonte_precipitacao_atual == "Open-Meteo"
+
+
+def test_erro_de_rede_do_openweather_sem_open_meteo_vira_fonte_indisponivel():
+    with patch.object(fc, "_buscar_openweather_atual", side_effect=ConnectionError("sem rede")), \
+         patch.object(fc, "_buscar_openweather_previsao", return_value={"list": []}), \
+         patch.object(fc, "_buscar_open_meteo", return_value=None), \
+         patch.object(fc, "_buscar_inmet_previsao", return_value=None), \
+         patch.object(fc, "_buscar_inmet_avisos", return_value=None):
+        with pytest.raises(fc.FonteClimaticaIndisponivel, match="chuva atual"):
             fc.obter_dados_consolidados(-23.62, -46.55)
 
 

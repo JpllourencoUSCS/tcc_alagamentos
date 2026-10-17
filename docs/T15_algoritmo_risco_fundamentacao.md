@@ -306,6 +306,56 @@ colaborativo). O modelo é, portanto, **estável a imprecisões moderadas** nos 
 da matriz pareada — o que reduz, sem eliminar, a limitação de os julgamentos terem sido
 feitos pela própria equipe.
 
+## 8.2 Revisão de 16/10/2026 — três critérios e fusão OpenWeather × Open-Meteo
+
+*Seção acrescentada em 16/10/2026; as seções 3 a 8.1 registram o modelo de quatro critérios
+como foi construído e usado até esta data.*
+
+**Decisão do grupo (16/10/2026):** retirar a ANA e a estação meteorológica da USCS — nenhuma
+das duas liberou acesso (a ANA não respondeu ao pedido de cadastro de agosto) — e, com elas,
+o critério C2 (pluviômetro local). Na prática, o C2 nunca teve dado real: o fail-safe da
+seção 6.3 redistribuía sempre o seu peso, e os pesos efetivos eram 50/35/15.
+
+**Pesos de três critérios.** A matriz da seção 4 sem a linha e a coluna de C2 (os mesmos
+julgamentos, sem refazê-los):
+
+| | C1 | C3 | C4 |
+|---|---|---|---|
+| **C1** | 1 | 2 | 3 |
+| **C3** | 1/2 | 1 | 2 |
+| **C4** | 1/3 | 1/2 | 1 |
+
+Autovetor principal: C1 = 53,96%, C3 = 29,70%, C4 = 16,34%; λmax = 3,0092;
+CI = 0,0046; RI (n = 3) = 0,58; **CR = 0,0079**. Os pesos implementados são o autovetor
+arredondado — **54/30/16**, sem o ajuste manual da seção 5, o que responde à crítica de que
+os pesos do sistema não eram os do método. Sem reportes colaborativos, o peso de C4 é
+redistribuído proporcionalmente (C1 = 64,3%, C3 = 35,7%).
+
+**Fusão de fontes.** A Open-Meteo (gratuita, sem chave) passou a medir as mesmas
+variáveis que o OpenWeather — chuva atual (acumulado de 15 min convertido para mm/h) e
+previsão (maior acumulado em bloco de 3 h nas próximas 24 h). Regra (`fusao_climatica.fundir`):
+com as duas, vale o maior valor (conservador); há divergência quando as leituras caem em
+faixas diferentes da escala da OMM (registrada, sem mudar o valor); com uma, vale a
+disponível; sem nenhuma, não há cálculo (HTTP 503). Até esta data, a falha do OpenWeather
+sozinho já impedia o cálculo.
+
+**Sensibilidade com os pesos novos** (`backend/analise_sensibilidade.py`, 280 cenários de
+chuva atual × previsão × colaborativo):
+
+| Critério | −20% | −10% | +10% | +20% |
+|---|---|---|---|---|
+| Precipitação atual | 12,9% | 7,1% | 3,9% | 7,1% |
+| Previsão | 5,7% | 2,5% | 3,2% | 8,9% |
+| Colaborativo | 2,1% | 1,4% | 1,8% | 3,2% |
+
+(percentual de cenários que mudam de classe; diferença média de score de no máximo
+3,4 pontos com ±20% e 1,7 ponto com ±10%.)
+
+**Exemplo real (16/10/2026, centro de São Caetano do Sul, chuva fraca):** OpenWeather
+1,02 mm/h e Open-Meteo 2,0 mm/h → 2,0 mm/h (score 20,0); previsão 4,07 mm e 5,1 mm em 3 h →
+5,1 mm (score 17,0); sem reportes → 20,0 × 0,643 + 17,0 × 0,357 = **18,9 (Baixo)**. Aviso
+"Tempestade — Perigo Potencial" vigente, sem piso.
+
 ## 9. Referências
 
 - SAATY, T. L. *The Analytic Hierarchy Process: Planning, Priority Setting, Resource

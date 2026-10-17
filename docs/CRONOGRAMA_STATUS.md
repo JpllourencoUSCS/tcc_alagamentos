@@ -2,7 +2,7 @@
 
 **Sistema de Monitoramento Colaborativo de Áreas com Risco de Alagamento**
 Período: 01/07/2026 a 30/10/2026 (17 semanas)
-*Última atualização de status: 07/10/2026 — Semana 15 (05/10 – 11/10). **Prazo antecipado:**
+*Última atualização de status: 16/10/2026 — Semana 16 (12/10 – 18/10). **Prazo antecipado:**
 projeto e documento teórico até o fim da semana de 12–16/10/2026.*
 
 ## Legenda de responsáveis
@@ -24,7 +24,33 @@ enviada em 06/09/2026 (Semanas 5, 8, 9 e 10); e para as do Guilherme a partir do
 que ele enviou em 06/09/2026 (Semanas 1–10). Ambos os resumos são repasse direto, sem
 validação própria do time de integração.
 
+## Situação em 16/10/2026 — último dia do prazo
+
+1. **Sistema pronto** e publicado no GitHub (CI aprovado em 07/10). Em 16/10, ajuste de
+   escopo decidido pelo grupo e implementado no mesmo dia: **ANA e estação da USCS
+   retiradas**; **Open-Meteo** como segunda fonte de chuva atual e previsão, com **regra de
+   fusão** (vale o maior valor, divergência registrada); **AHP com três critérios, 54/30/16**
+   (autovetor, CR = 0,0079, sem ajuste manual); filtro "Fontes de dados" retirado dos Ajustes.
+   114 testes no backend, 10 de JVM no app, lint sem erros; PT-001 v1.4 com 29 casos (21
+   aprovados, 8 aguardando usabilidade). Latência remedida (cadastro automático sem cache:
+   p95 de 809 ms). Detalhe na nota de 16/10, no fim do documento.
+2. **Documento teórico: não iniciado** (confirmado pelo João em 16/10). É o trabalho que
+   resta; matéria-prima nos `T16_secao_*.md` (atualizados em 16/10) e o mapa por capítulo na
+   seção 3.5 de `docs/Documento Teórico/Analise_escopo_e_revisao_do_TCC_2026-10-06.md`.
+3. **Usabilidade:** o grupo aplicou um formulário de pesquisa (Google Forms); o João aguarda
+   do Marlon as respostas. Falta saber se os respondentes usaram o app (avaliação de
+   usabilidade por questionário) ou não (pesquisa de opinião/validação do problema).
+4. **Decisões pendentes:** título (≤ 15 palavras, junto com o texto); hospedagem no Supabase
+   (fica dentro do escopo — o Supabase hospeda só o banco, a API precisa de outro serviço,
+   de preferência na região de São Paulo por causa do INMET —, para depois do documento).
+   Não escolhidos e registrados como limitação/trabalho futuro: contar um relato por usuário
+   (F) e registrar cada cálculo (G).
+5. **Ainda pendentes:** slides, referências (limiares de chuva OMM × AMS), firewall do
+   notebook com Docker.
+
 ## Situação em 07/10/2026 — prazo antecipado
+
+*(Mantida como registro; substituída pela "Situação em 16/10/2026" acima.)*
 
 **Prazo:** houve ajuste nos prazos — app e documento teórico precisam estar concluídos até
 o **fim da semana de 12–16/10/2026** (antes: rascunho ao orientador na S16 e banca em
@@ -518,6 +544,37 @@ deve partir desta base em vez de manter outra.
 - **Continua pendente do Guilherme:** corrigir os bugs dos testes internos (S8, aguarda a lista
   do Marlon), confirmar se a planilha PT-001 fecha a S11, e as tarefas que dependem dos testes
   com usuários (S12/S13) e da API real (capturas de tela da S14).
+
+**Sessão de 16/10/2026 — ajuste de escopo: ANA retirada, Open-Meteo e fusão, AHP de três
+critérios (notebook com Docker, sessão do João):**
+- **Decisões do grupo (16/10):** retirar a ANA e a estação da USCS; pesos E2 (autovetor de
+  três critérios, 54/30/16); incluir a Open-Meteo com regra de fusão (C+D); retirar o filtro
+  "Fontes de dados" dos Ajustes. Não escolhidos: um relato por usuário (F) e registro de cada
+  cálculo (G).
+- **Backend:** `algoritmo_risco.py` com três critérios; `fusao_climatica.py` sem o código da
+  ANA, com a Open-Meteo (`_buscar_open_meteo`, chuva de 15 min convertida para mm/h, pico em
+  blocos de 3 h) e a fusão (`fundir`: maior valor; divergência quando as leituras caem em
+  faixas diferentes da escala da OMM; uma fonte → usa a disponível; nenhuma → 503). A falha
+  só do OpenWeather deixou de dar 503. `GET /risco` traz o detalhe da fusão (`fusao`) e não
+  traz mais o pluviômetro. `.env.example` e `docker-compose.yml` sem as variáveis da ANA.
+  Análise de sensibilidade refeita (280 cenários; ±10% → no máximo 7,1% mudam de classe).
+  Achado nos testes: `pico_3h_open_meteo` voltava ao início da lista quando não havia hora
+  futura — corrigido antes do commit. 114 testes (106 sem banco + 8 de integração).
+- **App:** Previsão sem a linha "Pluviômetro local"; os cartões ⓘ de chuva atual e previsão
+  mostram o valor de cada fonte e avisam quando divergem; textos com os pesos novos; Ajustes
+  sem o filtro de fontes (e o notificador sem o filtro por fonte). 10 testes de JVM; lint
+  sem erros.
+- **Verificado ao vivo** (chuva fraca no centro de São Caetano do Sul): OpenWeather
+  1,02 mm/h × Open-Meteo 2,0 mm/h → 2,0; previsão 4,07 × 5,1 mm → 5,1; score 18,9 (Baixo),
+  igual ao cálculo manual; aviso do INMET "Perigo Potencial" vigente (sem piso). CT-AHP-004
+  aprovado; CT-AHP-002 (fail-safe da ANA) marcado como obsoleto. Evidências em
+  `docs/evidencias_testes/2026-10-16/`; capturas `06`, `07` e `10` refeitas.
+- **Latência remedida** (`latencia_api_demo_com_clima_openmeteo.csv`): cadastro automático
+  sem cache p50 695 ms / p95 809 ms; com cache p95 53,6 ms; leituras p95 ≤ 5,3 ms.
+- **Documentação:** T15 (nova seção 8.2, sem reescrever o histórico), `T16_secao_algoritmo_risco.md`
+  reescrita para o modelo atual, `T16_secao_relatorio_apis.md`, arquitetura, app,
+  resultados, metodologia, T19, `T_arquitetura_fontes_dados_final.md` (decisão), README,
+  roteiro da apresentação, referências (Open-Meteo) e a análise de 06/10 (A–E feitos).
 
 **Ocorrências com prazo no mapa (07/10/2026, pedido do João):** até aqui nada expirava — o mapa
 mostrava as 500 ocorrências mais recentes de qualquer data, e a faixa "ALERTA — Risco alto"

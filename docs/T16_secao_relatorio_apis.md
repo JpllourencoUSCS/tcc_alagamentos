@@ -14,14 +14,17 @@ relevância das informações para a classificação de risco de alagamento.
 
 Foram avaliadas quatro fontes de dados meteorológicos: OpenWeather, INMET (Instituto Nacional
 de Meteorologia), CEMADEN (Centro Nacional de Monitoramento e Alertas de Desastres Naturais) e,
-posteriormente, ANA (Agência Nacional de Águas e Saneamento Básico) e CPTEC/INPE. A arquitetura
-final do sistema utiliza três dessas fontes, cada uma cobrindo um papel distinto no modelo de
-classificação de risco (ver seção 3.Y — Algoritmo de Classificação de Risco):
+posteriormente, ANA (Agência Nacional de Águas e Saneamento Básico), CPTEC/INPE e Open-Meteo. A
+arquitetura final do sistema utiliza três fontes externas — OpenWeather e Open-Meteo, fundidas,
+para a chuva atual e a previsão, e o INMET para a previsão textual e os avisos oficiais —, além
+dos relatos dos usuários (ver seção 3.Y — Algoritmo de Classificação de Risco). A tabela abaixo
+registra também as fontes que passaram pelo projeto e saíram:
 
 | Fonte | Papel no sistema | Autenticação |
 |---|---|---|
 | OpenWeather | Precipitação atual (principal) + previsão principal | Chave de API (gratuita) |
-| ANA | Pluviômetro local — dado de medição física institucional | E-mail de cadastro + token OAuth (60 min) |
+| Open-Meteo | Segunda medida de chuva atual e previsão, fundida com o OpenWeather (desde 16/10/2026, seção 3.X.7) | Sem chave |
+| ANA | Pluviômetro local — **retirada em 16/10/2026**: o cadastro pedido em agosto nunca foi aprovado | E-mail de cadastro + token OAuth (60 min) |
 | CPTEC/INPE | Previsão municipal de 4 dias — validação cruzada qualitativa (até 03/10/2026) | Sem token |
 | INMET (API de previsão `apiprevmet3`) | Previsão municipal textual e avisos meteorológicos oficiais — validação cruzada qualitativa, no lugar do CPTEC desde 06/10/2026 (seção 3.X.4.1) | Sem token |
 
@@ -72,6 +75,9 @@ Os campos selecionados para uso no sistema são: `rain.1h` (precipitação na ú
 `main.humidity` (umidade relativa) e `coord` (validação das coordenadas retornadas).
 
 ### 3.X.3 Resultados dos Testes com a ANA
+
+*Registro histórico: a ANA foi retirada do projeto em 16/10/2026, porque o cadastro nunca foi
+aprovado (ver 3.X.7).*
 
 A integração com a ANA (`backend/fusao_climatica.py`, `testes-api/teste_ana.py`) segue o fluxo
 oficial documentado no manual técnico do órgão: autenticação via `Identificador`/`Senha`
@@ -187,39 +193,44 @@ mapas do sistema, hoje implementada em XML (`Marlon`, Semana 3).
 
 O escopo do monitoramento foi definido como o município de **São Caetano do Sul** (decisão
 de 03/09/2026). A previsão e os avisos do INMET são consultados pelo código IBGE do
-próprio município (`3548807`); o código da ANA confirmado para São Caetano do Sul
-(`21489000`) fica disponível para quando o cadastro for aprovado. Está em
-investigação, ainda sem decisão, o uso da estação meteorológica do campus da USCS como
-pluviômetro local.
+próprio município (`3548807`).
+
+**Ajuste de escopo (16/10/2026).** A ANA e a estação meteorológica do campus da USCS, que
+cumpririam o papel de pluviômetro físico local, foram retiradas do projeto: o cadastro na
+ANA, pedido em agosto, nunca foi aprovado, e a estação da USCS não teve resposta dos
+responsáveis nem interface programática confirmada. No lugar, entrou a **Open-Meteo** —
+serviço aberto, sem chave, já citado como candidata na proposta —, que mede as mesmas
+variáveis do OpenWeather. Com duas fontes para a mesma variável, o sistema passou a ter uma
+regra de fusão explícita (seção 3.Y.3).
 
 As fontes são combinadas pelo módulo de fusão climática do backend
 (`backend/fusao_climatica.py`), com quatro decisões de projeto:
 
 1. **Consultas em paralelo.** As chamadas externas (OpenWeather condição atual e previsão,
-   ANA, e previsão e avisos do INMET) são independentes e rodam ao mesmo tempo, cada uma com
-   limite de 10 s. O tempo total fica limitado à fonte mais lenta, e não à soma de todas.
-2. **Tolerância a falhas por fonte.** ANA e INMET indisponíveis não interrompem o cálculo:
-   o componente fica ausente e o peso do pluviômetro é redistribuído pelo modelo AHP. Só a
-   falha do OpenWeather, fonte principal, impede o cálculo automático; nesse caso a API
-   responde com um erro claro (HTTP 503) e o aplicativo orienta o usuário a informar o
-   nível manualmente.
+   Open-Meteo, e previsão e avisos do INMET) são independentes e rodam ao mesmo tempo, cada
+   uma com limite de 10 s. O tempo total fica limitado à fonte mais lenta, e não à soma.
+2. **Fusão e tolerância a falhas.** Com o OpenWeather e a Open-Meteo respondendo, vale o
+   maior valor de cada variável, e a divergência entre elas é registrada; com uma só, vale a
+   disponível. O INMET indisponível não interrompe o cálculo. Só a falha das duas fontes
+   numéricas impede o cálculo automático; nesse caso a API responde com um erro claro
+   (HTTP 503) e o aplicativo orienta o usuário a informar o nível manualmente.
 3. **Cache de 10 minutos por região de ~1 km.** O OpenWeather atualiza a condição atual
    aproximadamente a cada 10 minutos, então consultas repetidas da mesma região nesse
    intervalo reutilizam o resultado, sem novas chamadas externas.
 4. **Dado colaborativo como quarta fonte.** Os reportes feitos pelos usuários no aplicativo
    a até 1 km do ponto, nas últimas 3 horas, são agregados num score de 0 a 100 e entram no
-   modelo com peso de 15% (detalhes na seção do algoritmo). É a fonte que torna o sistema
+   modelo com peso de 16% (detalhes na seção do algoritmo). É a fonte que torna o sistema
    colaborativo e que não depende de nenhum órgão externo.
 
-As credenciais (chave do OpenWeather, identificador e senha da ANA) são lidas de variáveis
-de ambiente e nunca ficam no código-fonte nem no repositório.
+A única credencial (a chave do OpenWeather) é lida de variável de ambiente e nunca fica no
+código-fonte nem no repositório; Open-Meteo e INMET não exigem chave.
 
 ### 3.X.8 Síntese das Decisões Tecnológicas
 
 | Componente | Solução Adotada | Justificativa |
 |---|---|---|
 | Precipitação atual + previsão principal | OpenWeather API | Documentação, plano gratuito, JSON padronizado |
-| Pluviômetro local (dado físico institucional) | ANA | Papel que era do CEMADEN no modelo de risco; processo de cadastro oficialmente documentado |
+| Segunda fonte de chuva atual e previsão (fusão) | Open-Meteo (desde 16/10/2026) | Sem chave; mesmas variáveis do OpenWeather, o que permite a regra de fusão; substitui o papel de dado redundante da ANA, retirada por falta de acesso |
 | Previsão redundante (validação cruzada) | INMET — previsão por município e avisos oficiais (desde 06/10/2026) | Sem autenticação; testado de ponta a ponta para São Caetano do Sul; substitui o CPTEC, indisponível desde 03/10/2026 (3.X.4) |
 | Dado colaborativo | Reportes dos usuários do app | Única fonte sob controle do projeto; agregação por proximidade no tempo e no espaço |
 | Geocoding | Nominatim (OpenStreetMap) | Gratuito, sem autenticação, testado com sucesso |
@@ -230,7 +241,7 @@ proteção documentada contra automação (reCAPTCHA v3 e fluxo de autenticaçã
 respectivamente) — não por limitação de documentação, como avaliado preliminarmente. A ANA e o
 CPTEC assumiram, respectivamente, os papéis de dado físico institucional e previsão redundante
 que essas duas fontes ocupariam; desde 06/10/2026, o papel do CPTEC é da API de previsão e
-avisos do INMET.
+avisos do INMET, e desde 16/10/2026 a ANA, sem acesso liberado, deu lugar à Open-Meteo.
 
 ---
 

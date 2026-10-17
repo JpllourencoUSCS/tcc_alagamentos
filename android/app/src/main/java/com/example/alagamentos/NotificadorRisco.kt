@@ -35,7 +35,6 @@ object NotificadorRisco {
             o.id !in jaAvisadas &&
                 o.dataHora.isAfter(limite) &&
                 o.severidade.ordinal <= prefs.severidadeMinima.ordinal &&
-                prefs.notificarFonte(o.fonte) &&
                 // Sem localização conhecida, não dá para aplicar o raio: avisa a cidade toda
                 (local == null || distanciaKm(local.latitude, local.longitude, o.latitude, o.longitude) <= prefs.raioKm)
         }.sortedBy { it.severidade.ordinal }

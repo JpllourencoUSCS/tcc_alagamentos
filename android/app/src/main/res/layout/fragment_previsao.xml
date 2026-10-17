@@ -219,7 +219,6 @@
 
                     <include android:id="@+id/info_chuva_agora" layout="@layout/item_info_fonte" />
                     <include android:id="@+id/info_pico_previsto" layout="@layout/item_info_fonte" />
-                    <include android:id="@+id/info_pluviometro" layout="@layout/item_info_fonte" />
                     <include android:id="@+id/info_relatos" layout="@layout/item_info_fonte" />
                     <include android:id="@+id/info_inmet" layout="@layout/item_info_fonte" />
                 </LinearLayout>

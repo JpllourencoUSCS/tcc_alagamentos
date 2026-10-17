@@ -1,13 +1,20 @@
 """
 Algoritmo de classificação de risco de alagamento (modelo AHP).
 
-Pesos definidos na Semana 1 e formalizados na Semana 6 com matriz de comparação
-pareada e teste de consistência (CR=0.0038, dentro do limite de Saaty de 0.10) —
-ver docs/T15_algoritmo_risco_fundamentacao.md para a fundamentação completa:
-- Precipitação atual (OpenWeather rain.1h):           35%
-- Pluviômetro local (ANA, estação telemétrica):       25%
-- Previsão / tendência (OpenWeather forecast):        25%
-- Dado colaborativo (usuários do app):                15%
+Desde 16/10/2026, três critérios (decisão do grupo: a ANA e a estação da USCS saíram do
+projeto por falta de acesso, e com elas o critério "pluviômetro local"). Os pesos são o
+autovetor principal da matriz de comparação pareada com os mesmos julgamentos registrados
+em docs/T15_algoritmo_risco_fundamentacao.md (C1, C3 e C4 da matriz original), usados sem
+ajuste manual — autovetor 53,96% / 29,70% / 16,34%, arredondado para:
+- Precipitação atual (OpenWeather + Open-Meteo, maior valor): 54%
+- Previsão / pico das próximas 24 h (idem):                    30%
+- Dado colaborativo (usuários do app):                         16%
+λmax = 3,0092; CI = 0,0046; RI = 0,58; CR = 0,0079 (limite de Saaty: 0,10).
+
+Até 16/10/2026 eram quatro critérios — precipitação atual 35%, pluviômetro local (ANA)
+25%, previsão 25%, colaborativo 15% (CR = 0,0038) — com o peso da ANA sempre
+redistribuído (60/40 entre precipitação e previsão), porque a credencial nunca foi
+liberada: na prática, 50/35/15.
 
 Escala final: 0 a 100
 - Baixo risco:  0  a 30
@@ -17,22 +24,18 @@ Escala final: 0 a 100
 Os limiares de intensidade de chuva seguem a classificação da OMM (WMO) para
 chuva em mm/h: leve (<2.5), moderada (2.5–7.6), forte (7.6–50), violenta (>50).
 
-Fail-safe de fontes indisponíveis: se o pluviômetro local (ANA) ou o colaborativo
-não tiverem dado para a leitura, o peso do componente ausente é redistribuído
-entre os componentes disponíveis em vez de zerado silenciosamente. Isso evita
-que o score seja sistematicamente subestimado em áreas sem estação ANA ativa
-ou com baixa adoção do app (poucos ou nenhum reporte de usuário) — ver
-docs/T15_algoritmo_risco_fundamentacao.md, seção 6.3.
+Fail-safe: sem reportes colaborativos suficientes para a área, o peso do colaborativo
+é redistribuído proporcionalmente entre os demais, em vez de zerado silenciosamente
+(evita subestimar o risco em áreas com pouca adoção do app) — ver T15, seção 6.3.
 """
 
 from dataclasses import dataclass
 
 
 PESOS = {
-    "precipitacao_atual": 0.35,
-    "pluviometro_local": 0.25,
-    "previsao": 0.25,
-    "colaborativo": 0.15,
+    "precipitacao_atual": 0.54,
+    "previsao": 0.30,
+    "colaborativo": 0.16,
 }
 
 LIMIARES_CHUVA_MM_H = {
@@ -63,11 +66,22 @@ def score_previsao(pico_mm_3h: float) -> float:
     return score_precipitacao(mm_h_equivalente)
 
 
+def faixa_intensidade(mm_h: float) -> int:
+    """Faixa da classificação da OMM (0 leve, 1 moderada, 2 forte, 3 violenta) — usada
+    pela regra de fusão para dizer quando duas fontes divergem (fusao_climatica.fundir)."""
+    if mm_h < LIMIARES_CHUVA_MM_H["leve"]:
+        return 0
+    if mm_h < LIMIARES_CHUVA_MM_H["moderada"]:
+        return 1
+    if mm_h < LIMIARES_CHUVA_MM_H["forte"]:
+        return 2
+    return 3
+
+
 @dataclass
 class EntradaRisco:
-    precipitacao_atual_mm_h: float          # OpenWeather rain.1h
-    pico_previsto_mm_3h: float               # maior rain.3h nas próximas leituras
-    pluviometro_local_mm_h: float | None = None        # ANA — None se a chamada falhar
+    precipitacao_atual_mm_h: float          # já fundida (maior entre OpenWeather e Open-Meteo)
+    pico_previsto_mm_3h: float              # idem, maior acumulado de 3 h nas próximas 24 h
     reportes_colaborativos_score: float | None = None  # 0-100 já agregado, ou None se não há
                                                          # reportes suficientes para a área/janela
 
@@ -93,25 +107,10 @@ def calcular_risco(entrada: EntradaRisco) -> dict:
 
     pesos = dict(PESOS)
 
-    # Fail-safe 1 — ANA indisponível para essa leitura (falha pontual da API,
-    # por exemplo): redistribuímos o peso dela usando o split 60/40 já validado
-    # entre precipitação atual e previsão (decisão explícita, documentada, não
-    # um dado ausente silenciosamente ignorado). Mantido como split fixo (em
-    # vez de proporcional genérico) para não alterar um comportamento já em uso.
-    if entrada.pluviometro_local_mm_h is None:
-        s_local = None
-        peso_pluviometro = pesos["pluviometro_local"]
-        pesos["pluviometro_local"] = 0.0
-        pesos["precipitacao_atual"] += peso_pluviometro * 0.6
-        pesos["previsao"] += peso_pluviometro * 0.4
-    else:
-        s_local = score_precipitacao(entrada.pluviometro_local_mm_h)
-
-    # Fail-safe 2 — sem reportes colaborativos suficientes para essa área/janela
+    # Fail-safe — sem reportes colaborativos suficientes para essa área/janela
     # de tempo (None, não 0.0: zero reportes é diferente de reportes indicando
     # risco zero). Redistribuímos o peso do colaborativo proporcionalmente entre
-    # os componentes que sobraram (já considerando o ajuste do fail-safe 1, se
-    # também tiver ocorrido), em vez de descartar 15% do score silenciosamente
+    # os outros dois critérios, em vez de descartar 16% do score silenciosamente
     # — o que subestimaria o risco em áreas com baixa adoção do app.
     s_colab = entrada.reportes_colaborativos_score
     if s_colab is None:
@@ -120,7 +119,6 @@ def calcular_risco(entrada: EntradaRisco) -> dict:
     score_final = (
         s_precip * pesos["precipitacao_atual"]
         + s_previsao * pesos["previsao"]
-        + (s_local or 0) * pesos["pluviometro_local"]
         + (s_colab or 0) * pesos["colaborativo"]
     )
 
@@ -137,32 +135,28 @@ def calcular_risco(entrada: EntradaRisco) -> dict:
         "componentes": {
             "precipitacao_atual": round(s_precip, 1),
             "previsao": round(s_previsao, 1),
-            "pluviometro_local": round(s_local, 1) if s_local is not None else "N/A (falha pontual na ANA)",
             "colaborativo": round(s_colab, 1) if s_colab is not None else "N/A (sem reportes suficientes na área)",
         },
+        "pesos": {k: round(v, 4) for k, v in pesos.items()},
     }
 
 
 if __name__ == "__main__":
-    # Teste com dados reais coletados em testes-api/ (Santo André, SP) - sem ANA
-    # e sem reportes colaborativos disponíveis no momento do teste (piloto,
-    # ainda sem base de usuários ativa).
+    # Teste com dados reais coletados em testes-api/ (Santo André, SP), sem reportes
+    # colaborativos disponíveis no momento do teste (piloto, sem base de usuários ativa).
     entrada_teste = EntradaRisco(
         precipitacao_atual_mm_h=0.35,   # openweather_atual.json -> rain.1h
         pico_previsto_mm_3h=2.14,       # openweather_previsao.json -> maior rain.3h do horizonte
-        pluviometro_local_mm_h=None,    # simula falha pontual na ANA para este teste
         reportes_colaborativos_score=None,
     )
-    resultado = calcular_risco(entrada_teste)
-    print("=== TESTE COM DADOS REAIS (Santo André, SP) — sem ANA e sem reportes ===")
-    print(resultado)
+    print("=== TESTE COM DADOS REAIS (Santo André, SP) — sem reportes ===")
+    print(calcular_risco(entrada_teste))
 
     # Mesmo cenário, mas com reportes colaborativos indicando ausência de risco
     # (não "sem dado" - reportes existem e dizem "nada acontecendo").
     entrada_com_reportes = EntradaRisco(
         precipitacao_atual_mm_h=0.35,
         pico_previsto_mm_3h=2.14,
-        pluviometro_local_mm_h=None,
         reportes_colaborativos_score=0.0,
     )
     print("\n=== MESMO CENÁRIO, COM REPORTES CONFIRMANDO RISCO ZERO ===")

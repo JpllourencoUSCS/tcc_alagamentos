@@ -15,10 +15,11 @@ from algoritmo_risco import PESOS
 def test_pesos_perturbados_somam_1_e_mantem_proporcao_dos_demais():
     novos = pesos_perturbados(PESOS, "precipitacao_atual", 0.20)
     assert sum(novos.values()) == pytest.approx(1.0)
-    assert novos["precipitacao_atual"] == pytest.approx(0.42)
-    # pluviômetro e previsão continuam iguais entre si; colaborativo na mesma razão
-    assert novos["pluviometro_local"] == pytest.approx(novos["previsao"])
-    assert novos["colaborativo"] / novos["previsao"] == pytest.approx(0.15 / 0.25)
+    assert novos["precipitacao_atual"] == pytest.approx(PESOS["precipitacao_atual"] * 1.2)
+    # os outros dois mantêm a razão entre si
+    assert novos["colaborativo"] / novos["previsao"] == pytest.approx(
+        PESOS["colaborativo"] / PESOS["previsao"]
+    )
 
 
 def test_analise_nao_altera_os_pesos_do_modelo():

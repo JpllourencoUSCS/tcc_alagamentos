@@ -4,7 +4,7 @@ Wrapper fino sobre fusao_climatica (Semana 5 — Henrique, reconstruído em
 APIs externas (OpenWeather/ANA/INMET), pelo mesmo motivo de
 db/repository.py isolar o SQLAlchemy — fusao_climatica.obter_dados_consolidados
 faz requests HTTP de verdade, o que não pode rodar em teste automatizado sem
-rede e credenciais (ANA_IDENTIFICADOR/ANA_SENHA).
+rede e credenciais (OPENWEATHER_API_KEY).
 
 03/10/2026: passa a usar o cache de dados climáticos (~1 km / 10 min) e o
 agregador de reportes colaborativos (servicos/colaborativo.py) — até então o
@@ -86,10 +86,11 @@ class ClassificadorRiscoReal:
             "componentes": componentes,
             "precipitacao_atual_mm_h": dados.precipitacao_atual_mm_h,
             "pico_previsto_mm_3h": dados.pico_previsto_mm_3h,
-            "pluviometro_local_mm_h": dados.pluviometro_local_mm_h,
             "reportes_colaborativos": colaborativo.quantidade_reportes if colaborativo else 0,
             "previsao_inmet": dados.previsao_inmet,
             "avisos_inmet": dados.avisos_inmet,
             "fontes": resultado["fontes"],
+            # Fusão OpenWeather × Open-Meteo de cada variável (16/10/2026)
+            "fusao": resultado["fusao"],
             "dados_em_cache": do_cache,
         }

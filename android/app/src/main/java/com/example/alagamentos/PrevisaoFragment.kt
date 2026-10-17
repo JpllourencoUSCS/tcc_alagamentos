@@ -99,18 +99,17 @@ class PrevisaoFragment : Fragment(R.layout.fragment_previsao) {
             }
         }
 
-        linha(view, R.id.info_chuva_agora, R.string.previsao_chuva_agora, R.string.previsao_info_chuva_agora,
+        linha(view, R.id.info_chuva_agora, R.string.previsao_chuva_agora,
+            textoFusao(R.string.previsao_info_chuva_agora, risco.fusao?.precipitacaoAtual, R.string.previsao_valor_mm_h),
             getString(R.string.previsao_valor_mm_h, numero(risco.precipitacaoAtualMmH)))
-        linha(view, R.id.info_pico_previsto, R.string.previsao_pico, R.string.previsao_info_pico,
+        linha(view, R.id.info_pico_previsto, R.string.previsao_pico,
+            textoFusao(R.string.previsao_info_pico, risco.fusao?.previsao, R.string.previsao_valor_mm_3h),
             getString(R.string.previsao_valor_mm_3h, numero(risco.picoPrevistoMm3h)))
-        linha(view, R.id.info_pluviometro, R.string.previsao_pluviometro, R.string.previsao_info_pluviometro,
-            risco.pluviometroLocalMmH?.let { getString(R.string.previsao_valor_mm_h, numero(it)) }
-                ?: getString(R.string.previsao_sem_dado))
-        linha(view, R.id.info_relatos, R.string.previsao_relatos, R.string.previsao_info_relatos,
+        linha(view, R.id.info_relatos, R.string.previsao_relatos, getString(R.string.previsao_info_relatos),
             if (risco.componentes.colaborativo != null)
                 getString(R.string.previsao_relatos_valor, risco.reportesColaborativos)
             else getString(R.string.previsao_relatos_poucos))
-        linha(view, R.id.info_inmet, R.string.previsao_inmet, R.string.previsao_info_inmet,
+        linha(view, R.id.info_inmet, R.string.previsao_inmet, getString(R.string.previsao_info_inmet),
             risco.previsaoInmet ?: getString(R.string.previsao_sem_dado))
         mostrarAvisos(view, risco.avisosInmet.orEmpty())
     }
@@ -164,15 +163,26 @@ class PrevisaoFragment : Fragment(R.layout.fragment_previsao) {
         view.findViewById<TextView>(R.id.txt_previsao_erro_descricao).text = descricao
     }
 
-    private fun linha(view: View, linhaId: Int, rotuloRes: Int, infoRes: Int, valor: String) {
+    private fun linha(view: View, linhaId: Int, rotuloRes: Int, info: String, valor: String) {
         val linha = view.findViewById<View>(linhaId)
         val rotulo = getString(rotuloRes)
         linha.findViewById<TextView>(R.id.txt_rotulo).text = rotulo
         linha.findViewById<TextView>(R.id.txt_valor).text = valor
         linha.findViewById<View>(R.id.btn_info).apply {
             contentDescription = getString(R.string.previsao_info_descricao, rotulo)
-            setOnClickListener { mostrarInfo(rotulo, getString(infoRes)) }
+            setOnClickListener { mostrarInfo(rotulo, info) }
         }
+    }
+
+    // Texto do cartão ⓘ de uma variável fundida: a explicação, o valor de cada fonte
+    // agora e, se for o caso, o aviso de que as duas divergem (16/10/2026)
+    private fun textoFusao(explicacaoRes: Int, medida: MedidaFundidaDto?, unidadeRes: Int): String {
+        val explicacao = getString(explicacaoRes)
+        if (medida == null) return explicacao
+        fun valor(v: Double?) = v?.let { getString(unidadeRes, numero(it)) } ?: getString(R.string.previsao_sem_resposta)
+        val valores = getString(R.string.previsao_fusao_valores, valor(medida.openweather), valor(medida.openMeteo))
+        val divergencia = if (medida.divergente) "\n" + getString(R.string.previsao_fusao_divergente) else ""
+        return "$explicacao\n\n$valores$divergencia"
     }
 
     // Cartão com a origem do dado (ou a explicação do cálculo), aberto pelo ícone ⓘ

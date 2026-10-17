@@ -16,7 +16,7 @@ from sqlalchemy import func, select
 
 from api.ocorrencias import get_classificador_risco
 from db.models import Ocorrencia, ReporteColaborativoAgregado
-from fusao_climatica import DadosClimaticosConsolidados, FonteClimaticaIndisponivel
+from fusao_climatica import DadosClimaticosConsolidados, FonteClimaticaIndisponivel, fundir
 from main import app
 from servicos.classificacao import ClassificadorRiscoReal
 
@@ -25,12 +25,17 @@ LAT, LON = -23.6229, -46.5548
 AVALIACAO_EXEMPLO = {
     "latitude": LAT, "longitude": LON, "classificacao": "Médio", "score_final": 42.0,
     "classificacao_indice": "Médio", "piso_aviso_inmet": None,
-    "componentes": {"precipitacao_atual": 50.0, "previsao": 30.0,
-                    "pluviometro_local": None, "colaborativo": None},
+    "componentes": {"precipitacao_atual": 50.0, "previsao": 30.0, "colaborativo": None},
     "precipitacao_atual_mm_h": 7.6, "pico_previsto_mm_3h": 9.0,
-    "pluviometro_local_mm_h": None, "reportes_colaborativos": 0,
+    "reportes_colaborativos": 0,
     "previsao_inmet": None, "avisos_inmet": [],
-    "fontes": {"precipitacao_atual": "OpenWeather", "previsao": "OpenWeather", "pluviometro_local": None},
+    "fontes": {"precipitacao_atual": "OpenWeather", "previsao": "Open-Meteo"},
+    "fusao": {
+        "precipitacao_atual": {"openweather": 7.6, "open_meteo": 2.0, "valor": 7.6,
+                               "fonte": "OpenWeather", "divergente": True},
+        "previsao": {"openweather": 6.0, "open_meteo": 9.0, "valor": 9.0,
+                     "fonte": "Open-Meteo", "divergente": True},
+    },
     "dados_em_cache": False,
 }
 
@@ -58,7 +63,9 @@ def test_risco_devolve_classificacao_e_componentes():
     assert resp.status_code == 200
     corpo = resp.json()
     assert corpo["classificacao"] == "Médio"
-    assert corpo["componentes"]["pluviometro_local"] is None
+    assert set(corpo["componentes"]) == {"precipitacao_atual", "previsao", "colaborativo"}
+    assert corpo["fusao"]["precipitacao_atual"]["divergente"] is True
+    assert corpo["fusao"]["previsao"]["fonte"] == "Open-Meteo"
     assert corpo["latitude"] == LAT
 
 
@@ -83,6 +90,8 @@ def test_risco_integrado_inclui_colaborativo_e_nao_grava_nada(db_session):
     chuva_moderada = DadosClimaticosConsolidados(
         lat=LAT, lon=LON, precipitacao_atual_mm_h=5.0, pico_previsto_mm_3h=12.0,
         fonte_precipitacao_atual="OpenWeather", fonte_previsao="OpenWeather",
+        fusao_precipitacao=fundir(5.0, 4.0, horas=1),
+        fusao_previsao=fundir(12.0, None, horas=3),
         previsao_inmet="Muitas nuvens com pancadas de chuva e trovoadas isoladas",
         avisos_inmet=[{"evento": "Tempestade", "severidade": "Perigo Potencial", "cor": "#FFFE00",
                        "inicio": "2026-10-06 08:52", "fim": "2026-10-06 23:59",
@@ -96,7 +105,8 @@ def test_risco_integrado_inclui_colaborativo_e_nao_grava_nada(db_session):
     corpo = resp.json()
     assert corpo["reportes_colaborativos"] == 2
     assert corpo["componentes"]["colaborativo"] == 80.0
-    assert corpo["componentes"]["pluviometro_local"] is None   # ANA sem credencial
+    assert "pluviometro_local" not in corpo["componentes"]   # ANA retirada em 16/10/2026
+    assert corpo["fusao"]["precipitacao_atual"]["open_meteo"] == 4.0
     assert corpo["previsao_inmet"].startswith("Muitas nuvens")
     assert corpo["avisos_inmet"][0]["severidade"] == "Perigo Potencial"
     assert corpo["dados_em_cache"] is True

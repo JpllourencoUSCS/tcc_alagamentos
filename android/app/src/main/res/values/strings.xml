@@ -70,7 +70,6 @@
     <string name="previsao_fontes_titulo">O QUE ENTROU NO CÁLCULO</string>
     <string name="previsao_chuva_agora">Chuva agora</string>
     <string name="previsao_pico">Pico nas próximas 24&#160;h</string>
-    <string name="previsao_pluviometro">Pluviômetro local</string>
     <string name="previsao_relatos">Relatos de usuários</string>
     <string name="previsao_inmet">Previsão INMET</string>
     <string name="previsao_avisos_titulo">AVISOS OFICIAIS DO INMET</string>
@@ -82,18 +81,20 @@
     <string name="previsao_relatos_valor">%1$d relato(s)</string>
     <string name="previsao_relatos_poucos">Poucos relatos</string>
     <string name="previsao_sem_dado">Sem dado</string>
-    <string name="previsao_explicacao" formatted="false">O risco combina chuva atual (35%), pluviômetro local (25%), previsão (25%) e relatos de usuários próximos (15%). Fontes sem dado no momento têm o peso redistribuído entre as demais. Avisos de chuva do INMET elevam a classificação: Perigo, no mínimo MÉDIO; Grande Perigo, ALTO. A previsão do INMET aparece só como referência.</string>
+    <string name="previsao_explicacao" formatted="false">O risco combina chuva atual (54%), previsão (30%) e relatos de usuários próximos (16%), com pesos definidos pelo método AHP. Chuva atual e previsão vêm do OpenWeather e da Open-Meteo; vale o maior valor das duas. Sem relatos suficientes, o peso deles passa para os demais. Avisos de chuva do INMET elevam a classificação: Perigo, no mínimo MÉDIO; Grande Perigo, ALTO. A previsão do INMET aparece só como referência.</string>
     <string name="previsao_atualizar">Atualizar</string>
     <!-- Cartões de informação (ícone ⓘ) da aba Previsão: de onde vem cada dado (07/10/2026) -->
     <string name="previsao_info_descricao">Sobre: %1$s</string>
     <string name="previsao_info_padrao">Sobre este dado</string>
     <string name="previsao_info_risco_titulo">Como o risco é calculado</string>
     <string name="previsao_info_risco_descricao">Como o risco é calculado</string>
-    <string name="previsao_info_chuva_agora" formatted="false">Chuva medida agora no seu local, informada pelo OpenWeather, serviço meteorológico internacional. É o critério de maior peso no cálculo do risco (35%).</string>
-    <string name="previsao_info_pico" formatted="false">Maior volume de chuva previsto para um intervalo de 3 horas nas próximas 24 horas, segundo a previsão do OpenWeather. Peso no cálculo do risco: 25%.</string>
-    <string name="previsao_info_pluviometro" formatted="false">Medição de pluviômetro da ANA (Agência Nacional de Águas e Saneamento Básico), da rede hidrometeorológica nacional. Peso no cálculo do risco: 25%. Enquanto o acesso aos dados da ANA não é liberado, aparece \"Sem dado\" e esse peso é redistribuído entre as demais fontes.</string>
-    <string name="previsao_info_relatos" formatted="false">Ocorrências registradas por usuários deste app num raio de 1 km nas últimas 3 horas. Só entram no cálculo a partir de 2 relatos, para que um registro isolado não altere o risco. Peso no cálculo do risco: 15%.</string>
+    <string name="previsao_info_chuva_agora" formatted="false">Chuva medida agora no seu local. Vem de duas fontes, OpenWeather e Open-Meteo, e o cálculo usa a maior das duas (critério conservador, adequado a um alerta). Peso no cálculo do risco: 54%.</string>
+    <string name="previsao_info_pico" formatted="false">Maior volume de chuva previsto para um intervalo de 3 horas nas próximas 24 horas, também pelo OpenWeather e pela Open-Meteo (vale a maior previsão). Peso no cálculo do risco: 30%.</string>
+    <string name="previsao_info_relatos" formatted="false">Ocorrências registradas por usuários deste app num raio de 1 km nas últimas 3 horas. Só entram no cálculo a partir de 2 relatos, para que um registro isolado não altere o risco; sem relatos suficientes, o peso deles passa para a chuva atual e a previsão. Peso no cálculo do risco: 16%.</string>
     <string name="previsao_info_inmet">Texto descritivo do INMET (Instituto Nacional de Meteorologia) para o período do dia. É apenas descritivo: não é utilizado no cálculo do risco.</string>
+    <string name="previsao_fusao_valores">Agora — OpenWeather: %1$s · Open-Meteo: %2$s</string>
+    <string name="previsao_fusao_divergente">As duas fontes estão em faixas diferentes de intensidade de chuva; o cálculo usa a maior.</string>
+    <string name="previsao_sem_resposta">sem resposta</string>
     <string name="entendi">Entendi</string>
     <string name="previsao_indisponivel_titulo">Dados climáticos indisponíveis</string>
     <string name="previsao_indisponivel_descricao">O servidor não conseguiu consultar as fontes de clima agora. Tente atualizar em alguns minutos.</string>
@@ -102,7 +103,6 @@
     <string name="ajustes_titulo">Ajustes</string>
     <string name="ajustes_receber_alertas">Receber alertas</string>
     <string name="ajustes_receber_alertas_desc">Notificações sobre ocorrências na sua região.</string>
-    <string name="ajustes_fontes">FONTES DE DADOS</string>
     <string name="ajustes_severidade_minima">NÍVEL DE RISCO MÍNIMO PARA NOTIFICAR</string>
     <string name="ajustes_sev_baixa">Todos (baixo, médio e alto)</string>
     <string name="ajustes_sev_moderada">Médio e alto</string>

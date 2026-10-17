@@ -32,7 +32,7 @@ geoespacial**. O servidor também consulta três serviços climáticos externos.
                                                            ▼                   ▼
                                             ┌──────────────────────┐  ┌────────────────────┐
                                             │ PostgreSQL 16        │  │ OpenWeather        │
-                                            │ + PostGIS 3.4        │  │ ANA (HidroWebService)│
+                                            │ + PostGIS 3.4        │  │ Open-Meteo         │
                                             │ índice GiST em geom  │  │ INMET (previsão e  │
                                             │                      │  │ avisos; até 03/10, │
                                             │                      │  │ CPTEC/INPE)        │
@@ -68,19 +68,21 @@ HTTP 503 com mensagem orientando o usuário a informar o nível manualmente.
   calcula o componente colaborativo e aplica o AHP.
 - `servicos/colaborativo.py` agrega os reportes de usuários vizinhos (1 km, últimas 3 h)
   num score de 0 a 100 (T15, seção 6.4).
-- `fusao_climatica.py` consulta OpenWeather (condição atual e previsão), ANA e INMET
-  (previsão textual e avisos oficiais; no lugar do CPTEC desde 06/10/2026) **em paralelo**,
+- `fusao_climatica.py` consulta OpenWeather (condição atual e previsão), Open-Meteo e INMET
+  (previsão textual e avisos oficiais; no lugar do CPTEC desde 06/10/2026) **em paralelo** e
+  funde as duas medidas de chuva atual e de previsão (vale a maior; divergência registrada),
   com timeout de 10 s por fonte, e guarda o resultado em **cache** por 10 minutos para cada
   célula de ~1 km — e, no caso do INMET, por município, já que a resposta é a mesma para
   qualquer ponto da cidade.
-- `algoritmo_risco.py` implementa o modelo AHP, incluindo a redistribuição de pesos quando
-  uma fonte está indisponível.
+- `algoritmo_risco.py` implementa o modelo AHP de três critérios (54/30/16), incluindo a
+  redistribuição do peso do colaborativo quando não há reportes suficientes.
 
 **Camada de dados.** O acesso ao banco passa por um repositório (`db/repository.py`) com
 interface definida (`OcorrenciaRepositoryProtocol`). As rotas não usam o SQLAlchemy
 diretamente, o que permite testá-las com uma implementação em memória. O modelo de dados
 (`db/schema.sql`, `db/models.py`) tem três tabelas: `ocorrencias` (reportes de usuários e
-leituras das fontes automáticas), `estacoes_referencia` (estações físicas da ANA) e
+leituras das fontes automáticas), `estacoes_referencia` (estações físicas de referência;
+reservada para a ANA, sem uso desde a retirada da fonte em 16/10/2026) e
 `reportes_colaborativos_agregado` (histórico dos scores colaborativos calculados). A
 coluna `geom` (ponto PostGIS, SRID 4326) é mantida por *trigger* a partir de latitude e
 longitude e indexada com GiST. O filtro de região usa o operador `&&` contra
@@ -113,7 +115,7 @@ registrar o score colaborativo, e alimenta a aba "Previsão" do aplicativo.
 
 O banco e a API são empacotados como contêineres (`docker-compose.yml` com os serviços
 `db` e `api`; `Dockerfile` na raiz do repositório). As credenciais (senha do banco, chave
-do OpenWeather, credenciais da ANA) vêm de variáveis de ambiente lidas de um arquivo `.env`
+do OpenWeather) vêm de variáveis de ambiente lidas de um arquivo `.env`
 fora do controle de versão. Durante o desenvolvimento, o ambiente roda num notebook da
 equipe e é compartilhado com os demais integrantes por VPN privada (Tailscale), sem expor
 o banco na internet. A mesma imagem da API pode ser implantada em qualquer serviço de
@@ -121,7 +123,7 @@ hospedagem de contêineres, mudando só as variáveis de ambiente.
 
 ### 3.W.5 Qualidade e testes
 
-O backend tem uma suíte automatizada (pytest) com 100 testes em 07/10/2026, em duas
+O backend tem uma suíte automatizada (pytest) com 114 testes em 16/10/2026, em duas
 categorias:
 - **Testes de contrato**, que substituem banco e fontes externas por implementações em
   memória e verificam rotas, validação e regras.
@@ -137,8 +139,9 @@ A metodologia completa está na seção de testes (`T16_secao_metodologia_testes
 | PostgreSQL + PostGIS | Tipos e índices espaciais nativos (GiST/R-tree), validados no benchmark (T16_secao_benchmark). |
 | FastAPI | Validação e documentação OpenAPI geradas a partir dos tipos, e bom desempenho para uma API de leitura intensiva. |
 | Repositório com interface | Rotas testáveis sem banco, e troca de implementação sem alterar as rotas. |
-| Fusão climática em paralelo + cache | O tempo do cadastro com risco automático fica limitado à fonte mais lenta, e não à soma das quatro (RNF-03 e RNF-05 em T19). |
-| Fail-safe por fonte | A indisponibilidade da ANA ou a falta de reportes colaborativos não derrubam a classificação nem subestimam o risco (T15, seção 6.3). |
+| Fusão climática em paralelo + cache | O tempo do cadastro com risco automático fica limitado à fonte mais lenta, e não à soma das cinco consultas (RNF-03 e RNF-05 em T19). |
+| Duas fontes numéricas com regra de fusão | Chuva atual e previsão medidas pelo OpenWeather e pela Open-Meteo: vale a maior (conservador), a divergência é registrada, e a falha de uma não derruba o cálculo. |
+| Fail-safe do colaborativo | A falta de reportes colaborativos não subestima o risco: o peso é redistribuído (T15, seção 6.3). |
 | Contêineres + variáveis de ambiente | Mesmo artefato em desenvolvimento e hospedagem, sem credenciais no repositório. |
 
 ---

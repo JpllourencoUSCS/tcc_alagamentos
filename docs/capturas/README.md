@@ -20,11 +20,11 @@ fictício.
 | `03_alertas_filtrados.png` | Aba Alertas filtrada: São Caetano do Sul, últimas 24 h, risco Alto |
 | `04_detalhes.png` | Detalhes de uma ocorrência |
 | `05_cadastro.png` | Registrar ocorrência: endereço buscado ("Rua Alegre, 100"), pino no mapa, endereço encontrado e nível escolhido |
-| `06_previsao_risco.png` | Aba Previsão: risco atual calculado pelo AHP com dados reais, aviso oficial do INMET vigente (Tempestade · Perigo Potencial, sem efeito na classe) e os dados usados no cálculo, cada um com o ícone ⓘ da origem |
-| `07_ajustes.png` | Aba Ajustes: preferências de alerta e perfil |
+| `06_previsao_risco.png` | Aba Previsão (modelo de três critérios, 16/10/2026): risco atual calculado pelo AHP com dados reais, aviso oficial do INMET vigente (Tempestade · Perigo Potencial, sem efeito na classe) e os dados usados no cálculo, cada um com o ícone ⓘ da origem |
+| `07_ajustes.png` | Aba Ajustes: preferências de alerta e perfil (sem o filtro de fontes, retirado em 16/10/2026) |
 | `08_mapa_selecionada.png` | Aba Mapa com uma ocorrência selecionada (painel com nível, fonte, data e "Ver detalhes") |
 | `09_perfil.png` | Perfil do usuário (dados ficam só no aparelho) |
-| `10_previsao_info_fonte.png` | Aba Previsão: cartão aberto pelo ícone ⓘ do pluviômetro local (origem do dado: ANA) |
+| `10_previsao_info_fonte.png` | Aba Previsão: cartão ⓘ da chuva atual — duas fontes (OpenWeather e Open-Meteo), regra de fusão, peso e o valor de cada fonte no momento |
 
 Para refazer (de `android/scripts/`, com os pré-requisitos do cabeçalho do script):
 `python roteiro_capturas.py ../../docs/capturas`.

@@ -82,12 +82,17 @@ precisa ser concluído até o **fim da semana de 12–16/10/2026** (antes, banca
   técnicas já fechadas". Revisão geral no mesmo dia: 6 defeitos do app e 5 inconsistências
   da documentação corrigidos (lista na nota de 07/10 do `docs/CRONOGRAMA_STATUS.md`).
   PT-001 v1.3: 28 casos (20 aprovados, 8 aguardando só a avaliação de usabilidade).
-  `README.md` da raiz reescrito (repositório público). Pendência registrada sem mudança: o
-  filtro "Fontes de dados" dos Ajustes lista fontes que hoje não criam ocorrências.
-- **Ajustes de escopo ainda aguardando decisão** (seção 4 da análise): retirar a ANA e a
-  estação da USCS; incluir a Open-Meteo como segunda fonte numérica com regra de fusão;
-  AHP com 3 critérios (pesos 54/30/16, que mudariam os pesos fechados abaixo); contar um
-  relato por usuário no colaborativo; registrar cada cálculo de risco.
+  `README.md` da raiz reescrito (repositório público).
+
+**16/10/2026 (Semana 16, último dia do prazo) — ajuste de escopo decidido pelo grupo e
+implementado:** ANA e estação da USCS **retiradas**; **Open-Meteo** como segunda fonte de
+chuva atual e previsão, com **regra de fusão** (maior valor; divergência registrada); **AHP
+com três critérios, 54/30/16** (autovetor, CR = 0,0079); filtro "Fontes de dados" retirado dos
+Ajustes. Não escolhidos (limitação/trabalho futuro): contar um relato por usuário e registrar
+cada cálculo. 114 testes no backend, PT-001 v1.4 (29 casos). **O documento teórico ainda não
+foi iniciado** — é o que resta para a entrega; resultados do formulário de usabilidade
+(Google Forms) aguardados do Marlon. Hospedagem no Supabase em aberto, para depois do
+documento. Detalhe em "Situação em 16/10/2026" no `docs/CRONOGRAMA_STATUS.md`.
 
 **03/09/2026:** descoberta de que o campus da USCS possui uma estação meteorológica
 própria. Time está investigando junto aos responsáveis a possibilidade de acesso aos
@@ -117,9 +122,12 @@ investigação (03/09/2026)".
     liga os endpoints à fusão climática + agregador colaborativo + algoritmo de risco;
     `colaborativo.py` agrega relatos de usuário — 1 km, 3 h, mínimo 2 — no score 0–100 do
     componente colaborativo e registra em `reportes_colaborativos_agregado`)
-  - `fusao_climatica.py` lê `OPENWEATHER_API_KEY`/`ANA_IDENTIFICADOR`/`ANA_SENHA` do ambiente;
-    falha do OpenWeather vira `FonteClimaticaIndisponivel` (a API responde 503); cache de
-    10 min por célula de 0,01° (`obter_dados_consolidados_em_cache`). Desde 06/10/2026
+  - `fusao_climatica.py` lê `OPENWEATHER_API_KEY` do ambiente. Desde 16/10/2026 consulta
+    também a **Open-Meteo** (sem chave) e funde as duas medidas de chuva atual e de previsão
+    (`fundir`: vale a maior; `divergente` quando caem em faixas diferentes da escala da OMM;
+    uma fonte → usa a disponível); só com as duas fora vira `FonteClimaticaIndisponivel` (a
+    API responde 503). A ANA saiu do código em 16/10/2026. Cache de 10 min por célula de
+    0,01° (`obter_dados_consolidados_em_cache`). Desde 06/10/2026
     consulta o INMET (`apiprevmet3`, código IBGE `3548807`, sem token, com User-Agent de
     navegador): previsão textual do turno atual e avisos oficiais do município, com cache
     de 10 min **por município** (as respostas pesam ~700 KB). Desde 07/10/2026 aplica o
@@ -148,7 +156,7 @@ investigação (03/09/2026)".
     depender do que já existe no banco (dados de demonstração ou de outra pessoa,
     no banco compartilhado por Tailscale): consultar só os dados que o próprio teste
     criou, por exemplo com um bbox pequeno em volta deles — até 03/10/2026 dois testes
-    assumiam o banco vazio e quebravam. 100 testes em 07/10/2026 (92 sem banco + 8 de
+    assumiam o banco vazio e quebravam. 114 testes em 16/10/2026 (106 sem banco + 8 de
     integração). Sem
     `DATABASE_URL` definida, os testes de integração são pulados (skip), não
     falham — mesmo critério do resto do projeto para "sem Postgres disponível".
@@ -163,7 +171,8 @@ investigação (03/09/2026)".
   filtros de região/período do backend; a aba Previsão usa `GET /risco` (risco AHP atual +
   fontes do cálculo + previsão e avisos oficiais do INMET; quando um aviso eleva a classe,
   a tela diz "Elevado de BAIXO para MÉDIO pelo aviso do INMET"; a origem de cada dado fica
-  em ícones ⓘ). O mapa mostra só as ocorrências ativas — últimas 24 h, esmaecidas depois de
+  em ícones ⓘ, e os de chuva atual e previsão mostram o valor de cada fonte da fusão). Os
+  Ajustes não têm mais filtro por fonte de dados (16/10/2026). O mapa mostra só as ocorrências ativas — últimas 24 h, esmaecidas depois de
   3 h — e a aba Alertas abre em "Últimas 24 h" (regra em `JanelaOcorrencia`, `Ocorrencia.kt`).
   O cadastro marca o local por endereço (`Geocodificacao.kt`, geocodificador do próprio
   Android, sem chave; busca com ", São Caetano do Sul - SP" no texto e, sem resultado, o
@@ -202,7 +211,7 @@ investigação (03/09/2026)".
   não reescrever com conteúdo diferente do que realmente aconteceu). `T16_secao_*.md`
   são rascunhos de seções do relatório final e devem ser mantidos sincronizados com as
   decisões técnicas atuais. Material de teste (13/09/2026): `plano_e_fluxo_de_testes_TCC.xlsx`
-  (plano PT-001 + casos de teste; versão 1.3 com 28 casos em 07/10/2026),
+  (plano PT-001 + casos de teste; versão 1.4 com 29 casos em 16/10/2026),
   `questionario_teste_usabilidade.md` e `tcle_teste_usabilidade.md` (ambos dizem
   explicitamente que as ocorrências do teste são de demonstração). Desde 03/10/2026:
   `T19_criterios_desempenho.md` (RNF de latência + medições), `T16_secao_arquitetura.md`,
@@ -320,10 +329,16 @@ Tailscale `tcc-alagamentos-joao`, Windows 11, Ryzen 5 5600G, 16 GB):
   reCAPTCHA v3; endpoint histórico alternativo testado e sem retorno de dados. Não confundir
   com a API de **previsão e avisos** do INMET (`apiprevmet3`), que está em uso desde
   06/10/2026 (ver CPTEC abaixo).
-- **ANA**: fonte ativa para o papel de "pluviômetro local" no modelo AHP. Exige
-  cadastro por e-mail (`hidro@ana.gov.br`) — aguardando resposta. Ver `teste_ana.py`.
-  Possível fonte alternativa/complementar em investigação desde 03/09/2026 (estação
-  meteorológica do campus da USCS) — ainda não decidido, ver `docs/T_arquitetura_fontes_dados_final.md`.
+- **ANA e estação da USCS: retiradas (decisão do grupo, 16/10/2026).** O cadastro na ANA
+  (`hidro@ana.gov.br`, pedido em agosto) nunca foi aprovado e a estação do campus não teve
+  resposta. O critério "pluviômetro local" saiu do modelo. Permanecem só como registro
+  (`testes-api/teste_ana.py`), no vocabulário de fonte (`ana`, usado pela massa do benchmark)
+  e na tabela `estacoes_referencia` (sem uso). Ver `docs/T_arquitetura_fontes_dados_final.md`,
+  "Ajuste de escopo de 16/10/2026".
+- **Open-Meteo e regra de fusão (decisão do grupo, 16/10/2026):** a Open-Meteo mede as mesmas
+  variáveis do OpenWeather; com as duas, vale o **maior** valor (conservador), e a
+  divergência (faixas diferentes da escala da OMM) é registrada sem mudar o valor; com uma,
+  vale a disponível; sem nenhuma, 503.
 - **CPTEC/INPE → substituído pelo INMET (`apiprevmet3`) em 06/10/2026.** O CPTEC era a
   validação cruzada qualitativa (previsão de 4 dias, fora do AHP); METAR já tinha sido
   descartado. A partir de 03/10/2026 todos os endpoints do CPTEC responderam 403 (a
@@ -344,10 +359,12 @@ Tailscale `tcc-alagamentos-joao`, Windows 11, Ryzen 5 5600G, 16 GB):
   e a faixa de alerta mostram só as ocorrências das **últimas 24 h** (mesma janela das
   notificações); as com mais de **3 h** aparecem esmaecidas (janela do componente
   colaborativo); nada é apagado do banco, o histórico fica na aba Alertas.
-- **Modelo AHP**: pesos fixos — precipitação atual 35%, pluviômetro local 25%,
-  previsão 25%, colaborativo 15%. Não alterar sem o usuário pedir explicitamente. A análise
-  de sensibilidade de 03/10/2026 (`backend/analise_sensibilidade.py`, T15 seção 8.1) só mede
-  o efeito de variar os pesos; não os altera. Os parâmetros da agregação colaborativa
+- **Modelo AHP**: pesos fixos — precipitação atual 54%, previsão 30%, colaborativo 16%
+  (desde 16/10/2026, a pedido do João: autovetor da matriz de três critérios com os mesmos
+  julgamentos de T15, CR = 0,0079, sem ajuste manual; até então 35/25/25/15 com o
+  pluviômetro da ANA). Não alterar sem o usuário pedir explicitamente. A análise de
+  sensibilidade (`backend/analise_sensibilidade.py`, T15 seções 8.1 e 8.2) só mede o efeito de
+  variar os pesos; não os altera. Os parâmetros da agregação colaborativa
   (1 km, 3 h, mínimo de 2 relatos, T15 seção 6.4) são escolhas de projeto do protótipo, não
   calibradas.
 

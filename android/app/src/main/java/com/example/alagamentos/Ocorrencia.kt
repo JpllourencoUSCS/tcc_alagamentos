@@ -17,7 +17,7 @@ enum class Severidade(val api: String, val rotulo: String) {
 enum class FonteDado(val api: String, val rotulo: String) {
     USUARIO("usuario", "Relato de usuário"),
     OPENWEATHER("openweather", "OpenWeather"),
-    ANA("ana", "ANA"),
+    ANA("ana", "ANA"), // legado: a ANA saiu do projeto em 16/10/2026 (só a massa do benchmark usa)
     INMET("inmet", "INMET"); // até 07/10/2026: CPTEC("cptec", "CPTEC/INPE")
 
     companion object {

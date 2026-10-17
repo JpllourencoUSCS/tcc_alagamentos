@@ -50,6 +50,9 @@ intensidade de precipitação]
 
 ## Documentação técnica e fontes de dados
 
+OPEN-METEO. **Weather Forecast API**: documentação. [S. l.]: Open-Meteo, 2026. Disponível em:
+https://open-meteo.com/en/docs. Acesso em: 16 out. 2026.
+
 AGÊNCIA NACIONAL DE ÁGUAS E SANEAMENTO BÁSICO (ANA). **HidroWebService**: manual técnico
 de acesso aos dados das estações telemétricas. Versão 20.02.2026. Brasília: ANA, 2026.
 [confirmar título exato e URL do manual]

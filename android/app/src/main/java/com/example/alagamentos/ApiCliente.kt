@@ -113,11 +113,26 @@ data class RiscoDto(
     @SerializedName("componentes") val componentes: ComponentesRiscoDto,
     @SerializedName("precipitacao_atual_mm_h") val precipitacaoAtualMmH: Double,
     @SerializedName("pico_previsto_mm_3h") val picoPrevistoMm3h: Double,
-    @SerializedName("pluviometro_local_mm_h") val pluviometroLocalMmH: Double?,
     @SerializedName("reportes_colaborativos") val reportesColaborativos: Int,
     // Validação qualitativa do INMET (no lugar do CPTEC desde 06/10/2026); fora do AHP
     @SerializedName("previsao_inmet") val previsaoInmet: String?,
-    @SerializedName("avisos_inmet") val avisosInmet: List<AvisoInmetDto>?
+    @SerializedName("avisos_inmet") val avisosInmet: List<AvisoInmetDto>?,
+    // Fusão OpenWeather x Open-Meteo de cada variável (16/10/2026)
+    @SerializedName("fusao") val fusao: FusaoDto?
+)
+
+data class FusaoDto(
+    @SerializedName("precipitacao_atual") val precipitacaoAtual: MedidaFundidaDto?,
+    @SerializedName("previsao") val previsao: MedidaFundidaDto?
+)
+
+// Valor de cada fonte (null = sem resposta), valor usado (o maior) e divergência
+data class MedidaFundidaDto(
+    @SerializedName("openweather") val openweather: Double?,
+    @SerializedName("open_meteo") val openMeteo: Double?,
+    @SerializedName("valor") val valor: Double,
+    @SerializedName("fonte") val fonte: String?,
+    @SerializedName("divergente") val divergente: Boolean
 )
 
 // Aviso do INMET que elevou a classificação acima da classe do índice
@@ -140,7 +155,6 @@ data class AvisoInmetDto(
 data class ComponentesRiscoDto(
     @SerializedName("precipitacao_atual") val precipitacaoAtual: Double?,
     @SerializedName("previsao") val previsao: Double?,
-    @SerializedName("pluviometro_local") val pluviometroLocal: Double?,
     @SerializedName("colaborativo") val colaborativo: Double?
 )
 

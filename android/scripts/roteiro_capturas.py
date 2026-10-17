@@ -84,7 +84,7 @@ def main(destino: Path) -> None:
 
     a.tocar("nav_previsao", espera=1)
     foto("06_previsao_risco", espera=5)  # risco, avisos do INMET e fontes do cálculo
-    a.tocar(texto="Sobre: Pluviômetro local", espera=1)  # cartão ⓘ com a origem do dado
+    a.tocar(texto="Sobre: Chuva agora", espera=1)  # cartão ⓘ: fontes, regra de fusão e valores
     foto("10_previsao_info_fonte", espera=1)
     a.tocar(texto="Entendi", espera=1)
 

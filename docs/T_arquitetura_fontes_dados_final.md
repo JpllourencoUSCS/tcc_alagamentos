@@ -2,9 +2,20 @@
 
 *Responsável: João | Semanas 2–3 do cronograma | Consolidado em 05/08/2026 | Atualizado em
 03/10/2026 (agregação colaborativa, integração atual e situação das fontes) e em 07/10/2026
-(CPTEC substituído pelo INMET `apiprevmet3`; avisos oficiais como piso da classificação)*
+(CPTEC substituído pelo INMET `apiprevmet3`; avisos oficiais como piso da classificação) e em
+16/10/2026 (ANA e estação da USCS retiradas; Open-Meteo e regra de fusão; AHP com três critérios)*
 
-## Decisão
+## Decisão vigente (16/10/2026) — resumo
+
+**Decisão do grupo, 16/10/2026:** a **ANA** e a **estação meteorológica da USCS** saem do
+projeto (o cadastro na ANA, pedido em agosto, nunca foi aprovado; a estação da USCS não teve
+resposta nem interface programática confirmada). Entra a **Open-Meteo** como segunda fonte
+das mesmas variáveis do OpenWeather, com uma regra de fusão explícita, e o modelo AHP passa a
+ter três critérios (54/30/16 — autovetor da matriz com os mesmos julgamentos, CR = 0,0079).
+Detalhe na seção "Ajuste de escopo de 16/10/2026", no fim deste documento. As seções abaixo
+registram como cada decisão foi tomada na época.
+
+## Decisão (05/08/2026)
 
 O **CEMADEN** foi descartado como fonte de dados do projeto. O acesso à sua API (PED)
 depende de um fluxo de autenticação em duas etapas — cadastro de e-mail junto ao órgão e
@@ -37,8 +48,9 @@ as credenciais chegarem.
 
 | Fonte | Papel no sistema | Autenticação | Tipo de dado |
 |---|---|---|---|
-| **OpenWeather** | Precipitação atual (principal) + previsão principal | Chave de API (gratuita) | Modelo/estimativa |
-| **ANA** | Pluviômetro local — papel que era do CEMADEN no AHP | E-mail de cadastro + token OAuth (60 min) | Estação física (rede hidrometeorológica nacional) |
+| **OpenWeather** | Precipitação atual + previsão, fundidas com a Open-Meteo (desde 16/10/2026) | Chave de API (gratuita) | Modelo/estimativa |
+| **Open-Meteo** | Desde 16/10/2026: segunda medida de precipitação atual + previsão (fusão: vale a maior) | Sem chave | Modelo |
+| **ANA** | Pluviômetro local — papel que era do CEMADEN no AHP (**retirada em 16/10/2026**: cadastro nunca aprovado) | E-mail de cadastro + token OAuth (60 min) | Estação física (rede hidrometeorológica nacional) |
 | **CPTEC/INPE** | Previsão municipal (4 dias) — validação cruzada qualitativa da previsão (**até 03/10/2026**; substituído pelo INMET, ver seção "Substituição do CPTEC pelo INMET") | Sem token | Modelo |
 | **INMET (`apiprevmet3`)** | Desde 06/10/2026: previsão textual por município (validação qualitativa) + avisos meteorológicos oficiais (piso da classificação) | Sem token (User-Agent de navegador) | Previsão oficial / alerta oficial |
 
@@ -199,3 +211,36 @@ a ANA, ou inviável).
    de dado físico e previsão redundante, respectivamente. Inclui também seções novas com os
    resultados de teste da ANA (estrutural, pendente de credencial) e do CPTEC (funcional de
    ponta a ponta).
+
+## Ajuste de escopo de 16/10/2026 — ANA e estação da USCS retiradas, Open-Meteo e fusão
+
+**Decisão do grupo (16/10/2026), com o aval do orientador para ajustar o escopo documentando o
+motivo:**
+
+- **ANA retirada.** O cadastro foi pedido em agosto (`hidro@ana.gov.br`) e nunca aprovado. O
+  critério "pluviômetro local" nunca teve dado real: o fail-safe redistribuía sempre o seu
+  peso. O código de integração saiu do backend (`fusao_climatica.py`); `testes-api/teste_ana.py`
+  fica como registro. O valor `ana` continua no vocabulário de fonte das ocorrências e a tabela
+  `estacoes_referencia` continua no esquema, sem uso (a massa sintética do benchmark usa `ana`).
+- **Estação da USCS retirada.** Sem resposta dos responsáveis desde 03/09 e sem interface
+  programática confirmada. Trabalho futuro.
+- **Open-Meteo incluída** (`api.open-meteo.com/v1/forecast`, sem chave): chuva atual (acumulado
+  dos últimos 15 min, convertido para mm/h) e previsão horária (maior acumulado em bloco de 3 h
+  nas próximas 24 h, como o OpenWeather). Testada ao vivo para São Caetano do Sul em 06/10 e
+  16/10/2026.
+- **Regra de fusão** (`fusao_climatica.fundir`), para a chuva atual e para a previsão: com as
+  duas fontes, vale o **maior** valor (conservador, adequado a alerta); há **divergência**
+  quando as leituras caem em faixas diferentes da escala da OMM (registrada na resposta da API
+  e mostrada no app, sem mudar o valor); com uma fonte, vale a disponível; sem nenhuma, não há
+  cálculo automático (HTTP 503). Até esta data, a falha do OpenWeather sozinho já dava 503.
+- **AHP com três critérios** (precipitação atual 54%, previsão 30%, colaborativo 16%):
+  autovetor da matriz de comparação com os mesmos julgamentos registrados em T15 (sem a linha e
+  a coluna do pluviômetro), usado sem ajuste manual; CR = 0,0079. Detalhe em T15, seção 8.2.
+
+**Arquitetura de fontes resultante:** OpenWeather + Open-Meteo (chuva atual e previsão, fundidas)
+→ AHP; INMET (previsão textual, referência; avisos oficiais, piso da classe); relatos de usuários
+(critério colaborativo). A previsão textual do INMET continua fora do cálculo.
+
+**Riscos:** Open-Meteo e OpenWeather são modelos meteorológicos — o sistema não tem medição de
+chuva em solo. A Open-Meteo é gratuita para uso não comercial, com limite diário de requisições
+generoso para o protótipo (o cache de 10 min por célula reduz as chamadas).

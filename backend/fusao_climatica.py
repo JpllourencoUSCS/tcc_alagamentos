@@ -30,8 +30,19 @@ cruzada qualitativa — fora do AHP — entra a API de previsão por município 
 município. É outro serviço do INMET, diferente do descartado em agosto (o dado de
 estação em tempo real da apitempo, protegido por reCAPTCHA). Levantamento em
 `testes-api/teste_inmet_apiprevmet3.py`.
+
+Atualização de 16/10/2026 — ANA retirada, Open-Meteo e regra de fusão (decisão do grupo):
+a ANA nunca liberou a credencial (pedida em agosto) e a estação da USCS não teve resposta;
+as duas saíram do projeto. No lugar, a Open-Meteo (gratuita, sem chave) mede as MESMAS
+variáveis que o OpenWeather — chuva atual e previsão —, o que permite uma regra de fusão de
+verdade (`fundir`): com as duas fontes, vale o MAIOR valor (critério conservador, adequado
+a alerta) e a divergência é registrada quando elas caem em faixas diferentes da escala de
+intensidade da OMM; com uma só, vale a disponível; sem nenhuma, o risco não é calculado
+(FonteClimaticaIndisponivel -> HTTP 503). Até aqui, a falha do OpenWeather sozinho já dava
+503; agora a Open-Meteo cobre essa falha.
 """
 
+import logging
 import os
 import threading
 import time
@@ -40,24 +51,23 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta, timezone
 from dataclasses import dataclass, field
 
-from algoritmo_risco import EntradaRisco, calcular_risco
+from algoritmo_risco import EntradaRisco, calcular_risco, faixa_intensidade
 
 
-# Lida do ambiente (03/10/2026), como as credenciais da ANA logo abaixo — até
+# Lida do ambiente (03/10/2026) — até
 # então era o texto fixo "sua_chave_aqui", e todo POST /ocorrencias sem
 # nivel_risco falhava contra a API real com 401 do OpenWeather.
 OPENWEATHER_API_KEY = os.environ.get("OPENWEATHER_API_KEY", "")
 
 
 class FonteClimaticaIndisponivel(RuntimeError):
-    """OpenWeather (fonte principal, sem fail-safe) não respondeu ou não está
-    configurado — o risco não pode ser calculado automaticamente."""
+    """Nenhuma fonte meteorológica numérica (OpenWeather ou Open-Meteo) respondeu
+    para a chuva atual ou para a previsão — o risco não pode ser calculado
+    automaticamente."""
 
-ANA_BASE_URL = "https://www.ana.gov.br/hidrowebservice/EstacoesTelemetricas"
-ANA_IDENTIFICADOR = os.environ.get("ANA_IDENTIFICADOR")  # CPF/CNPJ cadastrado junto à ANA
-ANA_SENHA = os.environ.get("ANA_SENHA")
-ANA_CODIGO_ESTACAO_SANTO_ANDRE = "21477000"
-_ana_token_cache = {"token": None, "obtido_em": None}
+
+OPEN_METEO_URL = "https://api.open-meteo.com/v1/forecast"
+_log = logging.getLogger(__name__)
 
 INMET_BASE_URL = "https://apiprevmet3.inmet.gov.br"
 INMET_CODIGO_IBGE_SCS = "3548807"  # São Caetano do Sul/SP (código IBGE de 7 dígitos)
@@ -81,12 +91,14 @@ FUSO_BRASILIA = timezone(timedelta(hours=-3))
 class DadosClimaticosConsolidados:
     lat: float
     lon: float
+    # Valores já fundidos (maior entre OpenWeather e Open-Meteo) — o que entra no AHP
     precipitacao_atual_mm_h: float
     pico_previsto_mm_3h: float
     fonte_precipitacao_atual: str
     fonte_previsao: str
-    pluviometro_local_mm_h: float | None = None
-    fonte_pluviometro_local: str | None = None
+    # Detalhe da fusão de cada variável: valor de cada fonte, valor usado, divergência
+    fusao_precipitacao: dict = field(default_factory=dict)
+    fusao_previsao: dict = field(default_factory=dict)
     # Validação cruzada qualitativa — não entra no AHP (06/10/2026: INMET no lugar do CPTEC)
     previsao_inmet: str | None = None  # ex.: "Muitas nuvens com pancadas de chuva isoladas"
     avisos_inmet: list[dict] = field(default_factory=list)  # avisos oficiais ativos para o município
@@ -129,61 +141,80 @@ def _pico_precipitacao_3h(previsao_json: dict) -> float:
     return max(picos) if picos else 0.0
 
 
-# ---------- ANA ----------
+# ---------- Open-Meteo (16/10/2026) ----------
 
-def _obter_token_ana() -> str | None:
-    """Gera (ou reaproveita, se ainda válido) o token da ANA. Token expira em
-    60 minutos. Retorna None se as credenciais não estiverem configuradas ou
-    se a autenticação falhar (fail-safe)."""
-    if not (ANA_IDENTIFICADOR and ANA_SENHA):
-        return None
-
-    agora = datetime.now(timezone.utc)  # utcnow() é obsoleto desde o Python 3.12
-    if _ana_token_cache["token"] and _ana_token_cache["obtido_em"]:
-        if agora - _ana_token_cache["obtido_em"] < timedelta(minutes=55):
-            return _ana_token_cache["token"]
-
+def _buscar_open_meteo(lat: float, lon: float) -> dict | None:
+    """Chuva atual e previsão horária da Open-Meteo (sem chave). None em caso de
+    falha (fail-safe: a fusão segue com o OpenWeather)."""
     try:
         resp = requests.get(
-            f"{ANA_BASE_URL}/OAUth/v1",
-            headers={"Identificador": ANA_IDENTIFICADOR, "Senha": ANA_SENHA},
-            timeout=10,
-        )
-        resp.raise_for_status()
-        token = resp.json().get("items", {}).get("tokenautenticacao")
-        if token:
-            _ana_token_cache["token"] = token
-            _ana_token_cache["obtido_em"] = agora
-        return token
-    except (requests.exceptions.RequestException, ValueError, KeyError):
-        return None
-
-
-def _buscar_ana(codigo_estacao: str = ANA_CODIGO_ESTACAO_SANTO_ANDRE) -> float | None:
-    """Precipitação da leitura mais recente da estação telemétrica da ANA
-    (campo Chuva_Adotada, em mm). Retorna None em caso de falha (fail-safe:
-    nunca derruba a fusão por causa de uma fonte indisponível)."""
-    token = _obter_token_ana()
-    if not token:
-        return None
-    try:
-        resp = requests.get(
-            f"{ANA_BASE_URL}/HidroinfoanaSerieTelemetricaAdotada/v1",
+            OPEN_METEO_URL,
             params={
-                "CodigoDaEstacao": codigo_estacao,
-                "TipoFiltroData": "DATA_LEITURA",
-                "RangeIntervaloDeBusca": "DIAS_1",
+                "latitude": lat,
+                "longitude": lon,
+                "current": "precipitation",
+                "hourly": "precipitation",
+                "timezone": "America/Sao_Paulo",
+                "forecast_days": 2,
             },
-            headers={"Authorization": f"Bearer {token}"},
             timeout=10,
         )
         resp.raise_for_status()
-        items = resp.json().get("items", [])
-        if items:
-            return float(items[-1].get("Chuva_Adotada", 0) or 0)
+        return resp.json()
+    except (requests.exceptions.RequestException, ValueError):
         return None
-    except (requests.exceptions.RequestException, ValueError, TypeError, KeyError):
+
+
+def precipitacao_atual_open_meteo(dados: dict | None) -> float | None:
+    """Pura — chuva atual em mm/h. A Open-Meteo informa o acumulado do último intervalo
+    do modelo (`current.interval`, 900 s = 15 min); convertido para mm/h para ficar na
+    mesma unidade do OpenWeather (rain.1h)."""
+    atual = (dados or {}).get("current") or {}
+    valor = atual.get("precipitation")
+    if valor is None:
         return None
+    intervalo = atual.get("interval") or 3600
+    return float(valor) * 3600 / intervalo
+
+
+def pico_3h_open_meteo(dados: dict | None) -> float | None:
+    """Pura — maior acumulado de 3 h nas próximas 24 h, em blocos de 3 horas a partir da
+    hora em curso (o mesmo formato da previsão do OpenWeather: 8 blocos de 3 h). Cada
+    valor horário da Open-Meteo é o acumulado da hora que termina naquele horário."""
+    horario = (dados or {}).get("hourly") or {}
+    tempos, valores = horario.get("time") or [], horario.get("precipitation") or []
+    agora = ((dados or {}).get("current") or {}).get("time") or ""
+    inicio = next((i for i, t in enumerate(tempos) if t > agora), len(tempos))
+    proximas = [v or 0.0 for v in valores[inicio:inicio + 24]]
+    if not proximas:
+        return None
+    return max(sum(proximas[i:i + 3]) for i in range(0, len(proximas), 3))
+
+
+# ---------- Regra de fusão (16/10/2026) ----------
+
+def fundir(openweather: float | None, open_meteo: float | None, horas: int = 1) -> dict | None:
+    """Pura — funde duas medidas da mesma variável (chuva atual em mm/h, horas=1; ou
+    acumulado previsto de 3 h, horas=3). Com as duas, vale o MAIOR valor (critério
+    conservador, adequado a um sistema de alerta) e há divergência quando elas caem em
+    faixas diferentes da escala de intensidade da OMM (a mesma do índice). Com uma, vale
+    a disponível. Sem nenhuma, None."""
+    medidas = {"OpenWeather": openweather, "Open-Meteo": open_meteo}
+    disponiveis = {fonte: v for fonte, v in medidas.items() if v is not None}
+    if not disponiveis:
+        return None
+    valor = max(disponiveis.values())
+    fontes = [fonte for fonte, v in disponiveis.items() if v == valor]
+    divergente = len(disponiveis) == 2 and (
+        faixa_intensidade(openweather / horas) != faixa_intensidade(open_meteo / horas)
+    )
+    return {
+        "openweather": openweather,
+        "open_meteo": open_meteo,
+        "valor": valor,
+        "fonte": " e ".join(fontes),
+        "divergente": divergente,
+    }
 
 
 # ---------- INMET (apiprevmet3) — no lugar do CPTEC desde 06/10/2026 ----------
@@ -361,58 +392,69 @@ def _buscar_inmet_avisos(codigo_ibge: str | None, agora: float | None = None) ->
 
 # ---------- Consolidação ----------
 
+def _openweather_ou_none(futuro, nome: str):
+    """Resultado de uma chamada ao OpenWeather, ou None se ela falhou (sem chave,
+    timeout, 401...). A falha só derruba o cálculo se a Open-Meteo também faltar."""
+    try:
+        return futuro.result()
+    except Exception as erro:  # noqa: BLE001 — qualquer falha vira "fonte ausente"
+        _log.warning("OpenWeather (%s) indisponível: %s", nome, erro)
+        return None
+
+
 def obter_dados_consolidados(
     lat: float,
     lon: float,
-    codigo_estacao_ana: str = ANA_CODIGO_ESTACAO_SANTO_ANDRE,
     codigo_ibge_inmet: str | None = INMET_CODIGO_IBGE_SCS,
 ) -> DadosClimaticosConsolidados:
     # As chamadas são independentes entre si (nenhuma usa o resultado da
     # outra) — rodar em paralelo em vez de sequencial evita que o pior caso
     # (uma fonte lenta ou fora do ar) some até a soma dos timeouts de 10s
-    # (mais o da autenticação da ANA) no tempo de resposta ao usuário; em
+    # (na época, mais o da autenticação da ANA) no tempo de resposta ao usuário; em
     # paralelo, o tempo total fica limitado ao ramo mais lento, não à soma de
     # todos (achado de revisão de latência, 03/09/2026 — ver
-    # docs/CRONOGRAMA_STATUS.md). O comportamento de fail-safe de cada fonte
-    # (ANA/INMET devolvem None em erro; OpenWeather propaga a exceção) não
-    # muda — só o agendamento das chamadas.
+    # docs/CRONOGRAMA_STATUS.md). Cada fonte tem fail-safe próprio; desde
+    # 16/10/2026 nenhuma derruba sozinha o cálculo (ver `fundir`).
     with ThreadPoolExecutor(max_workers=5) as executor:
         futuro_atual = executor.submit(_buscar_openweather_atual, lat, lon)
         futuro_previsao = executor.submit(_buscar_openweather_previsao, lat, lon)
-        futuro_ana = executor.submit(_buscar_ana, codigo_estacao_ana)
+        futuro_open_meteo = executor.submit(_buscar_open_meteo, lat, lon)
         futuro_inmet_previsao = executor.submit(_buscar_inmet_previsao, codigo_ibge_inmet)
         futuro_inmet_avisos = executor.submit(_buscar_inmet_avisos, codigo_ibge_inmet)
 
-        try:
-            atual = futuro_atual.result()
-            previsao = futuro_previsao.result()
-        except FonteClimaticaIndisponivel:
-            raise
-        except Exception as erro:
-            # Timeout, 401 (chave inválida), erro de rede... tudo vira um único
-            # tipo de erro, que a API traduz em 503 com mensagem clara em vez
-            # de um 500 genérico (03/10/2026).
-            raise FonteClimaticaIndisponivel(f"OpenWeather indisponível: {erro}") from erro
-        pluviometro_local = futuro_ana.result()
+        atual = _openweather_ou_none(futuro_atual, "condição atual")
+        previsao = _openweather_ou_none(futuro_previsao, "previsão")
+        open_meteo = futuro_open_meteo.result()
         previsao_inmet = futuro_inmet_previsao.result()
         avisos_inmet = futuro_inmet_avisos.result()
 
-    precipitacao_atual = atual.get("rain", {}).get("1h", 0.0)
-    fonte_precip_atual = "OpenWeather"
-
-    pico_previsto = _pico_precipitacao_3h(previsao)
-
-    fonte_local = "ANA" if pluviometro_local is not None else None
+    fusao_precip = fundir(
+        atual.get("rain", {}).get("1h", 0.0) if atual is not None else None,
+        precipitacao_atual_open_meteo(open_meteo),
+        horas=1,
+    )
+    fusao_prev = fundir(
+        _pico_precipitacao_3h(previsao) if previsao is not None else None,
+        pico_3h_open_meteo(open_meteo),
+        horas=3,
+    )
+    if fusao_precip is None or fusao_prev is None:
+        # Nenhuma fonte para uma das variáveis: a API traduz em 503 com mensagem
+        # clara, em vez de um 500 genérico ou de um risco calculado pela metade.
+        faltando = "chuva atual" if fusao_precip is None else "previsão"
+        raise FonteClimaticaIndisponivel(
+            f"OpenWeather e Open-Meteo indisponíveis para a {faltando}."
+        )
 
     return DadosClimaticosConsolidados(
         lat=lat,
         lon=lon,
-        precipitacao_atual_mm_h=precipitacao_atual,
-        pico_previsto_mm_3h=pico_previsto,
-        fonte_precipitacao_atual=fonte_precip_atual,
-        fonte_previsao="OpenWeather",
-        pluviometro_local_mm_h=pluviometro_local,
-        fonte_pluviometro_local=fonte_local,
+        precipitacao_atual_mm_h=fusao_precip["valor"],
+        pico_previsto_mm_3h=fusao_prev["valor"],
+        fonte_precipitacao_atual=fusao_precip["fonte"],
+        fonte_previsao=fusao_prev["fonte"],
+        fusao_precipitacao=fusao_precip,
+        fusao_previsao=fusao_prev,
         previsao_inmet=previsao_inmet,
         avisos_inmet=avisos_inmet or [],
     )
@@ -423,8 +465,8 @@ def obter_dados_consolidados(
 # OpenWeather atualiza a condição atual a cada ~10 min; buscar de novo antes
 # disso só repete o mesmo dado pagando 5 chamadas externas (latência de
 # segundos no POST). A chave arredonda lat/lon em 2 casas (~1,1 km), escala
-# compatível com a resolução das fontes (OpenWeather é por grade, ANA/INMET
-# por estação/município) — dois reportes no mesmo bairro em poucos minutos
+# compatível com a resolução das fontes (OpenWeather e Open-Meteo são por grade,
+# o INMET por município) — dois reportes no mesmo bairro em poucos minutos
 # reaproveitam a mesma consulta. Era um dos itens "ainda em aberto" do achado
 # de latência de 03/09/2026 (ver docs/CRONOGRAMA_STATUS.md).
 CACHE_TTL_S = 600
@@ -494,7 +536,6 @@ def classificar_risco(
     entrada = EntradaRisco(
         precipitacao_atual_mm_h=dados.precipitacao_atual_mm_h,
         pico_previsto_mm_3h=dados.pico_previsto_mm_3h,
-        pluviometro_local_mm_h=dados.pluviometro_local_mm_h,
         reportes_colaborativos_score=reportes_colaborativos_score,
     )
     resultado = calcular_risco(entrada)
@@ -507,7 +548,10 @@ def classificar_risco(
     resultado["fontes"] = {
         "precipitacao_atual": dados.fonte_precipitacao_atual,
         "previsao": dados.fonte_previsao,
-        "pluviometro_local": dados.fonte_pluviometro_local,
+    }
+    resultado["fusao"] = {
+        "precipitacao_atual": dados.fusao_precipitacao,
+        "previsao": dados.fusao_previsao,
     }
     return resultado
 
@@ -516,13 +560,12 @@ def obter_classificacao_risco(
     lat: float,
     lon: float,
     reportes_colaborativos_score: float | None = None,
-    codigo_estacao_ana: str = ANA_CODIGO_ESTACAO_SANTO_ANDRE,
     codigo_ibge_inmet: str | None = INMET_CODIGO_IBGE_SCS,
 ) -> dict:
     """Ponto de entrada único do backend: busca dados de todas as fontes para
     uma coordenada e devolve a classificação de risco já pronta. Encadeia
     obter_dados_consolidados() + classificar_risco()."""
-    dados = obter_dados_consolidados(lat, lon, codigo_estacao_ana, codigo_ibge_inmet)
+    dados = obter_dados_consolidados(lat, lon, codigo_ibge_inmet)
     return classificar_risco(dados, reportes_colaborativos_score)
 
 
@@ -537,15 +580,18 @@ if __name__ == "__main__":
     with open("testes-api/openweather_previsao.json", encoding="utf-8") as f:
         previsao = json.load(f)
 
+    # Só o OpenWeather neste exemplo offline (sem rede para a Open-Meteo)
+    fusao_precip = fundir(atual.get("rain", {}).get("1h", 0.0), None, horas=1)
+    fusao_prev = fundir(_pico_precipitacao_3h(previsao), None, horas=3)
     dados = DadosClimaticosConsolidados(
         lat=atual["coord"]["lat"],
         lon=atual["coord"]["lon"],
-        precipitacao_atual_mm_h=atual.get("rain", {}).get("1h", 0.0),
-        pico_previsto_mm_3h=_pico_precipitacao_3h(previsao),
-        fonte_precipitacao_atual="OpenWeather",
-        fonte_previsao="OpenWeather",
-        # ANA indisponível neste exemplo offline (sem credenciais/rede) -
-        # simula exatamente o cenário de fail-safe descrito na Semana 6.
+        precipitacao_atual_mm_h=fusao_precip["valor"],
+        pico_previsto_mm_3h=fusao_prev["valor"],
+        fonte_precipitacao_atual=fusao_precip["fonte"],
+        fonte_previsao=fusao_prev["fonte"],
+        fusao_precipitacao=fusao_precip,
+        fusao_previsao=fusao_prev,
     )
     print("=== DADOS CONSOLIDADOS (a partir dos JSONs já coletados) ===")
     print(dados)
