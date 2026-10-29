@@ -112,8 +112,8 @@ cadastro sempre visível e endereço aproximado nos detalhes. PT-001 v1.5 (29/29
 refeitas com o perfil "João Pedro". Documento:
 `docs/Documento Teórico/TCC_Alagamentos_Versao2_2026-10-29.docx` (67 páginas), feita sobre a
 versão enviada ao orientador (`TCC_Alagamentos_Rascunho_2026-10-17.docx`, com as edições do
-grupo); faltam ficha catalográfica, número de folhas e data da banca, e conferir no navegador
-os números do IBGE. Detalhe em "Situação em 29/10/2026" no `docs/CRONOGRAMA_STATUS.md`.
+grupo); faltam ficha catalográfica, número de folhas e data da banca (números do IBGE conferidos
+pelo João: 165.655 habitantes no Censo 2022, 15,4 km² de área territorial). Detalhe em "Situação em 29/10/2026" no `docs/CRONOGRAMA_STATUS.md`.
 
 **03/09/2026:** descoberta de que o campus da USCS possui uma estação meteorológica
 própria. Time está investigando junto aos responsáveis a possibilidade de acesso aos

@@ -46,8 +46,7 @@ validação própria do time de integração.
    usabilidade, as melhorias, as edições do grupo na versão enviada ao orientador, IBGE,
    correlatos e as referências do INMET. Restam marcados em amarelo: ficha catalográfica,
    número de folhas e data da banca.
-6. **Ainda pendentes:** retorno do orientador sobre a versão 2, conferir no site do IBGE
-   (navegador) a área e a população citadas, slides, hospedagem no Supabase e firewall do
+6. **Ainda pendentes:** retorno do orientador sobre a versão 2, slides, hospedagem no Supabase e firewall do
    notebook com Docker.
 
 ## Situação em 16/10/2026 — último dia do prazo
@@ -604,12 +603,17 @@ Docker, sessão do João):**
   tabelas, 10 figuras): parte da versão enviada ao orientador em 17/10 (movida para
   `docs/Documento Teórico/TCC_Alagamentos_Rascunho_2026-10-17.docx`), com as edições do grupo
   (Escola de Tecnologias na ficha, sem a página da reitoria) e os resultados de usabilidade
-  (resumo, capítulos 3, 4, 5 e 6, Apêndices A e B); IBGE (15,3 km², 165.655 habitantes no
-  Censo 2022 — o site bloqueou o acesso automático, conferir no navegador); seção 2.7 sem a
+  (resumo, capítulos 3, 4, 5 e 6, Apêndices A e B); IBGE (165.655 habitantes no Censo 2022;
+  área territorial de 15,4 km² — o site bloqueou o acesso automático e o João conferiu os
+  números na página do IBGE Cidades, que hoje mostra 15,421 km²; o valor de 2022, usado na
+  densidade, é 15,331 km²); seção 2.7 sem a
   citação da OMM (a edição do WMO-No. 8 não foi confirmada), comparando com os níveis de
   aviso do INMET; correlatos CGE e Defesa Civil 40199 com referência; rotas da `apiprevmet3`
   na referência do INMET. Ficam em amarelo: ficha catalográfica, número de folhas e data da
-  banca.
+  banca. Validação final no mesmo dia: sumário e listas conferidos com as páginas, figuras e
+  tabelas em sequência e citadas, citações com referência; removida uma página em branco
+  depois da lista de tabelas (as quebras manuais viraram "quebra de página antes" nos
+  títulos). 67 páginas.
 - **Documentação:** `T16_secao_metodologia_testes.md`, `T16_secao_resultados_discussao.md`,
   `T16_secao_app_android.md`, `questionario_teste_usabilidade.md` (nota sobre o formulário
   aplicado) e `docs/capturas/README.md`.
