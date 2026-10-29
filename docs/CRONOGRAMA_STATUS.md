@@ -2,8 +2,10 @@
 
 **Sistema de Monitoramento Colaborativo de Áreas com Risco de Alagamento**
 Período: 01/07/2026 a 30/10/2026 (17 semanas)
-*Última atualização de status: 17/10/2026 (rascunho do documento teórico) — Semana 16 (12/10 – 18/10). **Prazo antecipado:**
-projeto e documento teórico até o fim da semana de 12–16/10/2026.*
+*Última atualização de status: 29/10/2026 (usabilidade analisada, melhorias no app e versão 2 do
+documento teórico) — Semana 17 (19/10 – 30/10). **Prazo antecipado:** projeto e documento
+teórico até o fim da semana de 12–16/10/2026; o rascunho foi entregue ao orientador em 17/10 e
+a versão 2 sai em 29/10.*
 
 ## Legenda de responsáveis
 - **Henrique** — backend / tech lead
@@ -24,7 +26,33 @@ enviada em 06/09/2026 (Semanas 5, 8, 9 e 10); e para as do Guilherme a partir do
 que ele enviou em 06/09/2026 (Semanas 1–10). Ambos os resumos são repasse direto, sem
 validação própria do time de integração.
 
+## Situação em 29/10/2026 — usabilidade concluída e versão 2 do documento
+
+1. **Avaliação de usabilidade concluída:** formulário do Google Forms com as capturas das sete
+   telas (os participantes **não usaram o app**; amostra de conveniência de familiares e
+   amigos). Só entram as **12 respostas com o termo de consentimento** (17 a 21/10/2026).
+   Média geral **4,79** em 5, todas as telas acima do critério de 4 (de 4,62 nos Alertas a
+   4,90 na Entrada e nos Detalhes). Análise e respostas em `docs/evidencias_testes/usabilidade/`.
+2. **Quatro melhorias no app a partir das perguntas específicas** (documentadas como aplicadas
+   depois da avaliação, sem nova rodada): entrada **sem senha** (nome opcional, só no
+   aparelho), legenda das cores no resumo do mapa, explicação do nível "Automático" sempre
+   visível no cadastro (e correção do texto que ainda citava pluviômetros) e endereço
+   aproximado nos detalhes. Build, lint sem erros e 10 testes de JVM.
+3. **PT-001 v1.5:** os 29 casos aprovados.
+4. **Dados de demonstração corrigidos:** os centros dos bairros estavam aproximados, vários
+   caíam no bairro errado e um ponto ficava em Santo André. 114 testes no backend.
+5. **Capturas refeitas** (11 telas, perfil "João Pedro") e **versão 2 do documento teórico**
+   (`docs/Documento Teórico/TCC_Alagamentos_Versao2_2026-10-29.docx`, 67 páginas) com a
+   usabilidade, as melhorias, as edições do grupo na versão enviada ao orientador, IBGE,
+   correlatos e as referências do INMET. Restam marcados em amarelo: ficha catalográfica,
+   número de folhas e data da banca.
+6. **Ainda pendentes:** retorno do orientador sobre a versão 2, conferir no site do IBGE
+   (navegador) a área e a população citadas, slides, hospedagem no Supabase e firewall do
+   notebook com Docker.
+
 ## Situação em 16/10/2026 — último dia do prazo
+
+*(Mantida como registro; substituída pela "Situação em 29/10/2026" acima.)*
 
 1. **Sistema pronto** e publicado no GitHub (CI aprovado em 07/10). Em 16/10, ajuste de
    escopo decidido pelo grupo e implementado no mesmo dia: **ANA e estação da USCS
@@ -547,6 +575,44 @@ deve partir desta base em vez de manter outra.
 - **Continua pendente do Guilherme:** corrigir os bugs dos testes internos (S8, aguarda a lista
   do Marlon), confirmar se a planilha PT-001 fecha a S11, e as tarefas que dependem dos testes
   com usuários (S12/S13) e da API real (capturas de tela da S14).
+
+**Sessão de 29/10/2026 — usabilidade, melhorias no app e versão 2 do documento (notebook com
+Docker, sessão do João):**
+- **Usabilidade:** o João trouxe o CSV com as respostas do formulário. Decisões do grupo: considerar só as
+  12 respostas com o termo de consentimento (17 a 21/10) e não mencionar as anteriores; os
+  participantes viram as telas, sem usar o app; amostra de familiares e amigos. A planilha
+  original (com todas as respostas) foi apagada; fica só
+  `docs/evidencias_testes/usabilidade/respostas_formulario_2026-10.csv` (12 linhas, sem nome
+  nem e-mail), com a análise em `analise_usabilidade_2026-10-29.md`. Média 4,79; 8 dos 12
+  deram 5 em tudo (limitação registrada).
+- **Melhorias no app (pedido do João, opção B para a entrada):** `LoginActivity` sem campo de
+  senha — o campo não tinha função e confundia; o nome é opcional e fica só no perfil do
+  aparelho. Resumo do mapa com o "●" de cada linha na cor do nível e a legenda dos
+  esmaecidos; texto do nível no cadastro sempre visível (`cadastro_risco_ajuda`); endereço
+  aproximado nos detalhes (geocodificação reversa do Android, `info_endereco`). Lint com 0
+  erros; 10 testes de JVM.
+- **Dados de demonstração (`backend/dados_demo.py`):** a captura dos detalhes mostrava um
+  relato de "Prosperidade" com endereço em Santo André. Os 15 centros foram recalculados por
+  uma grade de geocodificação reversa do OpenStreetMap e a variação caiu de ~330 m para
+  ~130 m; os 30 pontos ficam dentro do município e no bairro da descrição. Perto das divisas o
+  geocodificador do Android (que usa o CEP) ainda pode citar outro bairro — o roteiro de
+  capturas abre os detalhes de um relato de Boa Vista, que o Android confirma. 114 testes.
+- **Capturas:** as 11 refeitas (`android/scripts/roteiro_capturas.py` grava o nome "João
+  Pedro" no perfil, sem a etapa da senha); painéis de figura regenerados.
+- **PT-001 v1.5:** os 8 casos de usabilidade fechados como aprovados (29/29).
+- **Documento teórico, versão 2** (`TCC_Alagamentos_Versao2_2026-10-29.docx`, 67 páginas, 24
+  tabelas, 10 figuras): parte da versão enviada ao orientador em 17/10 (movida para
+  `docs/Documento Teórico/TCC_Alagamentos_Rascunho_2026-10-17.docx`), com as edições do grupo
+  (Escola de Tecnologias na ficha, sem a página da reitoria) e os resultados de usabilidade
+  (resumo, capítulos 3, 4, 5 e 6, Apêndices A e B); IBGE (15,3 km², 165.655 habitantes no
+  Censo 2022 — o site bloqueou o acesso automático, conferir no navegador); seção 2.7 sem a
+  citação da OMM (a edição do WMO-No. 8 não foi confirmada), comparando com os níveis de
+  aviso do INMET; correlatos CGE e Defesa Civil 40199 com referência; rotas da `apiprevmet3`
+  na referência do INMET. Ficam em amarelo: ficha catalográfica, número de folhas e data da
+  banca.
+- **Documentação:** `T16_secao_metodologia_testes.md`, `T16_secao_resultados_discussao.md`,
+  `T16_secao_app_android.md`, `questionario_teste_usabilidade.md` (nota sobre o formulário
+  aplicado) e `docs/capturas/README.md`.
 
 **Sessão de 16–17/10/2026 (noite) — rascunho do documento teórico (sessão do João):**
 - **Arquivo:** `docs/Documento Teórico/TCC_Alagamentos_Rascunho_2026-10-16.docx` (63 páginas),

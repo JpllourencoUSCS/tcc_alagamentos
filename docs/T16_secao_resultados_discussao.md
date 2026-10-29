@@ -82,9 +82,12 @@ risco do aplicativo, com a explicação de quais fontes entraram no cálculo.
 
 ### 5.X.5 Usabilidade
 
-*Pendente — preencher após as sessões com participantes (perfil da amostra, taxa de
-conclusão por tarefa, média das perguntas em escala Likert comparada ao limiar de 4,
-problemas relatados e correções feitas).*
+Doze participantes (amostra de conveniência, que avaliou as capturas das telas, sem usar o
+app) deram média de **4,79** em 5 às sete telas, todas acima do critério de 4. O resultado
+mais útil veio das perguntas específicas: elas mostraram onde a interface confundia — o campo
+de senha sem função, os marcadores esmaecidos, o nível "Automático" e a falta do endereço nos
+detalhes —, e cada ponto virou uma melhoria no app (29/10/2026), fechando o ciclo de avaliação
+e melhoria da Design Science Research. Detalhe em `docs/evidencias_testes/usabilidade/`.
 
 ### 5.X.6 Limitações
 
@@ -116,6 +119,8 @@ problemas relatados e correções feitas).*
 - **Hospedagem.** O ambiente de testes roda num notebook da equipe compartilhado por VPN;
   a implantação em um serviço de hospedagem fica preparada (contêineres), mas não foi feita.
 - **Notificações** só são verificadas com o aplicativo aberto.
+- **Avaliação de usabilidade restrita:** amostra de conveniência (pessoas próximas), sobre
+  capturas das telas, sem tarefas no app e sem nova rodada depois das melhorias.
 
 ### 5.X.7 Trabalhos futuros
 

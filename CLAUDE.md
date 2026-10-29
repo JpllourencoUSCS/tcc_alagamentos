@@ -101,6 +101,20 @@ validação. Pendências marcadas em amarelo no arquivo (usabilidade, IBGE, fich
 referências). A partir daqui o .docx é editado direto no Word; as figuras estão em
 `docs/Documento Teórico/figuras/` (`gerar_figuras.py`).
 
+**29/10/2026 (Semana 17) — usabilidade e versão 2 do documento:** avaliação de usabilidade
+concluída com as **12 respostas que aceitaram o termo** (17–21/10; decisão do grupo: não usar
+nem mencionar as anteriores). Os participantes **só viram as capturas das telas** (não usaram o
+app), amostra de familiares e amigos; média 4,79 em 5. Análise e CSV (sem nome/e-mail) em
+`docs/evidencias_testes/usabilidade/`. Quatro melhorias aplicadas depois, sem nova rodada:
+entrada **sem senha** (nome opcional), legenda das cores no mapa, explicação do nível no
+cadastro sempre visível e endereço aproximado nos detalhes. PT-001 v1.5 (29/29 aprovados).
+`dados_demo.py` com os centros dos bairros corrigidos (um ponto caía em Santo André). Capturas
+refeitas com o perfil "João Pedro". Documento:
+`docs/Documento Teórico/TCC_Alagamentos_Versao2_2026-10-29.docx` (67 páginas), feita sobre a
+versão enviada ao orientador (`TCC_Alagamentos_Rascunho_2026-10-17.docx`, com as edições do
+grupo); faltam ficha catalográfica, número de folhas e data da banca, e conferir no navegador
+os números do IBGE. Detalhe em "Situação em 29/10/2026" no `docs/CRONOGRAMA_STATUS.md`.
+
 **03/09/2026:** descoberta de que o campus da USCS possui uma estação meteorológica
 própria. Time está investigando junto aos responsáveis a possibilidade de acesso aos
 dados — se viável, poderia "substituir" a ANA no papel de pluviômetro local do modelo AHP.
@@ -171,7 +185,8 @@ investigação (03/09/2026)".
     de inventar outro padrão de setup/teardown.
 - `android/` — app Android (projeto Android Studio, Kotlin + XML Views, sem Compose;
   pacote `com.example.alagamentos`), versionado desde 29/09/2026. Entrada por
-  `LoginActivity.kt` (sem autenticação real); depois, navegação por abas inferiores em
+  `LoginActivity.kt` (sem autenticação; desde 29/10/2026 sem senha, só um nome opcional
+que fica no perfil do aparelho); depois, navegação por abas inferiores em
   `MainActivity.kt` com um `Fragment` por tela (Mapa, Alertas, Previsão, Ajustes; Detalhes,
   Cadastro e Perfil abrem por cima). Desde 30/09/2026 os dados vêm da API real via
   `ApiCliente.kt` (Retrofit) + `OcorrenciaRepository.kt` — `GET`/`POST /ocorrencias`, com os
@@ -218,7 +233,7 @@ investigação (03/09/2026)".
   não reescrever com conteúdo diferente do que realmente aconteceu). `T16_secao_*.md`
   são rascunhos de seções do relatório final e devem ser mantidos sincronizados com as
   decisões técnicas atuais. Material de teste (13/09/2026): `plano_e_fluxo_de_testes_TCC.xlsx`
-  (plano PT-001 + casos de teste; versão 1.4 com 29 casos em 16/10/2026),
+  (plano PT-001 + casos de teste; versão 1.5 com 29 casos, todos aprovados, em 29/10/2026),
   `questionario_teste_usabilidade.md` e `tcle_teste_usabilidade.md` (ambos dizem
   explicitamente que as ocorrências do teste são de demonstração). Desde 03/10/2026:
   `T19_criterios_desempenho.md` (RNF de latência + medições), `T16_secao_arquitetura.md`,

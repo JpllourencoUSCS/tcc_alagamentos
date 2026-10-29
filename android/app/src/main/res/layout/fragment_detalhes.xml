@@ -177,6 +177,12 @@
                     android:paddingHorizontal="16dp"
                     android:paddingVertical="8dp">
 
+                    <!-- Preenchido depois, pelo geocodificador do aparelho (29/10/2026) -->
+                    <include
+                        android:id="@+id/info_endereco"
+                        layout="@layout/item_info"
+                        android:visibility="gone" />
+
                     <include
                         android:id="@+id/info_deteccao"
                         layout="@layout/item_info" />

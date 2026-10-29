@@ -8,7 +8,7 @@ Uso como biblioteca (ver roteiro_capturas.py) ou pela linha de comando:
     python adb_app.py ids                      # lista resource-ids/textos da tela
     python adb_app.py toque-id btn_entrar      # toca no elemento pelo id
     python adb_app.py toque-texto Alertas      # toca no elemento pelo texto
-    python adb_app.py digitar edt_login_usuario "Maria"
+    python adb_app.py digitar edt_busca_endereco "Rua Alegre, 100"
     python adb_app.py captura saida.png
 
 Requer o adb do Android SDK (padrão: %LOCALAPPDATA%\\Android\\Sdk\\platform-tools).

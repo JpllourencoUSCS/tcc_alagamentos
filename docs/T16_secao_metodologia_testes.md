@@ -71,7 +71,14 @@ O desempenho foi avaliado em dois níveis, com critérios definidos antes das me
 
 ### 4.X.5 Avaliação de usabilidade
 
-A usabilidade será avaliada com participantes do público-alvo (moradores ou frequentadores
+**Como foi aplicada (outubro de 2026):** os participantes **não usaram o app**; viram as
+capturas das sete telas principais num formulário do Google Forms e avaliaram cada uma em
+quatro critérios (facilidade de uso, intuitividade, design e importância, de 1 a 5), além de
+uma pergunta específica por tela e um comentário. Amostra de conveniência (familiares e amigos
+dos integrantes); só entram as 12 respostas que aceitaram o termo de consentimento (17 a
+21/10/2026). O protocolo planejado originalmente está abaixo, como registro.
+
+Protocolo planejado: a usabilidade seria avaliada com participantes do público-alvo (moradores ou frequentadores
 de São Caetano do Sul), segundo o protocolo:
 
 1. Leitura e assinatura do **Termo de Consentimento Livre e Esclarecido**
@@ -94,12 +101,10 @@ módulo.
 aprovados e 8 pulados por desenho (07/10/2026, incluindo a integração com o INMET e a
 regra de piso dos avisos).
 
-**Casos do PT-001 (29 casos, em 16/10/2026):**
-
-| Status | Casos |
-|---|---|
-| Aprovado | 21 — CT-API-001 a 006, CT-AHP-001 a 004, CT-CAD-002 a 007, CT-LST-002, CT-MAP-003, CT-NOT-001, CT-PRV-001 e 002 |
-| Em execução (parte funcional aprovada; falta a avaliação com participantes) | 8 — CT-CAD-001, CT-LST-001, CT-MAP-001, CT-MAP-002, CT-DET-001, CT-CFG-001, CT-LOG-001, CT-PRV-003 |
+**Casos do PT-001 (29 casos, versão 1.5 de 29/10/2026): os 29 aprovados.** Os 8 casos de
+usabilidade (CT-CAD-001, CT-LST-001, CT-MAP-001, CT-MAP-002, CT-DET-001, CT-CFG-001,
+CT-LOG-001, CT-PRV-003) tiveram a parte funcional aprovada em emulador e foram fechados com a
+avaliação de usabilidade de outubro.
 
 Os casos do mapa (CT-MAP-001 e 002) ficaram bloqueados de 03/10 a 07/10/2026: a chave do
 Google Maps só aceita os certificados Android cadastrados no Google Cloud, e o APK de teste
@@ -132,12 +137,21 @@ reais — e de um quinto só aparecer com o aparelho no idioma do público-alvo 
 importância de testar no ambiente mais próximo possível do real: os testes com
 implementações em memória, sozinhos, não os revelariam.
 
-**Usabilidade:** *pendente — preencher após as sessões (número de participantes, perfil,
-média por pergunta Likert, taxa de conclusão por tarefa, problemas relatados e defeitos
-registrados).*
+**Usabilidade (12 participantes, 336 notas):** média geral **4,79** em 5; todas as telas
+acima do critério de 4 (de 4,62 nos Alertas a 4,90 na Entrada e nos Detalhes); 95% das notas
+foram 4 ou 5. As perguntas específicas apontaram quatro dúvidas, que viraram melhorias no app
+em 29/10/2026: entrada sem senha (o campo sem função confundia), legenda das cores no mapa,
+explicação do nível "Automático" sempre visível no cadastro (e correção do texto que ainda
+citava pluviômetros) e endereço aproximado nos detalhes. Tabelas e respostas em
+`docs/evidencias_testes/usabilidade/`.
+
+**Limitações da avaliação:** amostra de conveniência de pessoas próximas (8 dos 12 deram 5 em
+tudo); sem tarefas no app, mede compreensão e percepção, não taxa de conclusão; sem nova
+rodada depois das melhorias.
 
 ---
 
-*Seção redigida com base em `docs/plano_e_fluxo_de_testes_TCC.xlsx` (versão 1.4, 16/10/2026, 29 casos),
+*Seção redigida com base em `docs/plano_e_fluxo_de_testes_TCC.xlsx` (versão 1.5, 29/10/2026, 29 casos),
+`docs/evidencias_testes/usabilidade/`,
 `backend/tests/`, `docs/T19_criterios_desempenho.md`, `docs/evidencias_testes/2026-10-03/` e
 `docs/evidencias_testes/2026-10-07/`.*

@@ -18,10 +18,10 @@
     <string name="status_vazio_descricao">O histórico completo está na aba Alertas.</string>
 
     <string name="situacao_atual">Situação atual (últimas 24 h)</string>
-    <string name="resumo_legenda">Marcadores esmaecidos: registrados há mais de 3 h.</string>
-    <string name="resumo_alto">• %1$d com risco alto</string>
-    <string name="resumo_medio">• %1$d com risco médio</string>
-    <string name="resumo_baixo">• %1$d com risco baixo</string>
+    <string name="resumo_legenda">Marcadores mais apagados: registrados há mais de 3 h (já não contam no cálculo do risco).</string>
+    <string name="resumo_alto">● %1$d com risco alto (vermelho)</string>
+    <string name="resumo_medio">● %1$d com risco médio (laranja)</string>
+    <string name="resumo_baixo">● %1$d com risco baixo (verde)</string>
     <string name="resumo_atualizacao">Registro mais recente: %1$s</string>
     <string name="sel_info">%1$s • %2$s • %3$s</string>
     <string name="ver_detalhes">Ver detalhes</string>
@@ -41,6 +41,8 @@
     <string name="rotulo_estacao">Estação de referência</string>
     <string name="rotulo_fonte">Fonte</string>
     <string name="rotulo_coordenadas">Coordenadas</string>
+    <string name="rotulo_endereco">Endereço aproximado</string>
+    <string name="detalhes_local_endereco">%1$s · %2$s</string>
     <string name="valor_chuva">%1$.1f mm/h</string>
     <string name="valor_temperatura">%1$.1f °C</string>
     <string name="valor_coordenadas">%1$s</string>
@@ -141,15 +143,13 @@
     <string name="cancelar">Cancelar</string>
     <string name="perfil_sair">Sair</string>
 
-    <!-- Login (protótipo, sem autenticação real) -->
+    <!-- Entrada (sem cadastro nem senha desde 29/10/2026) -->
     <string name="login_titulo">Monitoramento de Alagamentos</string>
     <string name="login_subtitulo">São Caetano do Sul</string>
-    <string name="login_usuario">Nome ou e-mail</string>
-    <string name="login_senha">Senha</string>
+    <string name="login_usuario">Como quer ser chamado?</string>
+    <string name="login_usuario_ajuda">Opcional. Aparece só no seu perfil.</string>
     <string name="login_entrar">Entrar</string>
-    <string name="login_erro_usuario">Informe seu nome ou e-mail</string>
-    <string name="login_erro_senha">Informe uma senha</string>
-    <string name="login_aviso_prototipo">Protótipo acadêmico: não há verificação de senha. Os dados ficam só neste aparelho.</string>
+    <string name="login_aviso_prototipo">O app não pede cadastro nem senha. Seus relatos são anônimos: o servidor recebe só um código gerado neste aparelho.</string>
 
     <!-- Cadastro de ocorrência -->
     <string name="registrar_ocorrencia">Registrar</string>
@@ -175,8 +175,7 @@
     <string name="cadastro_sem_localizacao">Não foi possível obter sua localização. Marque o local tocando no mapa.</string>
     <string name="cadastro_risco">NÍVEL DE RISCO</string>
     <string name="cadastro_risco_auto">Automático</string>
-    <string name="cadastro_risco_auto_desc">O servidor calcula o risco com os dados climáticos do local (chuva, previsão e pluviômetros).</string>
-    <string name="cadastro_risco_manual_desc">O nível escolhido por você será registrado no lugar do cálculo automático.</string>
+    <string name="cadastro_risco_ajuda">Automático: o servidor calcula o risco com a chuva de agora, a previsão e os relatos próximos. Baixo, Médio ou Alto: escolha se você está vendo a situação no local; o seu nível é registrado no lugar do cálculo.</string>
     <string name="cadastro_descricao">Descrição (opcional)</string>
     <string name="cadastro_descricao_ajuda">Ex.: rua alagada, água na altura da calçada.</string>
     <string name="cadastro_enviar">Enviar ocorrência</string>

@@ -29,17 +29,19 @@ usuário.
 
 ### 3.V.2 Estrutura de navegação
 
-O app tem uma tela de entrada (`LoginActivity`) e, depois dela, uma atividade principal
+O app tem uma tela de entrada (`LoginActivity`) — desde 29/10/2026 sem cadastro nem senha:
+o nome é opcional e fica no aparelho, e o único identificador enviado ao servidor é o código
+gerado pelo app no perfil — e, depois dela, uma atividade principal
 (`MainActivity`) com **barra de navegação inferior** de quatro abas, cada uma um
 `Fragment`:
 
 | Aba / tela | Função |
 |---|---|
-| **Mapa** | Ocorrências **ativas** — as das últimas 24 h — como marcadores coloridos por nível de risco (verde, laranja, vermelho), com um círculo de 250 m em volta de cada uma; as registradas há mais de 3 h aparecem esmaecidas (já não entram no componente colaborativo do risco). Cartão "Situação atual" com a contagem por nível e o registro mais recente; alerta em destaque quando há ocorrências de risco alto. Nada é apagado: o histórico fica na aba Alertas. |
+| **Mapa** | Ocorrências **ativas** — as das últimas 24 h — como marcadores coloridos por nível de risco (verde, laranja, vermelho), com um círculo de 250 m em volta de cada uma; as registradas há mais de 3 h aparecem esmaecidas (já não entram no componente colaborativo do risco). Cartão "Situação atual" com a contagem por nível (o ponto de cada linha na cor do nível, servindo de legenda) e o registro mais recente; alerta em destaque quando há ocorrências de risco alto. Nada é apagado: o histórico fica na aba Alertas. |
 | **Alertas** | Lista das ocorrências, da mais recente para a mais antiga, com filtros de região (todas, São Caetano do Sul, "perto de mim"), período (24 h — o padrão, como o mapa —, 7 dias, 30 dias ou todo o histórico) e nível de risco. |
 | **Previsão** | Risco de alagamento calculado agora para a posição do usuário (ou o centro da cidade), com cada fonte que entrou no cálculo AHP (chuva atual, pico previsto, relatos de usuários) e os **avisos meteorológicos oficiais do INMET** para o município, coloridos pelo nível de perigo; quando um aviso eleva a classe (piso), a tela explica ("Elevado de BAIXO para MÉDIO pelo aviso do INMET"). A previsão textual do INMET aparece como referência. A origem de cada dado e a explicação do cálculo ficam em cartões abertos por ícones de informação, para a tela mostrar só os valores; os cartões de chuva atual e previsão mostram o valor de cada fonte (OpenWeather e Open-Meteo) e avisam quando elas divergem. |
 | **Ajustes** | Preferências de alerta (ligar/desligar, nível mínimo e raio de 1 a 20 km) e acesso ao perfil. Até 16/10/2026 havia também um filtro por fonte de dados, retirado porque só os relatos de usuários criam ocorrências. |
-| Detalhes *(sobre a aba)* | Informações completas de uma ocorrência; aberta pelo marcador do mapa, pela lista ou por uma notificação. |
+| Detalhes *(sobre a aba)* | Informações completas de uma ocorrência, com o endereço aproximado (rua e bairro, pelo geocodificador do aparelho); aberta pelo marcador do mapa, pela lista ou por uma notificação. |
 | Registrar ocorrência *(sobre a aba)* | Formulário de cadastro, aberto pelo botão "Registrar" do Mapa e dos Alertas. |
 | Perfil *(sobre a aba)* | Nome, e-mail (opcional), bairro de São Caetano do Sul e identificador do usuário gerado pelo app. |
 
@@ -72,7 +74,8 @@ O cadastro é o que torna o sistema colaborativo. O usuário:
    "Localização informada não pertence a São Caetano do Sul" (a API também recusa pontos
    fora do município, para clientes que não sejam o app);
 2. escolhe o nível de risco — **Automático** (o servidor calcula pelo AHP) ou Baixo, Médio
-   ou Alto, quando ele está vendo a situação na rua;
+   ou Alto, quando ele está vendo a situação na rua; a explicação dos dois modos fica sempre
+   visível;
 3. descreve a situação, opcionalmente (até 300 caracteres).
 
 Após o envio, o app abre os detalhes da ocorrência criada, já com o nível calculado. Cada
@@ -95,7 +98,12 @@ O app usa tema escuro, com cores de alto contraste para os três níveis de risc
 laranja e vermelho). O nível nunca é comunicado só pela cor: ele aparece também por
 extenso ("ALTO", "MÉDIO", "BAIXO") em todas as telas. Os textos estão em português, e a
 única tela de entrada não pede cadastro real — o protótipo não implementa autenticação
-(fora do escopo).
+(fora do escopo); desde 29/10/2026 também não pede senha.
+
+**Melhorias a partir da avaliação de usabilidade (29/10/2026):** entrada sem senha, legenda das
+cores no resumo do mapa, explicação do nível "Automático" sempre visível no cadastro (com a
+correção do texto que ainda citava pluviômetros) e endereço aproximado nos detalhes. Ver
+`docs/evidencias_testes/usabilidade/analise_usabilidade_2026-10-29.md`.
 
 ### 3.V.7 Verificação
 

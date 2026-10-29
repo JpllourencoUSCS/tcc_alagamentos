@@ -83,6 +83,26 @@ class DetalhesFragment : Fragment(R.layout.fragment_detalhes) {
             o.idEstacaoRef?.let { getString(R.string.valor_estacao, it) }
         )
         preencherInfo(view, R.id.info_coordenadas, R.string.rotulo_coordenadas, ctx.coordenadas(o))
+        preencherEndereco(view, o)
+    }
+
+    // Rua e bairro da ocorrência (sugestão da avaliação de usabilidade, 29/10/2026): as
+    // coordenadas sozinhas não dizem onde fica o alagamento. Sem internet ou sem resultado,
+    // a tela fica como estava, só com as coordenadas.
+    private fun preencherEndereco(view: View, o: Ocorrencia) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val endereco = try {
+                Geocodificacao.reverso(requireContext(), o.latitude, o.longitude).firstOrNull()?.resumo()
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                null
+            } ?: return@launch
+            view.findViewById<TextView>(R.id.det_local).text = getString(
+                R.string.detalhes_local_endereco, endereco, requireContext().tempoRelativo(o.dataHora)
+            )
+            preencherInfo(view, R.id.info_endereco, R.string.rotulo_endereco, endereco)
+        }
     }
 
     // Campos opcionais que o backend não preencheu ficam ocultos

@@ -77,12 +77,9 @@ class CadastroFragment : Fragment(R.layout.fragment_cadastro) {
             else pedirLocalizacao.launch(Localizacao.PERMISSOES)
         }
 
-        view.findViewById<ChipGroup>(R.id.chips_cadastro_risco).setOnCheckedStateChangeListener { _, ids ->
-            view.findViewById<TextView>(R.id.txt_cadastro_risco_ajuda).setText(
-                if (ids.firstOrNull() == R.id.chip_risco_auto) R.string.cadastro_risco_auto_desc
-                else R.string.cadastro_risco_manual_desc
-            )
-        }
+        // A explicação dos dois modos (automático × nível escolhido) fica sempre visível desde
+        // 29/10/2026: antes só aparecia a do modo selecionado, e na avaliação de usabilidade
+        // parte dos participantes não entendeu o "Automático"
 
         view.findViewById<MaterialButton>(R.id.btn_enviar).setOnClickListener { enviar(view) }
 

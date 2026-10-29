@@ -1,6 +1,9 @@
 package com.example.alagamentos
 
 import android.os.Bundle
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.ForegroundColorSpan
 import android.util.Log
 import android.view.View
 import android.widget.TextView
@@ -111,17 +114,27 @@ class MapaFragment : Fragment(R.layout.fragment_mapa), OnMapReadyCallback {
             )
         }
 
+        // O ponto de cada linha sai na cor do nível: o resumo serve de legenda das cores dos
+        // marcadores (pedido na avaliação de usabilidade, 29/10/2026)
         v.findViewById<TextView>(R.id.txt_resumo_alto).text =
-            getString(R.string.resumo_alto, altas)
+            linhaLegenda(R.string.resumo_alto, altas, R.color.status_high)
         v.findViewById<TextView>(R.id.txt_resumo_medio).text =
-            getString(R.string.resumo_medio, medias)
+            linhaLegenda(R.string.resumo_medio, medias, R.color.status_medium)
         v.findViewById<TextView>(R.id.txt_resumo_baixo).text =
-            getString(R.string.resumo_baixo, baixas)
+            linhaLegenda(R.string.resumo_baixo, baixas, R.color.status_low)
         v.findViewById<TextView>(R.id.txt_resumo_atualizacao).text =
             todas.maxOfOrNull { it.dataHora }
                 ?.let { getString(R.string.resumo_atualizacao, it.formatado()) }
                 ?: ""
     }
+
+    private fun linhaLegenda(textoRes: Int, quantidade: Int, corRes: Int): CharSequence =
+        SpannableString(getString(textoRes, quantidade)).apply {
+            setSpan(
+                ForegroundColorSpan(ContextCompat.getColor(requireContext(), corRes)),
+                0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
 
     private fun mostrarStatus(titulo: String, descricao: String, corRes: Int) {
         val v = view ?: return

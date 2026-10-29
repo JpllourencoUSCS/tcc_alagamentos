@@ -25,21 +25,30 @@ from db.session import SessionLocal
 
 MARCADOR = "demo-seed"
 
-# Centro aproximado de bairros de São Caetano do Sul
+# Um ponto bem dentro de cada um dos 15 bairros de São Caetano do Sul (29/10/2026): o ponto de
+# uma grade de 0,003° com mais vizinhos no mesmo bairro, pela geocodificação reversa do
+# OpenStreetMap (Nominatim), que coincide com a do geocodificador do Android. Até esta data os
+# centros eram aproximados e vários caíam no bairro errado (e um ponto, em Santo André): nos
+# detalhes, o endereço mostrado contradizia o bairro da descrição.
 BAIRROS = {
-    "Centro": (-23.6229, -46.5548),
-    "Barcelona": (-23.6262, -46.5634),
-    "Santa Paula": (-23.6155, -46.5651),
-    "Santa Maria": (-23.6309, -46.5728),
-    "Cerâmica": (-23.6150, -46.5745),
-    "Fundação": (-23.6098, -46.5594),
-    "Nova Gerty": (-23.6359, -46.5634),
-    "Oswaldo Cruz": (-23.6300, -46.5480),
-    "Olímpico": (-23.6255, -46.5460),
-    "Prosperidade": (-23.6175, -46.5440),
-    "Mauá": (-23.6105, -46.5490),
-    "Boa Vista": (-23.6210, -46.5700),
+    "Barcelona": (-23.621, -46.553),
+    "Boa Vista": (-23.642, -46.559),
+    "Centro": (-23.612, -46.577),
+    "Cerâmica": (-23.627, -46.574),
+    "Fundação": (-23.609, -46.568),
+    "Jardim São Caetano": (-23.639, -46.580),
+    "Mauá": (-23.645, -46.574),
+    "Nova Gerty": (-23.645, -46.565),
+    "Olímpico": (-23.630, -46.559),
+    "Oswaldo Cruz": (-23.633, -46.568),
+    "Prosperidade": (-23.612, -46.550),
+    "Santa Maria": (-23.633, -46.553),
+    "Santa Paula": (-23.618, -46.565),
+    "Santo Antônio": (-23.618, -46.577),
+    "São José": (-23.636, -46.574),
 }
+# Variação em volta do ponto (~130 m): pequena para o ponto não sair do bairro
+JITTER_GRAUS = 0.0012
 
 DESCRICOES = {
     NivelRisco.ALTO: [
@@ -79,8 +88,8 @@ def gerar(agora: datetime, semente: int = 7) -> list[dict]:
         )[0]
         fonte = rng.choices([FonteDado.USUARIO, FonteDado.OPENWEATHER], weights=[3, 1])[0]
         linha = {
-            "latitude": round(lat + rng.uniform(-0.003, 0.003), 6),
-            "longitude": round(lon + rng.uniform(-0.003, 0.003), 6),
+            "latitude": round(lat + rng.uniform(-JITTER_GRAUS, JITTER_GRAUS), 6),
+            "longitude": round(lon + rng.uniform(-JITTER_GRAUS, JITTER_GRAUS), 6),
             "data_hora": agora - idade,
             "nivel_risco": nivel.value,
             "fonte": fonte.value,

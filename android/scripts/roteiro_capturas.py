@@ -4,8 +4,8 @@ contra a API real (03/10/2026; refeitas e ampliadas em 07/10/2026, com o mapa li
 os avisos do INMET na aba Previsão).
 
 Pré-requisitos:
-- Emulador ligado (`adb devices` lista um aparelho) com o app instalado e já com login feito,
-  em pt-BR e no fuso de São Paulo. Conferir com `adb shell date`: a cada boot o emulador pode
+- Emulador ligado (`adb devices` lista um aparelho) com o app instalado (APK de depuração,
+  para o `run-as` que grava o nome do perfil) e já com a entrada feita, em pt-BR e no fuso de São Paulo. Conferir com `adb shell date`: a cada boot o emulador pode
   voltar para GMT (horas 3 h adiantadas). Para corrigir, inclusive o relógio da barra de status:
   `adb root`, `adb shell settings put global auto_time_zone 0` e
   `adb shell cmd time_zone_detector suggest_manual_time_zone --zone_id America/Sao_Paulo`.
@@ -22,9 +22,13 @@ Uso (de android/scripts/):
     python roteiro_capturas.py ../../docs/capturas
 
 Gera um PNG por tela. Nas legendas do relatório, identificar as ocorrências como "dados de
-demonstração".
+demonstração". Desde 29/10/2026 o perfil das capturas é "João Pedro" (gravado direto nas
+preferências do app, porque o `input text` do adb não digita acentos) e a tela de entrada não
+tem mais senha.
 """
 
+import re
+import tempfile
 import sys
 import time
 from pathlib import Path
@@ -32,17 +36,36 @@ from pathlib import Path
 import adb_app as a
 
 CENTRO_SCS = ("-46.5548", "-23.6229")  # longitude, latitude (ordem do "geo fix")
-# Marcador vermelho (norte, Av. do Estado) no enquadramento das ocorrências de demonstração das
-# últimas 24 h (o mapa só mostra essas desde 07/10/2026); dados_demo usa semente fixa
-MARCADOR_DEMO = (454, 868)
-SENHA_FICTICIA = "teste123"  # o login não valida credenciais (CT-LOG-001)
+# Marcador vermelho (oeste, perto da Cerâmica) no enquadramento das ocorrências de demonstração
+# das últimas 24 h (o mapa só mostra essas desde 07/10/2026); dados_demo usa semente fixa. Posição
+# refeita em 29/10/2026, depois da correção dos centros de bairro em dados_demo.py
+MARCADOR_DEMO = (226, 1236)
+NOME_PERFIL = "João Pedro"
+OCORRENCIA_DETALHES = "(Boa Vista)"  # risco alto, últimas 24 h, na lista filtrada
 ENDERECO_DEMO = "Rua Alegre, 100"  # em São Caetano do Sul; sem acentos (o "input text" do adb não aceita)
+
+
+def definir_nome_perfil(nome: str) -> None:
+    """Grava o nome no perfil (SharedPreferences "perfil") com o app parado; tira o e-mail."""
+    a.adb("shell", "am", "force-stop", a.PACOTE)
+    xml = a.adb("exec-out", "run-as", a.PACOTE, "cat", "shared_prefs/perfil.xml")
+    xml = re.sub(r'\s*<string name="(nome|email)">.*?</string>', "", xml, flags=re.S)
+    xml = xml.replace("<map>", f'<map>\n    <string name="nome">{nome}</string>', 1)
+    # O exec-in com run-as não grava (testado em 29/10/2026): o arquivo vai para /data/local/tmp
+    # e o run-as copia para a pasta do app
+    with tempfile.TemporaryDirectory() as tmp:
+        local = Path(tmp) / "perfil.xml"
+        local.write_text(xml, encoding="utf-8")
+        a.adb("push", str(local), "/data/local/tmp/perfil.xml")
+    a.adb("shell", "chmod", "644", "/data/local/tmp/perfil.xml")
+    a.adb("shell", "run-as", a.PACOTE, "cp", "/data/local/tmp/perfil.xml", "shared_prefs/perfil.xml")
+    a.adb("shell", "rm", "/data/local/tmp/perfil.xml")
 
 
 def main(destino: Path) -> None:
     destino.mkdir(parents=True, exist_ok=True)
     a.adb("emu", "geo", "fix", *CENTRO_SCS)
-    a.adb("shell", "am", "force-stop", a.PACOTE)
+    definir_nome_perfil(NOME_PERFIL)
     a.adb("shell", "am", "start", "-n", f"{a.PACOTE}/.LoginActivity")
     time.sleep(5)
 
@@ -65,13 +88,15 @@ def main(destino: Path) -> None:
     a.tocar("chip_periodo_24h", espera=1)
     a.tocar("chip_alto", espera=1)
     foto("03_alertas_filtrados")
+
+    # Detalhes de uma ocorrência cujo endereço (geocodificador do Android) confirma o bairro da
+    # descrição: perto das divisas, o Android às vezes atribui o bairro vizinho (29/10/2026)
+    a.tocar(texto=OCORRENCIA_DETALHES, contem=True, espera=6)
+    foto("04_detalhes")
+    a.voltar()
     a.tocar("chip_todos", espera=0.5)
     a.tocar("chip_periodo_todo", espera=0.5)
     a.tocar("chip_regiao_todas", espera=1)
-
-    a.tocar("alerta_titulo", espera=2)  # primeira ocorrência da lista
-    foto("04_detalhes")
-    a.voltar()
 
     a.tocar("nav_mapa", espera=2)
     a.tocar("fab_registrar", espera=4)
@@ -83,7 +108,7 @@ def main(destino: Path) -> None:
     a.voltar()
 
     a.tocar("nav_previsao", espera=1)
-    foto("06_previsao_risco", espera=5)  # risco, avisos do INMET e fontes do cálculo
+    foto("06_previsao_risco", espera=12)  # risco, avisos do INMET e fontes do cálculo
     a.tocar(texto="Sobre: Chuva agora", espera=1)  # cartão ⓘ: fontes, regra de fusão e valores
     foto("10_previsao_info_fonte", espera=1)
     a.tocar(texto="Entendi", espera=1)
@@ -94,10 +119,9 @@ def main(destino: Path) -> None:
     a.tocar("card_perfil", espera=2)
     foto("09_perfil")
 
-    # Sai e entra de novo, para capturar o login sem perder a sessão do roteiro
+    # Sai e entra de novo, para capturar a entrada sem perder a sessão do roteiro
     a.rolar()                           # "Sair" fica no fim da tela de perfil
-    a.tocar("btn_sair", espera=3)
-    a.digitar("edt_login_senha", SENHA_FICTICIA)
+    a.tocar("btn_sair", espera=3)       # a entrada já vem com o nome do perfil
     a.fechar_teclado()
     foto("00_login", espera=1)
     a.tocar("btn_entrar", espera=3)

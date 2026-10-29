@@ -3,17 +3,16 @@ package com.example.alagamentos
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Patterns
 import android.view.inputmethod.EditorInfo
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.widget.doAfterTextChanged
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
 
-// Tela de entrada do protótipo. Não há autenticação real (fora do escopo do
-// sistema, ver CT-LOG-001 e o TCLE): qualquer nome/e-mail e senha preenchidos
-// levam à área principal.
+// Tela de entrada do protótipo. Desde 29/10/2026 não pede senha: o app nunca teve
+// autenticação (fora do escopo) e, na avaliação de usabilidade, o campo de senha sem
+// função confundia os participantes. Relatar não depende de cadastro: o único
+// identificador enviado ao servidor é o código gerado no aparelho (Perfil.idUsuario).
+// O nome é opcional e só adianta o perfil, que fica no aparelho.
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var perfil: Perfil
@@ -28,44 +27,20 @@ class LoginActivity : AppCompatActivity() {
         }
         setContentView(R.layout.activity_login)
 
-        val tilUsuario = findViewById<TextInputLayout>(R.id.til_login_usuario)
-        val tilSenha = findViewById<TextInputLayout>(R.id.til_login_senha)
         val edtUsuario = findViewById<TextInputEditText>(R.id.edt_login_usuario)
-        val edtSenha = findViewById<TextInputEditText>(R.id.edt_login_senha)
-
-        if (savedInstanceState == null) edtUsuario.setText(perfil.email ?: perfil.nome)
-
-        edtUsuario.doAfterTextChanged { tilUsuario.error = null }
-        edtSenha.doAfterTextChanged { tilSenha.error = null }
-        edtSenha.setOnEditorActionListener { _, acao, _ ->
+        if (savedInstanceState == null) edtUsuario.setText(perfil.nome)
+        edtUsuario.setOnEditorActionListener { _, acao, _ ->
             if (acao == EditorInfo.IME_ACTION_DONE) entrar() else false
         }
         findViewById<MaterialButton>(R.id.btn_entrar).setOnClickListener { entrar() }
     }
 
     private fun entrar(): Boolean {
-        val usuario = findViewById<TextInputEditText>(R.id.edt_login_usuario).text?.toString()?.trim()
-        val senha = findViewById<TextInputEditText>(R.id.edt_login_senha).text?.toString()
+        val nome = findViewById<TextInputEditText>(R.id.edt_login_usuario).text?.toString()
+            ?.trim()?.replace(Regex("\\s+"), " ")
 
-        var valido = true
-        if (usuario.isNullOrEmpty()) {
-            findViewById<TextInputLayout>(R.id.til_login_usuario).error =
-                getString(R.string.login_erro_usuario)
-            valido = false
-        }
-        if (senha.isNullOrEmpty()) {
-            findViewById<TextInputLayout>(R.id.til_login_senha).error =
-                getString(R.string.login_erro_senha)
-            valido = false
-        }
-        if (!valido || usuario == null) return true
-
-        // Aproveita o que foi digitado para adiantar o perfil, sem sobrescrever
-        if (Patterns.EMAIL_ADDRESS.matcher(usuario).matches()) {
-            if (perfil.email == null) perfil.email = usuario
-        } else if (!perfil.preenchido) {
-            perfil.nome = usuario.replace(Regex("\\s+"), " ")
-        }
+        // Adianta o nome do perfil, sem sobrescrever um perfil já preenchido
+        if (!nome.isNullOrEmpty() && !perfil.preenchido) perfil.nome = nome
         perfil.sessaoAtiva = true
         abrirPrincipal()
         return true

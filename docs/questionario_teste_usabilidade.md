@@ -1,5 +1,10 @@
 # Questionário de Teste de Usabilidade — Sistema de Monitoramento Colaborativo de Alagamentos
 
+> **Nota de 29/10/2026:** este é o roteiro planejado. O formulário efetivamente aplicado
+> (outubro de 2026) avaliou as capturas de sete telas, sem tarefas no app e sem perfil do
+> participante — estrutura e resultados em `docs/evidencias_testes/usabilidade/` e no
+> Apêndice B do documento teórico.
+
 **TCC II — Ciência da Computação (USCS)**
 Orientador: Prof. Dr. Marcos Alberto Bussab
 Equipe: Henrique, João, Marlon e Guilherme
