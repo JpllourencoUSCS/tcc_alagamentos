@@ -68,7 +68,7 @@ cada variável são combinadas por uma regra explícita:
 2. **Com as duas fontes, vale o maior valor** — critério conservador, adequado a um
    sistema de alerta, em que subestimar o risco custa mais que superestimá-lo.
 3. **Divergência registrada.** As fontes são consideradas divergentes quando suas leituras
-   caem em faixas diferentes da escala de intensidade da OMM (a mesma usada no cálculo). A
+   caem em faixas diferentes da escala de intensidade de chuva usada no cálculo (3.Y.4). A
    divergência não muda o valor usado; é registrada na resposta da API e mostrada no
    aplicativo.
 4. **Com uma fonte só, vale a disponível.** Sem nenhuma, o risco não é calculado
@@ -78,10 +78,12 @@ cada variável são combinadas por uma regra explícita:
 ### 3.Y.4 Cálculo do Score e Classificação
 
 Cada componente (precipitação atual e pico de previsão, em mm/h equivalentes) é convertido
-para uma escala comum de 0 a 100 por meio de uma função de interpolação baseada na
-classificação de intensidade de chuva da Organização Meteorológica Mundial (OMM/WMO):
-chuva leve (< 2,5 mm/h), moderada (2,5–7,6 mm/h), forte (7,6–50 mm/h) e violenta
-(> 50 mm/h). O score final é a soma ponderada dos componentes, resultando em uma escala de
+para uma escala comum de 0 a 100 por meio de uma função de interpolação baseada em
+limiares de intensidade de chuva: leve (< 2,5 mm/h), moderada (2,5–7,6 mm/h) e forte
+(7,6–50 mm/h), do *Glossary of Meteorology* da American Meteorological Society, e violenta
+(≥ 50 mm/h, score 100), do guia de instrumentos e métodos de observação da Organização
+Meteorológica Mundial (WMO-No. 8, 7. ed., 2008, Parte I, cap. 14, anexo, p. I.14-7), que usa 10 mm/h, e não 7,6 mm/h, como limite
+entre moderada e forte; nessa fronteira, o índice mantém o valor da AMS. O score final é a soma ponderada dos componentes, resultando em uma escala de
 0 a 100, classificada como:
 
 | Classificação | Faixa de score |

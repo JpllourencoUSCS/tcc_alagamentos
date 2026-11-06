@@ -1,5 +1,6 @@
 """
-Agregador de reportes colaborativos (componente C4 do AHP, 15% — pendência
+Agregador de reportes colaborativos (componente colaborativo do AHP: 16% desde
+16/10/2026; no modelo de quatro critérios era o C4, com 15% — pendência
 aberta em 17/08/2026 no CRONOGRAMA_STATUS.md, implementada em 03/10/2026).
 
 Transforma os reportes brutos de usuários (`ocorrencias.fonte = 'usuario'`)
@@ -14,7 +15,7 @@ Regras (ver docs/T15_algoritmo_risco_fundamentacao.md, seção 6.4):
 - **Valor de cada reporte**: o nível informado pelo usuário vira o ponto médio
   da faixa correspondente da própria escala do AHP (Baixo 0-30 -> 15,
   Médio 30-60 -> 45, Alto 60-100 -> 80), mantendo o componente na mesma
-  escala dos outros três.
+  escala dos outros critérios.
 - **Peso de cada reporte**: decai linearmente com a idade (1 no instante do
   reporte, 0 no fim da janela) e com a distância (1 no ponto, 0 na borda do
   raio) — reportes mais recentes e mais próximos pesam mais, a mesma ideia da
@@ -23,6 +24,10 @@ Regras (ver docs/T15_algoritmo_risco_fundamentacao.md, seção 6.4):
   0.0), acionando o fail-safe 2 do algoritmo (redistribuição do peso de C4).
   Um único reporte isolado não basta para mover o score — reduz o efeito de
   reporte equivocado ou mal-intencionado.
+- **Limitação conhecida (registrada em 05/11/2026)**: o cadastro com nível
+  "Automático" grava a classe calculada pelo próprio índice com fonte 'usuario';
+  nas JANELA_HORAS seguintes, esse registro entra aqui como relato, e parte do
+  componente pode repetir a saída do índice. Ver T15, seção 8.
 """
 
 import math

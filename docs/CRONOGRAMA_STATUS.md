@@ -2,10 +2,11 @@
 
 **Sistema de Monitoramento Colaborativo de Áreas com Risco de Alagamento**
 Período: 01/07/2026 a 30/10/2026 (17 semanas)
-*Última atualização de status: 29/10/2026 (usabilidade analisada, melhorias no app e versão 2 do
-documento teórico) — Semana 17 (19/10 – 30/10). **Prazo antecipado:** projeto e documento
-teórico até o fim da semana de 12–16/10/2026; o rascunho foi entregue ao orientador em 17/10 e
-a versão 2 sai em 29/10.*
+*Última atualização de status: 05/11/2026 (versão 2 aprovada pelo orientador sem correções,
+banca marcada para 01/12/2026, versão final do documento e revisão geral do repositório) —
+depois da Semana 17. **Prazo antecipado:** projeto e documento teórico até o fim da semana de
+12–16/10/2026; o rascunho foi entregue ao orientador em 17/10, a versão 2 em 29/10 e a versão
+final em 05/11.*
 
 ## Legenda de responsáveis
 - **Henrique** — backend / tech lead
@@ -26,7 +27,33 @@ enviada em 06/09/2026 (Semanas 5, 8, 9 e 10); e para as do Guilherme a partir do
 que ele enviou em 06/09/2026 (Semanas 1–10). Ambos os resumos são repasse direto, sem
 validação própria do time de integração.
 
+## Situação em 05/11/2026 — documento final e banca marcada
+
+1. **Versão 2 aprovada:** o orientador revisou a versão de 29/10 e não pediu alterações.
+2. **Banca em 01/12/2026 (terça-feira), 19h20–20h00, Apresentação 1:** Prof. Marcos A. Bussab
+   (orientador), Prof. Alexandre de Souza e Profa. Karhyne S. P. Assis. A divulgação da banca
+   usa o título antigo ("Sistema de monitoramento e prevenção a alagamentos de baixo custo");
+   o grupo decidiu manter o título do documento — avisar a coordenação.
+3. **Versão final do documento:**
+   `docs/Documento Teórico/TCC_Alagamentos_Versao_Final_2026-11-05.docx` (67 páginas), sobre a
+   versão 2: banca na folha de aprovação, data da banca, ficha catalográfica pelo modelo do
+   template (67 f., sem o aviso de ficha provisória) e a limitação dos relatos de nível
+   automático. Nenhum trecho em amarelo restante.
+4. **Revisão geral do repositório** (detalhe na nota da sessão de 05/11): corrigidos comentários e
+   textos desatualizados, versões das dependências fixadas, `schema.sql` reaplicável, portas do
+   Docker só em `127.0.0.1` (Tailscale encerrado). 114 testes aprovados.
+5. **Ainda pendentes:** slides da banca, desativar a regra de firewall do Tailscale (exige administrador) e hospedagem no
+   Supabase (opcional).
+6. **PT-001 v1.6:** CT-AHP-001 reexecutado com os pesos 54/30/16 (score 4,8, Baixo);
+   CT-AHP-002 reescrito — da ANA indisponível para a redistribuição do peso colaborativo sem
+   relatos (4,8 sem relatos × 4,0 com relatos de risco zero); CT-PRV-003 reexecutado no
+   emulador (cartões ⓘ atuais, sem a ANA); CT-PRV-002 com o **piso do INMET observado ao vivo**
+   (avisos Perigo vigentes: índice 2,4, Baixo → classe Médio, app e API iguais). Os 29 casos
+   seguem aprovados. Evidências em `docs/evidencias_testes/2026-11-05/`.
+
 ## Situação em 29/10/2026 — usabilidade concluída e versão 2 do documento
+
+*(Mantida como registro; substituída pela "Situação em 05/11/2026" acima.)*
 
 1. **Avaliação de usabilidade concluída:** formulário do Google Forms com as capturas das sete
    telas (os participantes **não usaram o app**; amostra de conveniência de familiares e
@@ -574,6 +601,119 @@ deve partir desta base em vez de manter outra.
 - **Continua pendente do Guilherme:** corrigir os bugs dos testes internos (S8, aguarda a lista
   do Marlon), confirmar se a planilha PT-001 fecha a S11, e as tarefas que dependem dos testes
   com usuários (S12/S13) e da API real (capturas de tela da S14).
+
+**Sessão de 06/11/2026 — revisão do documento teórico final (notebook com Docker, sessão do
+João):** leitura das 67 páginas e conferência de cada número com a fonte — análise de
+sensibilidade (reexecutada), AHP, exemplos de cálculo, benchmark, latência (T19 e CSVs),
+usabilidade (recalculada do CSV) e afirmações sobre o app; sumário, listas, numeração e citação
+de figuras e tabelas, citações × referências, siglas, marcas de revisão. Corrigido no
+`TCC_Alagamentos_Versao_Final_2026-11-05.docx`:
+  1. Figura 1 (Gantt): a barra do formulário de usabilidade estava hachurada como "período a
+     confirmar" e de 05 a 16/10; passou a 17–21/10, sem a legenda (`gerar_figuras.py`).
+  2. 1.3: "medições e testes entre 03/10 e 16/10" → desempenho até 16/10, usabilidade 17–21/10,
+     casos do PT-001 até 05/11.
+  3. Tabela 14: "situação em 29/10/2026" → 05/11/2026 (PT-001 v1.6).
+  4. Referências do OpenWeather e da Open-Meteo, listadas sem citação, citadas na 4.5.1.
+  5. 2.7: retirada a frase sobre o código atribuir as faixas à OMM (o código foi corrigido em
+     05/11) e, com ela, a sigla OMM; comentários de `algoritmo_risco.py` e
+     `T16_secao_algoritmo_risco.md` alinhados ao texto do documento para o limiar de 50 mm/h
+     ("limiar usual"; a fonte na OMM, WMO-No. 8, segue não conferida).
+  6. Siglas AMS, DER, LGPD e TCLE introduzidas no primeiro uso (estavam só na lista).
+  7. CLUSTER: explicada a diferença entre os 2,04 ms e os 4,83 ms da Tabela 16 (cache do SO).
+  8. Retângulo do benchmark: 6,7 km × 6,1 km, não 6,6 × 6,6 (também no `T16_secao_benchmark.md`).
+  9. Latência: o cadastro automático sem cache usou 10 pontos, sem aquecimento (3.5 e 5.3.4).
+  10. Tabela 24 e Apêndice B citados no texto.
+  11. Figura 2: o banco também aparece em contêiner ("Contêiner Docker (db)").
+  Renderização conferida: 67 páginas; três entradas do sumário e da lista de tabelas subiram uma
+  página (Tabela 19, Tabela 21 e 5.3.5) e foram atualizadas. Ao abrir no Word, conferir o sumário
+  (a paginação do Word pode diferir um pouco da do LibreOffice).
+  Segunda passada da revisão (mesmo dia): referências cruzadas (seções, equações, RF/RNF),
+  tipografia e numeração (o documento conta as páginas desde a capa, como o template da USCS) sem
+  problemas; corrigidos mais quatro pontos de forma — fonte "T19" das Tabelas 18 e 19 trocada pelo
+  caminho `docs/T19_criterios_desempenho.md`; referências do IBGE em ordem cronológica e com o nome
+  por extenso; siglas CEP, CGE, GPS, SMS, TCC, USCS, VPN e WGS incluídas na lista; INMET e AMS
+  citados pela sigla, como ANPD, CEMADEN e IBGE. Continua com 67 páginas, sumário sem mudança.
+  Terceira passada (mesmo dia): casos da Tabela 4 e da Tabela 14 × Apêndice A, "Fonte:" das 34
+  legendas, grafias, páginas em branco e os 16 links (14 abrem; AMS e IBGE respondem 403 a acesso
+  automatizado — conferir no navegador) sem problemas. Corrigida a coerência de datas: a 4.2 dizia
+  que o prazo de entrega foi antecipado para 16/10, mas usabilidade, melhorias e revisão seguiram
+  até novembro (agora: prazo de conclusão do sistema); na Figura 1, "Redação do documento e da
+  apresentação" até 30/10 virou "Redação e revisão do documento" até 06/11 (a apresentação ainda
+  não foi feita e a figura é o cronograma executado). 67 páginas, sumário sem mudança.
+  Quarta passada (mesmo dia): releitura completa; três ajustes de redação (5.3.1, 5.3.4 — o cache
+  reduz o tempo em 10 a 15 vezes —, 5.3.5) e **fonte do limiar de 50 mm/h confirmada**: WMO-No. 8,
+  7ª ed. (2008), Parte I, cap. 14, anexo, p. I.14-7 (leve < 2,5; moderada 2,5–10,0; forte
+  10,0–50,0; violenta ≥ 50,0 mm/h). A 2.7 passou a citar (WMO, 2008) e a registrar que o índice
+  mantém o 7,6 mm/h da AMS no limite moderada/forte; referência e sigla WMO incluídas;
+  `algoritmo_risco.py`, T15, `T16_secao_algoritmo_risco.md` e `referencias_consolidadas.md`
+  (pendência 1 resolvida) alinhados. 67 páginas, sumário sem mudança.
+  Revisão final antes do envio ao orientador e ao revisor (mesmo dia): metadados do arquivo
+  corrigidos (descreviam o documento como "Rascunho"; agora título completo, os quatro autores e
+  "Versão final") e ficha catalográfica posta na metade de baixo da página, como no template (o
+  espaço antes do parágrafo era ignorado pelo LibreOffice; trocado por um parágrafo de altura fixa).
+  O Word não está instalado no notebook com Docker: conferir no Word o sumário e a ficha.
+
+**Sessão de 05/11/2026 — versão final do documento e revisão geral do repositório (notebook com
+Docker, sessão do João):**
+- **Documento:** o orientador aprovou a versão 2 sem correções. Versão final em
+  `docs/Documento Teórico/TCC_Alagamentos_Versao_Final_2026-11-05.docx`: banca (Prof. Alexandre
+  de Souza e Profa. Karhyne S. P. Assis, abaixo do orientador, no formato do template), data
+  "01 de dezembro de 2026", ficha catalográfica pelo modelo do template — sem CDD/Cutter, que o
+  template não pede — com "67 f.", e o aviso de ficha provisória retirado. A versão 2 fica como
+  a enviada ao orientador. Paginação conferida pelo LibreOffice: 67 páginas, sumário sem mudança.
+- **Revisão do repositório** (pedido do João): 114 testes aprovados (106 sem banco + 8 contra o
+  PostGIS), CI verde nos 6 últimos commits, nenhuma chave ou senha nos arquivos nem no histórico,
+  CSV da usabilidade sem dado pessoal, média 4,79 recalculada a partir do CSV, números do
+  benchmark coerentes entre resumo, rascunhos e roteiro. Corrigido:
+  - **Relatos de nível "Automático" no componente colaborativo:** o cadastro automático grava a
+    classe do próprio índice com `fonte = 'usuario'`, e ela entra na agregação colaborativa —
+    parte do componente pode repetir a saída do índice. Decisão do João: registrar como
+    limitação (documento final 6.2 e 6.3, T15 §8, `T16_secao_resultados_discussao.md`,
+    docstring de `servicos/colaborativo.py`), sem mudar o código.
+  - **Origem dos limiares de chuva:** comentários do código (`algoritmo_risco.py`,
+    `fusao_climatica.py`, `api/schemas.py` — este aparece no `/docs` da API), um teste,
+    `T16_secao_algoritmo_risco.md`, T15 §8.2, `T_arquitetura` e `CLAUDE.md` ainda atribuíam as
+    quatro faixas à OMM; passam a seguir a correção de 17/10 (AMS para leve/moderada/forte, OMM
+    para violenta).
+  - **Comentários desatualizados:** `servicos/classificacao.py` e `api/ocorrencias.py` (503 só
+    com OpenWeather **e** Open-Meteo fora), `colaborativo.py` e `schema.sql` (16%, não 15%),
+    `db/models.py` e o cabeçalho de `fusao_climatica.py` (ANA/CPTEC como registro histórico);
+    `.env.example` dizia que sem a chave do OpenWeather o cálculo dava 503 (a Open-Meteo cobre).
+  - **Exemplo de `fusao_climatica.py`** (`python fusao_climatica.py`) quebrava: lia JSONs de
+    `testes-api/` que não são versionados; passou a usar os mesmos valores embutidos.
+  - **Dois `.pyc` versionados** (`backend/__pycache__`) retirados do Git.
+  - **Versões das dependências fixadas** em `requirements.txt` e `requirements-benchmark.txt`
+    (as do ambiente em que os testes passaram; Python 3.13).
+  - **`schema.sql` reaplicável:** `CREATE OR REPLACE TRIGGER` (antes, reaplicar dava erro);
+    testado aplicando duas vezes num banco descartável.
+  - **Tailscale encerrado:** o time não usa mais; `docker-compose.yml` publica o banco e a API só
+    em `127.0.0.1` (conferido: pelo IP da rede local as portas recusam conexão). A regra de
+    firewall "TCC Alagamentos - PostgreSQL (Tailscale)" continua ativa — desativar exige
+    PowerShell como administrador. `docs/ACESSO_BANCO_DEV.md` marcado como encerrado.
+  - `T16_secao_relatorio_apis.md` §3.X.3 (ANA no passado) e nota no topo do T15 (seções que
+    registram o modelo de quatro critérios × §8.2, o modelo atual).
+- **PT-001 v1.6:** o CT-AHP-002 estava marcado "Obsoleto" na observação mas com status
+  "Aprovado" (entrava no 29/29), o CT-AHP-001 citava os pesos 35/25/25/15 e o CT-PRV-003, a ANA
+  nos ícones ⓘ. Os dois primeiros foram reescritos e reexecutados para o modelo de três
+  critérios, o CT-PRV-003 foi reexecutado no emulador (os cinco cartões, textos em
+  `docs/evidencias_testes/2026-11-05/ct_prv_003_textos.txt`) e o CT-AHP-004 deixou de citar a
+  OMM. Durante a reexecução havia avisos de nível Perigo vigentes para o município: o piso foi
+  observado ao vivo pela primeira vez (índice 2,4, Baixo → Médio), registrado no CT-PRV-002.
+  O documento final acompanha (versão 1.6 do plano, CT-AHP-002 no Apêndice A e na Seção 5).
+- **Arquivos excluídos (pedido do João):** `PlaceholderFragment.kt` e `fragment_placeholder.xml`
+  (tela provisória de 29/09, sem uso), `ExampleUnitTest.kt` e `ExampleInstrumentedTest.kt` (testes
+  de exemplo do Android Studio — os testes de JVM passam a ser só os 10 do `FuncoesPurasTest`),
+  `android/.idea/deploymentTargetSelector.xml` e `deviceManager.xml` (estado pessoal do Android
+  Studio; agora no `android/.gitignore`) e três cores sem uso em `colors.xml`. Os documentos
+  teóricos, inclusive os rascunhos, ficam todos (decisão do João). Depois das exclusões: build
+  limpo, 10 testes de JVM, lint sem erros (32 avisos: versões de bibliotecas, plurais, sobreposição
+  de fundo e um rótulo de acessibilidade no Perfil), as quatro abas abertas no emulador sem
+  travamento.
+- **Não corrigido, registrado:** `GET /risco` aceita qualquer coordenada (o `POST`
+  recusa fora de São Caetano) e aplica a previsão e os avisos do INMET de São Caetano a qualquer
+  ponto — decisão do João: limitação conhecida, registrada só na documentação do repositório
+  (`T16_secao_arquitetura.md` §3.W.2), não no documento teórico, porque a seção 1.3 já delimita o
+  sistema a São Caetano do Sul e a correção exige mudar também o app; o app busca no máximo 500 ocorrências por consulta, sem paginação.
 
 **Sessão de 29/10/2026 — usabilidade, melhorias no app e versão 2 do documento (notebook com
 Docker, sessão do João):**

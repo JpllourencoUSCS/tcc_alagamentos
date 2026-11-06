@@ -1,7 +1,7 @@
 """
 Testes da Open-Meteo e da regra de fusão (fusao_climatica.py, 16/10/2026): conversão
 da chuva atual para mm/h, pico de 3 h nas próximas 24 h e a fusão OpenWeather × Open-Meteo
-(maior valor; divergência quando as fontes caem em faixas diferentes da escala da OMM).
+(maior valor; divergência quando as fontes caem em faixas diferentes da escala de intensidade de chuva do índice).
 """
 
 import sys

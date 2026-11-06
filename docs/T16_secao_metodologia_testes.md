@@ -101,10 +101,15 @@ módulo.
 aprovados e 8 pulados por desenho (07/10/2026, incluindo a integração com o INMET e a
 regra de piso dos avisos).
 
-**Casos do PT-001 (29 casos, versão 1.5 de 29/10/2026): os 29 aprovados.** Os 8 casos de
+**Casos do PT-001 (29 casos, versão 1.6 de 05/11/2026): os 29 aprovados.** Os 8 casos de
 usabilidade (CT-CAD-001, CT-LST-001, CT-MAP-001, CT-MAP-002, CT-DET-001, CT-CFG-001,
 CT-LOG-001, CT-PRV-003) tiveram a parte funcional aprovada em emulador e foram fechados com a
-avaliação de usabilidade de outubro.
+avaliação de usabilidade de outubro. Na versão 1.6, os casos do algoritmo escritos para o
+modelo de quatro critérios foram atualizados: o CT-AHP-001 foi reexecutado com os pesos
+54/30/16, e o CT-AHP-002, que verificava a indisponibilidade da ANA, passou a verificar a
+redistribuição do peso do componente colaborativo sem relatos suficientes. O CT-PRV-003 foi
+reexecutado com os cartões de informação atuais, e o CT-PRV-002 registrou o piso do INMET
+observado ao vivo, com avisos de nível Perigo vigentes em 05/11/2026.
 
 Os casos do mapa (CT-MAP-001 e 002) ficaram bloqueados de 03/10 a 07/10/2026: a chave do
 Google Maps só aceita os certificados Android cadastrados no Google Cloud, e o APK de teste
@@ -151,7 +156,7 @@ rodada depois das melhorias.
 
 ---
 
-*Seção redigida com base em `docs/plano_e_fluxo_de_testes_TCC.xlsx` (versão 1.5, 29/10/2026, 29 casos),
-`docs/evidencias_testes/usabilidade/`,
+*Seção redigida com base em `docs/plano_e_fluxo_de_testes_TCC.xlsx` (versão 1.6, 05/11/2026, 29 casos),
+`docs/evidencias_testes/usabilidade/`, `docs/evidencias_testes/2026-11-05/`,
 `backend/tests/`, `docs/T19_criterios_desempenho.md`, `docs/evidencias_testes/2026-10-03/` e
 `docs/evidencias_testes/2026-10-07/`.*

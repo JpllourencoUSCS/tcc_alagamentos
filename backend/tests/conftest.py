@@ -11,7 +11,8 @@ nenhuma escrita sobrevive, incluindo os `db.commit()` que
 SAVEPOINT atual; o listener abaixo reabre um novo na hora).
 
 Isso resolve o problema de testar contra um banco que pode estar vazio (ou,
-sendo compartilhado com o time via Tailscale, com dados de outra pessoa):
+quando era compartilhado com o time via Tailscale, até 05/11/2026, com dados
+de outra pessoa):
 cada teste cria os próprios dados e não deixa rastro, então o estado inicial
 do banco nunca importa.
 

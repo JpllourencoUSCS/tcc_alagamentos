@@ -48,8 +48,9 @@ def criar_ocorrencia(
         try:
             resultado = classificador.classificar(valores["latitude"], valores["longitude"])
         except FonteClimaticaIndisponivel:
-            # 503, não 500: a falha é de uma fonte externa (OpenWeather), não
-            # do backend, e o cliente tem uma saída — informar o nível à mão.
+            # 503, não 500: a falha é das fontes externas (OpenWeather e Open-Meteo
+            # fora ao mesmo tempo), não do backend, e o cliente tem uma saída —
+            # informar o nível à mão.
             raise HTTPException(
                 status_code=503,
                 detail=(

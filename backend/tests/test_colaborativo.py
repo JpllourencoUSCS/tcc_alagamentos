@@ -154,7 +154,7 @@ def test_post_sem_nivel_usa_reportes_colaborativos(db_session):
 
     assert resultado["score_colaborativo"] is not None
     assert resultado["score_colaborativo"] > 70
-    # Com chuva zero, todo o score vem do colaborativo (15% sem ANA)
+    # Com chuva zero, todo o score vem do colaborativo (peso de 16%)
     assert resultado["score_final"] > 0
 
 

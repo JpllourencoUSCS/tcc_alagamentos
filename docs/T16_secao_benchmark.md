@@ -25,7 +25,7 @@ dataset pode ser reproduzido (`backend/benchmark/gerar_dados.py`). Cada banco us
 `schema.sql` de produção, e as estatísticas do otimizador são atualizadas (`ANALYZE`) após
 a carga.
 
-**Consultas medidas.** Ambas usam o bbox de uma janela de mapa de ~6,6 km × 6,6 km
+**Consultas medidas.** Ambas usam o bbox de uma janela de mapa de ~6,7 km × 6,1 km (0,06° × 0,06°)
 centrada em São Caetano do Sul, que contém cerca de 0,5% dos registros:
 
 1. **Consulta espacial**: `SELECT count(*) … WHERE geom && ST_MakeEnvelope(…)`. Só o

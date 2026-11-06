@@ -5,8 +5,9 @@ Responsável por buscar dados de todas as fontes disponíveis para uma coordenad
 e devolver um pacote único, pronto para alimentar o algoritmo de risco
 (backend/algoritmo_risco.py).
 
-Arquitetura final de fontes (decisão de 04-05/08/2026 — CEMADEN e INMET
-descartados, substituídos por ANA e CPTEC):
+Arquitetura de fontes de 04-05/08/2026 (registro histórico — CEMADEN e INMET
+descartados, substituídos por ANA e CPTEC; a composição atual está nas atualizações
+de 06/10 e 16/10/2026, abaixo):
 
 - OpenWeather: precipitação atual + previsão principal (integrada e testada)
 - ANA:         rede hidrometeorológica nacional — pluviômetro físico institucional,
@@ -37,7 +38,7 @@ as duas saíram do projeto. No lugar, a Open-Meteo (gratuita, sem chave) mede as
 variáveis que o OpenWeather — chuva atual e previsão —, o que permite uma regra de fusão de
 verdade (`fundir`): com as duas fontes, vale o MAIOR valor (critério conservador, adequado
 a alerta) e a divergência é registrada quando elas caem em faixas diferentes da escala de
-intensidade da OMM; com uma só, vale a disponível; sem nenhuma, o risco não é calculado
+intensidade de chuva do índice; com uma só, vale a disponível; sem nenhuma, o risco não é calculado
 (FonteClimaticaIndisponivel -> HTTP 503). Até aqui, a falha do OpenWeather sozinho já dava
 503; agora a Open-Meteo cobre essa falha.
 """
@@ -197,7 +198,7 @@ def fundir(openweather: float | None, open_meteo: float | None, horas: int = 1) 
     """Pura — funde duas medidas da mesma variável (chuva atual em mm/h, horas=1; ou
     acumulado previsto de 3 h, horas=3). Com as duas, vale o MAIOR valor (critério
     conservador, adequado a um sistema de alerta) e há divergência quando elas caem em
-    faixas diferentes da escala de intensidade da OMM (a mesma do índice). Com uma, vale
+    faixas diferentes da escala de intensidade de chuva do índice. Com uma, vale
     a disponível. Sem nenhuma, None."""
     medidas = {"OpenWeather": openweather, "Open-Meteo": open_meteo}
     disponiveis = {fonte: v for fonte, v in medidas.items() if v is not None}
@@ -570,15 +571,13 @@ def obter_classificacao_risco(
 
 
 if __name__ == "__main__":
-    # Exemplo de uso local com os JSONs já coletados (sem chamada de rede),
-    # simulando o retorno esperado de obter_dados_consolidados() e já
-    # aplicando o algoritmo de risco sobre o resultado.
-    import json
-
-    with open("testes-api/openweather_atual.json", encoding="utf-8") as f:
-        atual = json.load(f)
-    with open("testes-api/openweather_previsao.json", encoding="utf-8") as f:
-        previsao = json.load(f)
+    # Exemplo offline (sem chamada de rede), simulando o retorno de
+    # obter_dados_consolidados() e já aplicando o algoritmo de risco. Os valores são os
+    # da coleta real do OpenWeather para Santo André (rain.1h = 0,35 mm/h; maior rain.3h
+    # das próximas 24 h = 2,14 mm), a mesma de algoritmo_risco.py. Até 05/11/2026 o
+    # exemplo lia os JSONs dessa coleta em testes-api/, que não são versionados.
+    atual = {"coord": {"lat": -23.6639, "lon": -46.5383}, "rain": {"1h": 0.35}}
+    previsao = {"list": [{"rain": {"3h": 2.14}}]}
 
     # Só o OpenWeather neste exemplo offline (sem rede para a Open-Meteo)
     fusao_precip = fundir(atual.get("rain", {}).get("1h", 0.0), None, horas=1)

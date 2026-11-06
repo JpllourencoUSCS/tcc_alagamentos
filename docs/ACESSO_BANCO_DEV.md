@@ -1,5 +1,10 @@
 # Acesso ao banco de desenvolvimento (via Tailscale)
 
+> **Encerrado em 05/11/2026.** O time não usa mais o Tailscale: o `docker-compose.yml` passou
+> a publicar o banco (5432) e a API (8000) só em `127.0.0.1`, e a regra de firewall "TCC
+> Alagamentos - PostgreSQL (Tailscale)" deve ser desativada. Este guia fica como registro de
+> como o banco foi compartilhado durante o desenvolvimento.
+
 Guia para qualquer pessoa do time conectar no Postgres/PostGIS que roda na máquina do
 João, usado para desenvolvimento e testes até o time decidir a hospedagem definitiva
 (ver `CRONOGRAMA_STATUS.md`). **Não é o banco de produção** — só existe enquanto o

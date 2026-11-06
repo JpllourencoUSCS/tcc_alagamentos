@@ -79,20 +79,19 @@ Os campos selecionados para uso no sistema são: `rain.1h` (precipitação na ú
 *Registro histórico: a ANA foi retirada do projeto em 16/10/2026, porque o cadastro nunca foi
 aprovado (ver 3.X.7).*
 
-A integração com a ANA (`backend/fusao_climatica.py`, `testes-api/teste_ana.py`) segue o fluxo
-oficial documentado no manual técnico do órgão: autenticação via `Identificador`/`Senha`
+A integração com a ANA (em `backend/fusao_climatica.py` até 16/10/2026; o levantamento continua
+em `testes-api/teste_ana.py`) seguia o fluxo oficial documentado no manual técnico do órgão: autenticação via `Identificador`/`Senha`
 cadastrados por e-mail, geração de um token OAuth com validade de 60 minutos, e consulta à
 série telemétrica adotada da estação (campo `Chuva_Adotada`, em mm) por código de estação —
 `21477000` para Santo André, SP, confirmado junto às demais estações do ABC Paulista
 (`21489000` São Caetano do Sul, `21488000` São Bernardo do Campo).
 
-Até o fechamento desta seção, a integração está implementada e testada estruturalmente (fluxo
-de token, chamada autenticada, tratamento de erro), mas a validação de ponta a ponta com dados
-reais depende da aprovação do cadastro solicitado à ANA (`hidro@ana.gov.br`), pendência externa
-ao controle da equipe. O sistema foi projetado para **não falhar** na ausência desse dado: caso
-a chamada à ANA não retorne (credenciais pendentes, token expirado ou erro de rede), o algoritmo
-de risco redistribui o peso desse componente entre precipitação atual e previsão, em vez de
-travar ou descartar o cálculo (ver seção 3.Y).
+A integração chegou a ser implementada e testada estruturalmente (fluxo de token, chamada
+autenticada, tratamento de erro), mas a validação de ponta a ponta com dados reais dependia da
+aprovação do cadastro solicitado à ANA (`hidro@ana.gov.br`), que nunca veio. Enquanto esteve no
+sistema, a ausência desse dado não derrubava o cálculo: o algoritmo de risco redistribuía o
+peso do componente entre precipitação atual e previsão (ver seção 3.Y). Com a retirada, o
+código da ANA saiu do backend e o modelo passou a ter três critérios.
 
 ### 3.X.4 Resultados dos Testes com o CPTEC/INPE
 

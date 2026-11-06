@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS ocorrencias (
 
 -- ---------------------------------------------------------------------------
 -- Tabela nova: reportes_colaborativos_agregado
--- Componente "colaborativo" do AHP (15% do score, ver algoritmo_risco.py) precisa
+-- Componente "colaborativo" do AHP (16% do score desde 16/10/2026, ver algoritmo_risco.py) precisa
 -- de um score 0-100 já agregado por área/janela de tempo. Calculado a partir dos
 -- reportes brutos (fonte='usuario' em `ocorrencias`) por servicos/colaborativo.py;
 -- cada score usado numa classificação fica registrado aqui.
@@ -71,7 +71,8 @@ CREATE TABLE IF NOT EXISTS reportes_colaborativos_agregado (
 
 -- ---------------------------------------------------------------------------
 -- Sincronização automática de geom a partir de latitude/longitude
--- (ST_MakePoint espera (longitude, latitude), nessa ordem)
+-- (ST_MakePoint espera (longitude, latitude), nessa ordem). CREATE OR REPLACE TRIGGER
+-- (PostgreSQL 14+, 05/11/2026): o arquivo pode ser reaplicado sem erro.
 -- ---------------------------------------------------------------------------
 CREATE OR REPLACE FUNCTION trg_sync_geom() RETURNS trigger AS $$
 BEGIN
@@ -80,11 +81,11 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER ocorrencias_sync_geom
+CREATE OR REPLACE TRIGGER ocorrencias_sync_geom
     BEFORE INSERT OR UPDATE OF latitude, longitude ON ocorrencias
     FOR EACH ROW EXECUTE FUNCTION trg_sync_geom();
 
-CREATE TRIGGER estacoes_referencia_sync_geom
+CREATE OR REPLACE TRIGGER estacoes_referencia_sync_geom
     BEFORE INSERT OR UPDATE OF latitude, longitude ON estacoes_referencia
     FOR EACH ROW EXECUTE FUNCTION trg_sync_geom();
 

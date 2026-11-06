@@ -88,6 +88,9 @@ práticos de integração com dados públicos brasileiros.
 
 ## Como cada fonte se conecta ao modelo AHP
 
+*(Modelo de quatro critérios, vigente até 16/10/2026. O atual — três critérios, 54/30/16, com a
+fusão OpenWeather × Open-Meteo — está na seção "Ajuste de escopo de 16/10/2026", no fim.)*
+
 - **Precipitação atual (35%):** OpenWeather.
 - **Pluviômetro local (25%):** ANA. Se a chamada falhar (ou enquanto o token não estiver
   configurado), o peso é redistribuído automaticamente entre precipitação atual e previsão
@@ -230,7 +233,7 @@ motivo:**
   16/10/2026.
 - **Regra de fusão** (`fusao_climatica.fundir`), para a chuva atual e para a previsão: com as
   duas fontes, vale o **maior** valor (conservador, adequado a alerta); há **divergência**
-  quando as leituras caem em faixas diferentes da escala da OMM (registrada na resposta da API
+  quando as leituras caem em faixas diferentes da escala de intensidade de chuva do índice (registrada na resposta da API
   e mostrada no app, sem mudar o valor); com uma fonte, vale a disponível; sem nenhuma, não há
   cálculo automático (HTTP 503). Até esta data, a falha do OpenWeather sozinho já dava 503.
 - **AHP com três critérios** (precipitação atual 54%, previsão 30%, colaborativo 16%):

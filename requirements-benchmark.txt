@@ -2,4 +2,4 @@
 # Separadas do requirements.txt para não pesar a imagem Docker da API.
 #   pip install -r requirements-benchmark.txt
 -r requirements.txt
-matplotlib
+matplotlib==3.11.2

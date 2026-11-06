@@ -32,8 +32,8 @@ class Base(DeclarativeBase):
 
 
 class EstacaoReferencia(Base):
-    """Estação física de medição consultada (hoje, só ANA — ver
-    docs/T_arquitetura_fontes_dados_final.md sobre a saída do INMET/CEMADEN)."""
+    """Estação física de medição (só ANA; tabela sem uso desde a retirada da fonte,
+    em 16/10/2026 — ver docs/T_arquitetura_fontes_dados_final.md)."""
 
     __tablename__ = "estacoes_referencia"
     __table_args__ = (
@@ -54,7 +54,7 @@ class EstacaoReferencia(Base):
 
 class Ocorrencia(Base):
     """Registro de ocorrência — tanto reportes de usuário quanto leituras
-    automáticas das fontes climáticas (OpenWeather/ANA/INMET; até 06/10/2026, CPTEC)."""
+    automáticas das fontes climáticas (FonteDado: openweather, inmet e a legada ana; até 07/10/2026, cptec)."""
 
     __tablename__ = "ocorrencias"
     __table_args__ = (

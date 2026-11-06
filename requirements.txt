@@ -1,12 +1,14 @@
-requests
+# Versões fixadas em 05/11/2026 (as do ambiente em que os 114 testes passaram, Python 3.13):
+# sem versão, uma instalação nova podia trazer uma biblioteca incompatível.
+requests==2.34.2
 
 # Backend (Semana 2+ — Henrique)
-fastapi
-uvicorn[standard]
-sqlalchemy>=2.0
-geoalchemy2
-psycopg2-binary
+fastapi==0.141.1
+uvicorn[standard]==0.52.4
+sqlalchemy==2.0.52
+geoalchemy2==0.20.0
+psycopg2-binary==2.9.12
 
 # Testes (Semana 3+)
-pytest
-httpx
+pytest==9.1.1
+httpx==0.28.1

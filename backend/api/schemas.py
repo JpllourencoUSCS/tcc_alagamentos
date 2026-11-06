@@ -49,7 +49,7 @@ class FontesRisco(BaseModel):
 class MedidaFundidaOut(BaseModel):
     """Uma variável medida por duas fontes (16/10/2026): o valor de cada uma (null =
     fonte sem resposta), o valor usado no índice (o maior) e se elas divergem (caem em
-    faixas diferentes da escala de intensidade da OMM)."""
+    faixas diferentes da escala de intensidade de chuva do índice)."""
 
     openweather: float | None
     open_meteo: float | None

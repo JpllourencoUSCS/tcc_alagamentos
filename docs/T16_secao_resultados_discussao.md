@@ -114,6 +114,11 @@ e melhoria da Design Science Research. Detalhe em `docs/evidencias_testes/usabil
   feitos pela equipe, sem especialistas em hidrologia ou defesa civil, e os parâmetros da
   agregação colaborativa (1 km, 3 h, mínimo de dois reportes) são escolhas de projeto. A
   análise de sensibilidade mitiga, mas não substitui, essa calibração.
+- **Relatos de nível "Automático".** Quando o usuário escolhe o nível "Automático", a
+  ocorrência é gravada com a classe calculada pelo próprio índice e, nas três horas
+  seguintes, entra no componente colaborativo como se fosse a avaliação de um morador.
+  Parte desse componente pode, assim, repetir a saída do índice, em vez de trazer
+  informação independente.
 - **Dados de demonstração.** Não houve episódio real de alagamento registrado pelo sistema
   durante o desenvolvimento; os testes do aplicativo usaram ocorrências de demonstração.
 - **Hospedagem.** O ambiente de testes roda num notebook da equipe compartilhado por VPN;

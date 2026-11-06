@@ -60,8 +60,18 @@ Expõe três operações sobre ocorrências e uma de consulta de risco:
 | `GET /risco` | Risco de alagamento calculado agora para uma coordenada, com o score de cada componente do AHP e os dados usados. Não grava nada. |
 
 Valores fora do vocabulário (por exemplo, um nível de risco inexistente) são rejeitados
-com HTTP 422. A falha da fonte climática principal durante o cálculo automático devolve
-HTTP 503 com mensagem orientando o usuário a informar o nível manualmente.
+com HTTP 422. Quando nem o OpenWeather nem a Open-Meteo respondem durante o cálculo
+automático, a API devolve HTTP 503 com mensagem orientando o usuário a informar o nível
+manualmente (até 16/10/2026, bastava a falha do OpenWeather).
+
+**Limitação conhecida (registrada em 05/11/2026, só na documentação do repositório).**
+Diferente do `POST /ocorrencias`, o `GET /risco` aceita qualquer coordenada, e a previsão
+textual e os avisos do INMET consultados são sempre os de São Caetano do Sul (código IBGE
+fixo) — para um ponto fora da cidade, o resultado combina a chuva daquele ponto com os avisos
+de São Caetano. A aba Previsão envia a localização real do aparelho, então restringir só a
+API faria a aba mostrar erro fora do município; a correção completa exige que o app use o
+centro da cidade nesse caso. Fica como trabalho futuro, por estar fora do escopo declarado
+(monitoramento de São Caetano do Sul).
 
 **Camada de serviços.** Separa as rotas da lógica de domínio:
 - `servicos/classificacao.py` orquestra o cálculo automático: obtém os dados climáticos,
@@ -117,8 +127,9 @@ O banco e a API são empacotados como contêineres (`docker-compose.yml` com os 
 `db` e `api`; `Dockerfile` na raiz do repositório). As credenciais (senha do banco, chave
 do OpenWeather) vêm de variáveis de ambiente lidas de um arquivo `.env`
 fora do controle de versão. Durante o desenvolvimento, o ambiente roda num notebook da
-equipe e é compartilhado com os demais integrantes por VPN privada (Tailscale), sem expor
-o banco na internet. A mesma imagem da API pode ser implantada em qualquer serviço de
+equipe; até 05/11/2026 foi compartilhado com os demais integrantes por VPN privada
+(Tailscale), sem expor o banco na internet, e desde então as portas só aceitam conexões da
+própria máquina. A mesma imagem da API pode ser implantada em qualquer serviço de
 hospedagem de contêineres, mudando só as variáveis de ambiente.
 
 ### 3.W.5 Qualidade e testes

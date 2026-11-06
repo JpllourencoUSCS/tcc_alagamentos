@@ -115,6 +115,21 @@ versão enviada ao orientador (`TCC_Alagamentos_Rascunho_2026-10-17.docx`, com a
 grupo); faltam ficha catalográfica, número de folhas e data da banca (números do IBGE conferidos
 pelo João: 165.655 habitantes no Censo 2022, 15,4 km² de área territorial). Detalhe em "Situação em 29/10/2026" no `docs/CRONOGRAMA_STATUS.md`.
 
+**05/11/2026 — versão final do documento e banca:** o orientador aprovou a versão 2 **sem
+correções**. Banca em **01/12/2026 (terça), 19h20–20h00**: Prof. Marcos A. Bussab (orientador),
+Prof. Alexandre de Souza e Profa. Karhyne S. P. Assis (titulação e nome completo não informados
+na divulgação). A divulgação usa o título antigo ("…de baixo custo"); o grupo mantém o título do
+documento. **Versão final:** `docs/Documento Teórico/TCC_Alagamentos_Versao_Final_2026-11-05.docx`
+(67 páginas; banca, data, ficha catalográfica pelo modelo do template com "67 f." e a limitação
+dos relatos de nível automático) — a versão 2 fica como a enviada ao orientador. No mesmo dia,
+revisão geral do repositório: textos e comentários desatualizados corrigidos, dependências com
+versão fixada, `schema.sql` reaplicável e **Tailscale encerrado** (portas do Docker só em
+`127.0.0.1`). Em 06/11, revisão do documento final: 11 correções (Figura 1 sem o "período a confirmar",
+Figura 2 com o banco em contêiner, período dos testes, Tabela 14, citação do OpenWeather e da
+Open-Meteo, frase da OMM retirada, siglas, CLUSTER, retângulo do benchmark, amostra da latência,
+Tabela 24 e Apêndice B citados); 67 páginas. Pendentes: slides e regra de firewall (administrador). PT-001 v1.6 (CT-AHP-001/002 reescritos para o modelo de três critérios,
+CT-PRV-003 reexecutado; piso do INMET observado ao vivo em 05/11). Detalhe em "Situação em 05/11/2026" no `docs/CRONOGRAMA_STATUS.md`.
+
 **03/09/2026:** descoberta de que o campus da USCS possui uma estação meteorológica
 própria. Time está investigando junto aos responsáveis a possibilidade de acesso aos
 dados — se viável, poderia "substituir" a ANA no papel de pluviômetro local do modelo AHP.
@@ -145,7 +160,7 @@ investigação (03/09/2026)".
     componente colaborativo e registra em `reportes_colaborativos_agregado`)
   - `fusao_climatica.py` lê `OPENWEATHER_API_KEY` do ambiente. Desde 16/10/2026 consulta
     também a **Open-Meteo** (sem chave) e funde as duas medidas de chuva atual e de previsão
-    (`fundir`: vale a maior; `divergente` quando caem em faixas diferentes da escala da OMM;
+    (`fundir`: vale a maior; `divergente` quando caem em faixas diferentes da escala de intensidade de chuva do índice;
     uma fonte → usa a disponível); só com as duas fora vira `FonteClimaticaIndisponivel` (a
     API responde 503). A ANA saiu do código em 16/10/2026. Cache de 10 min por célula de
     0,01° (`obter_dados_consolidados_em_cache`). Desde 06/10/2026
@@ -175,7 +190,7 @@ investigação (03/09/2026)".
     rollback no final (padrão recomendado pelo próprio SQLAlchemy para suítes de
     teste) — nenhum dado criado pelo teste sobrevive. Os testes também não podem
     depender do que já existe no banco (dados de demonstração ou de outra pessoa,
-    no banco compartilhado por Tailscale): consultar só os dados que o próprio teste
+    como no banco compartilhado por Tailscale até 05/11/2026): consultar só os dados que o próprio teste
     criou, por exemplo com um bbox pequeno em volta deles — até 03/10/2026 dois testes
     assumiam o banco vazio e quebravam. 114 testes em 16/10/2026 (106 sem banco + 8 de
     integração). Sem
@@ -219,8 +234,8 @@ que fica no perfil do aparelho); depois, navegação por abas inferiores em
   da sessão. Com o repositório dentro do OneDrive, definir
   `ALAGAMENTOS_BUILD_DIR=C:\gradle-build\alagamentos` (lido por `android/build.gradle.kts`):
   sem isso o OneDrive trava os intermediários e o build falha com "Unable to delete
-  directory". Testes de JVM: `gradlew testDebugUnitTest` (`FuncoesPurasTest.kt`, 10 em
-  07/10/2026). `gradlew lintDebug`: 0 erros em 07/10/2026 (os avisos restantes são versões
+  directory". Testes de JVM: `gradlew testDebugUnitTest` (`FuncoesPurasTest.kt`, os únicos testes de JVM: 10 em 05/11/2026, depois de
+  excluídos os testes de exemplo do Android Studio). `gradlew lintDebug`: 0 erros em 05/11/2026 (os avisos restantes são versões
   novas de bibliotecas, plurais e falsos positivos).
   `android/scripts/`: `adb_app.py` (automação do app no emulador via adb, usada nos testes
   de 03/10 e 07/10) e `roteiro_capturas.py` (as 11 capturas do relatório em `docs/capturas/`;
@@ -233,7 +248,7 @@ que fica no perfil do aparelho); depois, navegação por abas inferiores em
   não reescrever com conteúdo diferente do que realmente aconteceu). `T16_secao_*.md`
   são rascunhos de seções do relatório final e devem ser mantidos sincronizados com as
   decisões técnicas atuais. Material de teste (13/09/2026): `plano_e_fluxo_de_testes_TCC.xlsx`
-  (plano PT-001 + casos de teste; versão 1.5 com 29 casos, todos aprovados, em 29/10/2026),
+  (plano PT-001 + casos de teste; versão 1.6 com 29 casos, todos aprovados, em 05/11/2026),
   `questionario_teste_usabilidade.md` e `tcle_teste_usabilidade.md` (ambos dizem
   explicitamente que as ocorrências do teste são de demonstração). Desde 03/10/2026:
   `T19_criterios_desempenho.md` (RNF de latência + medições), `T16_secao_arquitetura.md`,
@@ -245,9 +260,10 @@ que fica no perfil do aparelho); depois, navegação por abas inferiores em
   estrutura do template (1 Introdução, 2 Referencial Teórico, 3 Pesquisa/Amostragem,
   4 Desenvolvimento, 5 Testes, 6 Conclusão); os `T16_secao_*.md` são a matéria-prima dos
   capítulos 4 a 6.
-- Raiz: `Dockerfile` (imagem da API), `docker-compose.yml` (serviços `db` e `api`),
-  `.env.example` (variáveis esperadas no `.env`), `requirements.txt`,
-  `requirements-benchmark.txt`, `.github/workflows/ci.yml` (pytest contra PostGIS real +
+- Raiz: `Dockerfile` (imagem da API), `docker-compose.yml` (serviços `db` e `api`, portas só
+  em `127.0.0.1` desde 05/11/2026), `.env.example` (variáveis esperadas no `.env`),
+  `requirements.txt` e `requirements-benchmark.txt` (versões fixadas desde 05/11/2026 — ao
+  atualizar uma biblioteca, rodar a suíte antes de mudar a versão), `.github/workflows/ci.yml` (pytest contra PostGIS real +
   build e testes do app a cada push — criado em 03/10/2026; primeira execução no GitHub em
   07/10/2026, com os dois jobs aprovados).
 
@@ -291,6 +307,13 @@ container desta máquina: os 3 passam, e `SELECT count(*) FROM ocorrencias` depo
 suíte confirma 0 linhas — o rollback por SAVEPOINT não deixa dado nenhum no banco
 compartilhado por Tailscale.
 
+**Encerrado em 05/11/2026 — o time não usa mais o Tailscale.** O `docker-compose.yml` passou a
+publicar o banco (5432) e a API (8000) só em `127.0.0.1` (o emulador continua alcançando a API
+por `10.0.2.2`, que é o 127.0.0.1 do computador). A regra de firewall "TCC Alagamentos -
+PostgreSQL (Tailscale)" ainda precisa ser desativada como administrador
+(`Disable-NetFirewallRule -DisplayName "TCC Alagamentos - PostgreSQL (Tailscale)"`). O parágrafo
+abaixo fica como registro.
+
 **Banco compartilhado com o time via Tailscale (03/09/2026):** o banco desta máquina foi
 exposto ao time via [Tailscale](https://tailscale.com) (VPN privada) em vez de exposto na
 internet aberta. A intenção era liberar a porta 5432 só para o Tailscale (regra de Firewall
@@ -320,8 +343,8 @@ está no repo para replicar em qualquer máquina com Docker instalado.
 **Estado do notebook com Docker em 03/10/2026** (hostname `DESKTOP-NOGQFTB`, dispositivo
 Tailscale `tcc-alagamentos-joao`, Windows 11, Ryzen 5 5600G, 16 GB):
 - `docker compose up -d` sobe `alagamentos_db` e `alagamentos_api` (API em
-  `http://localhost:8000`, docs em `/docs`). A API lê `OPENWEATHER_API_KEY` (e as da ANA, se
-  houver) do `.env` — a do OpenWeather já está configurada. Depois de mudar o `.env`, rodar
+  `http://localhost:8000`, docs em `/docs`). A API lê `OPENWEATHER_API_KEY` do
+  `.env` — a do OpenWeather já está configurada. Depois de mudar o `.env`, rodar
   `docker compose up -d api` para o contêiner pegar o valor novo; depois de mudar código do
   backend, `docker compose up -d --build api`.
 - O banco principal tem as 30 ocorrências de demonstração (`backend/dados_demo.py`); os
@@ -359,7 +382,7 @@ Tailscale `tcc-alagamentos-joao`, Windows 11, Ryzen 5 5600G, 16 GB):
   "Ajuste de escopo de 16/10/2026".
 - **Open-Meteo e regra de fusão (decisão do grupo, 16/10/2026):** a Open-Meteo mede as mesmas
   variáveis do OpenWeather; com as duas, vale o **maior** valor (conservador), e a
-  divergência (faixas diferentes da escala da OMM) é registrada sem mudar o valor; com uma,
+  divergência (faixas diferentes da escala de intensidade de chuva do índice) é registrada sem mudar o valor; com uma,
   vale a disponível; sem nenhuma, 503.
 - **CPTEC/INPE → substituído pelo INMET (`apiprevmet3`) em 06/10/2026.** O CPTEC era a
   validação cruzada qualitativa (previsão de 4 dias, fora do AHP); METAR já tinha sido

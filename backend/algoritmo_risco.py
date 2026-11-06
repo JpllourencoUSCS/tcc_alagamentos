@@ -21,8 +21,12 @@ Escala final: 0 a 100
 - Médio risco: 30  a 60
 - Alto risco:  60 a 100
 
-Os limiares de intensidade de chuva seguem a classificação da OMM (WMO) para
-chuva em mm/h: leve (<2.5), moderada (2.5–7.6), forte (7.6–50), violenta (>50).
+Limiares de intensidade de chuva em mm/h: leve (<2.5), moderada (2.5–7.6) e forte
+(7.6–50), do Glossary of Meteorology da American Meteorological Society; violenta
+(>=50), do guia de instrumentos e métodos de observação da OMM (WMO-No. 8, 7. ed., 2008, Parte I, cap. 14, anexo, p. I.14-7,
+conferido em 06/11/2026), que usa 10 mm/h, e não 7,6, entre moderada e forte — por isso
+as três primeiras faixas seguem a AMS. Ver T15, seção 6.1. Origem corrigida em
+17/10/2026; até então as quatro faixas eram atribuídas à OMM.
 
 Fail-safe: sem reportes colaborativos suficientes para a área, o peso do colaborativo
 é redistribuído proporcionalmente entre os demais, em vez de zerado silenciosamente
@@ -46,7 +50,7 @@ LIMIARES_CHUVA_MM_H = {
 
 
 def score_precipitacao(mm_h: float) -> float:
-    """Converte mm/h em score 0-100 pela classificação da OMM."""
+    """Converte mm/h em score 0-100 pela escala de intensidade de chuva (LIMIARES_CHUVA_MM_H)."""
     if mm_h <= 0:
         return 0.0
     if mm_h < LIMIARES_CHUVA_MM_H["leve"]:
@@ -67,7 +71,7 @@ def score_previsao(pico_mm_3h: float) -> float:
 
 
 def faixa_intensidade(mm_h: float) -> int:
-    """Faixa da classificação da OMM (0 leve, 1 moderada, 2 forte, 3 violenta) — usada
+    """Faixa da escala de intensidade de chuva (0 leve, 1 moderada, 2 forte, 3 violenta) — usada
     pela regra de fusão para dizer quando duas fontes divergem (fusao_climatica.fundir)."""
     if mm_h < LIMIARES_CHUVA_MM_H["leve"]:
         return 0

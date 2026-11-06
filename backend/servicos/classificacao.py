@@ -1,14 +1,14 @@
 """
 Wrapper fino sobre fusao_climatica (Semana 5 — Henrique, reconstruído em
 18/08/2026): isola o endpoint de criação de ocorrências da chamada real às
-APIs externas (OpenWeather/ANA/INMET), pelo mesmo motivo de
+APIs externas (OpenWeather, Open-Meteo e INMET; até 16/10/2026, também a ANA), pelo mesmo motivo de
 db/repository.py isolar o SQLAlchemy — fusao_climatica.obter_dados_consolidados
 faz requests HTTP de verdade, o que não pode rodar em teste automatizado sem
 rede e credenciais (OPENWEATHER_API_KEY).
 
 03/10/2026: passa a usar o cache de dados climáticos (~1 km / 10 min) e o
 agregador de reportes colaborativos (servicos/colaborativo.py) — até então o
-componente colaborativo (15%) entrava sempre como None no AHP.
+componente colaborativo (15% na época; 16% desde 16/10/2026) entrava sempre como None no AHP.
 """
 
 from typing import Protocol
@@ -33,8 +33,9 @@ class ClassificadorRiscoReal:
     fusão (previsão numérica, fontes, avisos do INMET) não é persistido em
     `ocorrencias` hoje.
 
-    Lança fusao_climatica.FonteClimaticaIndisponivel se o OpenWeather (fonte
-    principal) falhar — a API traduz em 503.
+    Lança fusao_climatica.FonteClimaticaIndisponivel quando nem o OpenWeather nem a
+    Open-Meteo respondem (desde 16/10/2026; antes, bastava o OpenWeather falhar) — a
+    API traduz em 503.
     """
 
     def __init__(self, db: Session | None = None):

@@ -1,0 +1,28 @@
+== btn_info_risco
+Como o risco é calculado
+O risco combina chuva atual (54%), previsão (30%) e relatos de usuários próximos (16%), com pesos definidos pelo método AHP. Chuva atual e previsão vêm do OpenWeather e da Open-Meteo; vale o maior valor das duas. Sem relatos suficientes, o peso deles passa para os demais. Avisos de chuva do INMET elevam a classificação: Perigo, no mínimo MÉDIO; Grande Perigo, ALTO. A previsão do INMET aparece só como referência.
+Entendi
+
+== info_chuva_agora
+Chuva agora
+Chuva medida agora no seu local. Vem de duas fontes, OpenWeather e Open-Meteo, e o cálculo usa a maior das duas (critério conservador, adequado a um alerta). Peso no cálculo do risco: 54%.
+
+Agora — OpenWeather: 0,2 mm/h · Open-Meteo: 0,0 mm/h
+Entendi
+
+== info_pico_previsto
+Pico nas próximas 24 h
+Maior volume de chuva previsto para um intervalo de 3 horas nas próximas 24 horas, também pelo OpenWeather e pela Open-Meteo (vale a maior previsão). Peso no cálculo do risco: 30%.
+
+Agora — OpenWeather: 0,6 mm em 3 h · Open-Meteo: 1,0 mm em 3 h
+Entendi
+
+== info_relatos
+Relatos de usuários
+Ocorrências registradas por usuários deste app num raio de 1 km nas últimas 3 horas. Só entram no cálculo a partir de 2 relatos, para que um registro isolado não altere o risco; sem relatos suficientes, o peso deles passa para a chuva atual e a previsão. Peso no cálculo do risco: 16%.
+Entendi
+
+== info_inmet
+Previsão INMET
+Texto descritivo do INMET (Instituto Nacional de Meteorologia) para o período do dia. É apenas descritivo: não é utilizado no cálculo do risco.
+Entendi

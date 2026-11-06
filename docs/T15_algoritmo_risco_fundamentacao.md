@@ -3,6 +3,11 @@
 *Responsável: João | Semana 6 do cronograma (atrasada, concluída em 17/08/2026) |
 Insumo direto para a seção 3.Y do relatório final (ver `T16_secao_algoritmo_risco.md`)*
 
+> **Nota (05/11/2026):** as seções 3, 4, 5, 6.2, 6.3 e 7 registram o modelo de quatro
+> critérios (com o pluviômetro da ANA), como foi fundamentado em agosto. O modelo em uso
+> desde 16/10/2026 — três critérios, pesos 54/30/16 — está na seção 8.2; as seções 6.1,
+> 6.4 e 6.5 continuam valendo.
+
 ## 1. Objetivo
 
 Documentar a fundamentação teórica e o funcionamento do algoritmo de classificação de
@@ -130,8 +135,10 @@ a tabela dizia "80 – 100" para a faixa violenta, o que não corresponde ao có
 documento atribuíam as quatro faixas à OMM. Os limites de 2,5 e 7,6 mm/h (leve, moderada,
 forte) vêm do *Glossary of Meteorology* da American Meteorological Society; o de 50 mm/h
 (violenta) vem do guia de instrumentos da OMM (WMO-No. 8), que usa 10 mm/h, e não 7,6, como
-limite entre moderada e forte. O modelo não muda — só a citação. Edição e tabela do
-WMO-No. 8 ainda a conferir (`docs/referencias_consolidadas.md`, pendência 1). A previsão (`score_previsao()`) usa a
+limite entre moderada e forte. O modelo não muda — só a citação. *Conferido em 06/11/2026:*
+7ª edição (2008), Parte I, capítulo 14, anexo "Criteria for light, moderate and heavy
+precipitation intensity", p. I.14-7 — chuva leve < 2,5, moderada 2,5–10,0, forte 10,0–50,0 e
+violenta ≥ 50,0 mm/h (valores para medição de 3 min). A previsão (`score_previsao()`) usa a
 mesma função, convertendo o pico de precipitação previsto (mm em 3h) para uma taxa
 equivalente em mm/h antes de aplicar a mesma escala.
 
@@ -285,6 +292,13 @@ score = 33,2 × 0,412 = 13,7 → Baixo
   um score 0–100 não existia em nenhum repositório do projeto (confirmado em 17/08/2026), e
   o componente entrava sempre como `None`. Continua em aberto a calibração dos parâmetros
   da agregação (raio, janela e mínimo de reportes) com dados reais de uso.
+- **Relatos de nível "Automático" entram no componente colaborativo** (registrado em
+  05/11/2026): quando o usuário escolhe o nível "Automático" no cadastro, a ocorrência é
+  gravada com a classe calculada pelo próprio índice e com `fonte = 'usuario'`; nas 3 h
+  seguintes, ela entra na agregação da seção 6.4 como se fosse a avaliação de um morador.
+  Parte do componente colaborativo pode, assim, repetir a saída do índice, em vez de
+  trazer informação independente. Extensão futura: marcar essas ocorrências e deixá-las
+  fora da agregação (ou contar só a presença do relato, sem o nível).
 - ~~**Sem análise de sensibilidade formal**~~ — **feita em 03/10/2026** (seção 8.1).
 
 ### 8.1 Análise de sensibilidade dos pesos (03/10/2026)
@@ -344,7 +358,7 @@ redistribuído proporcionalmente (C1 = 64,3%, C3 = 35,7%).
 variáveis que o OpenWeather — chuva atual (acumulado de 15 min convertido para mm/h) e
 previsão (maior acumulado em bloco de 3 h nas próximas 24 h). Regra (`fusao_climatica.fundir`):
 com as duas, vale o maior valor (conservador); há divergência quando as leituras caem em
-faixas diferentes da escala da OMM (registrada, sem mudar o valor); com uma, vale a
+faixas diferentes da escala de intensidade de chuva do índice (registrada, sem mudar o valor); com uma, vale a
 disponível; sem nenhuma, não há cálculo (HTTP 503). Até esta data, a falha do OpenWeather
 sozinho já impedia o cálculo.
 
@@ -373,4 +387,5 @@ chuva atual × previsão × colaborativo):
   (2,5 mm/h) e moderada (7,6 mm/h), usados em `LIMIARES_CHUVA_MM_H`.
 - World Meteorological Organization (WMO/OMM). *Guide to Instruments and Methods of
   Observation* (WMO-No. 8) — limite de chuva violenta (50 mm/h), usado em
-  `LIMIARES_CHUVA_MM_H` (edição a confirmar).
+  `LIMIARES_CHUVA_MM_H` (7ª edição, 2008, Parte I, cap. 14, anexo, p. I.14-7; conferido em
+  06/11/2026).

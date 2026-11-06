@@ -44,9 +44,10 @@ allocation. New York: McGraw-Hill, 1980.
 SAATY, T. L. Decision making with the analytic hierarchy process. **International
 Journal of Services Sciences**, v. 1, n. 1, p. 83–98, 2008.
 
-WORLD METEOROLOGICAL ORGANIZATION. **Guide to instruments and methods of observation**
-(WMO-No. 8). Geneva: WMO, 2018. [confirmar edição e capítulo da classificação de
-intensidade de precipitação]
+WORLD METEOROLOGICAL ORGANIZATION (WMO). **Guide to meteorological instruments and methods
+of observation**. 7. ed. Geneva: WMO, 2008. (WMO-No. 8). Parte I, cap. 14, anexo: criteria for
+light, moderate and heavy precipitation intensity, p. I.14-7. [conferido em 06/11/2026; citado
+no documento teórico, seção 2.7, como (WMO, 2008)]
 
 ## Documentação técnica e fontes de dados
 
@@ -108,6 +109,10 @@ https://docs.sqlalchemy.org/en/20/orm/session_transaction.html. Acesso em: 03 ou
    e forte) e da OMM (violenta)". Conferir nas duas fontes antes de escrever.
    **17/10/2026:** citação corrigida dessa forma no T15 (seção 6.1) e no rascunho do
    documento teórico (seção 2.7); falta só conferir a edição e a tabela do WMO-No. 8.
+   **06/11/2026 — resolvida:** conferido na 7ª edição (2008), Parte I, cap. 14, anexo, p.
+   I.14-7: leve < 2,5, moderada 2,5–10,0, forte 10,0–50,0, violenta ≥ 50,0 mm/h. O documento
+   teórico passou a citar (WMO, 2008) para os 50 mm/h e a registrar a diferença no limite
+   moderada/forte (10 na OMM × 7,6 na AMS, que o índice mantém).
 2. **Manual da ANA:** título exato, versão e URL.
 3. **Referências do levantamento de APIs (T05–T07, T12):** os documentos citam testes e
    documentação de cada fonte, mas não trazem referências formais; incluir aqui as que

@@ -61,9 +61,9 @@ def salvar(fig, nome):
 
 def arquitetura():
     ESC["v"] = 1.1
-    fig, ax = plt.subplots(figsize=(10, 6.2))
+    fig, ax = plt.subplots(figsize=(10, 6.5))
     ax.set_xlim(0, 10)
-    ax.set_ylim(0, 6.2)
+    ax.set_ylim(-0.3, 6.2)
     ax.axis("off")
 
     caixa(ax, 0.1, 2.0, 2.4, 2.9, "Aplicativo Android",
@@ -72,7 +72,11 @@ def arquitetura():
 
     ax.add_patch(FancyBboxPatch((2.95, 0.9), 4.1, 5.0, boxstyle="round,pad=0.02,rounding_size=0.1",
                                 fc="white", ec=BORDA, lw=1, ls="--"))
-    ax.text(5.0, 5.75, "Contêiner Docker", ha="center", fontsize=8, style="italic")
+    ax.text(5.0, 5.75, "Contêiner Docker (api)", ha="center", fontsize=8, style="italic")
+    # O banco também roda em contêiner (serviço db do docker-compose.yml) — 06/11/2026
+    ax.add_patch(FancyBboxPatch((7.4, -0.2), 2.6, 2.25, boxstyle="round,pad=0.02,rounding_size=0.1",
+                                fc="white", ec=BORDA, lw=1, ls="--"))
+    ax.text(8.7, -0.12, "Contêiner Docker (db)", ha="center", va="bottom", fontsize=8, style="italic")
     caixa(ax, 3.1, 4.45, 3.8, 1.05, "API REST (FastAPI)",
           ["POST/GET /ocorrencias · GET /risco", "validação Pydantic · OpenAPI em /docs"])
     caixa(ax, 3.1, 2.65, 3.8, 1.6, "Serviços de domínio",
@@ -207,8 +211,12 @@ def gantt():
         ("Integração do app com a API real", "Marlon", d(2026, 9, 28), d(2026, 10, 7), False),
         ("Execução do benchmark, latência e testes do app", "Henrique", d(2026, 9, 28), d(2026, 10, 7), False),
         ("Ajustes de escopo: INMET, Open-Meteo, AHP 3 critérios", "João", d(2026, 10, 6), d(2026, 10, 16), False),
-        ("Formulário de usabilidade (Google Forms)", "Marlon", d(2026, 10, 5), d(2026, 10, 16), True),
-        ("Redação do documento e da apresentação", "Todos", d(2026, 9, 28), d(2026, 10, 30), False),
+        # Respostas analisadas: as 12 que aceitaram o termo, de 17 a 21/10/2026 (06/11/2026: até
+        # então a barra ia de 05 a 16/10, marcada como "período a confirmar")
+        ("Formulário de usabilidade (Google Forms)", "Marlon", d(2026, 10, 17), d(2026, 10, 21), False),
+        # 06/11/2026: até então "Redação do documento e da apresentação" até 30/10; a versão final e
+        # as revisões foram até 06/11, e a apresentação ainda não tinha sido feita (cronograma executado)
+        ("Redação e revisão do documento", "Todos", d(2026, 9, 28), d(2026, 11, 6), False),
     ]
     cores = {"Henrique": "#4c78a8", "João": "#f58518", "Marlon": "#54a24b", "Guilherme": "#b279a2",
              "Todos": "#7f7f7f"}
@@ -223,14 +231,15 @@ def gantt():
     ax.xaxis.set_major_locator(mdates.WeekdayLocator(byweekday=mdates.MO, interval=2))
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%d/%m"))
     ax.tick_params(axis="x", labelsize=10.5)
-    ax.set_xlim(mdates.date2num(d(2026, 6, 29)), mdates.date2num(d(2026, 11, 2)))
+    ax.set_xlim(mdates.date2num(d(2026, 6, 29)), mdates.date2num(d(2026, 11, 10)))
     ax.grid(axis="x", ls=":", lw=0.6)
     for x, rot in [(d(2026, 7, 13), "Fase 2"), (d(2026, 8, 10), "Fase 3"), (d(2026, 9, 14), "Fase 4")]:
         ax.axvline(mdates.date2num(x), color="#999999", lw=0.8)
         ax.text(mdates.date2num(x) + 1, -0.9, rot, fontsize=10, color="#555555")
     ax.text(mdates.date2num(d(2026, 7, 1)) + 1, -0.9, "Fase 1", fontsize=10, color="#555555")
     legenda = [Patch(fc=c, ec="black", lw=0.5, label=r) for r, c in cores.items()]
-    legenda.append(Patch(fc="white", ec="black", hatch="//", label="período a confirmar"))
+    if any(a[4] for a in atividades):
+        legenda.append(Patch(fc="white", ec="black", hatch="//", label="período a confirmar"))
     ax.legend(handles=legenda, loc="upper center", bbox_to_anchor=(0.3, -0.06), fontsize=10, ncol=3, frameon=False)
     ax.set_ylim(len(atividades) - 0.5, -1.2)
     salvar(fig, "fig_gantt.png")
