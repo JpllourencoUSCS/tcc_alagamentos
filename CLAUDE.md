@@ -117,8 +117,8 @@ pelo João: 165.655 habitantes no Censo 2022, 15,4 km² de área territorial). D
 
 **05/11/2026 — versão final do documento e banca:** o orientador aprovou a versão 2 **sem
 correções**. Banca em **01/12/2026 (terça), 19h20–20h00**: Prof. Marcos A. Bussab (orientador),
-Prof. Alexandre de Souza e Profa. Karhyne S. P. Assis (titulação e nome completo não informados
-na divulgação). A divulgação usa o título antigo ("…de baixo custo"); o grupo mantém o título do
+Prof. Alexandre de Souza e Profa. Karhyne Sousa Padilha de Assis (nome completo informado pelo João
+em 06/11; a titulação dos dois não foi informada). A divulgação usa o título antigo ("…de baixo custo"); o grupo mantém o título do
 documento. **Versão final:** `docs/Documento Teórico/RISCO DE ALAGAMENTO URBANO - sistema colaborativo com fusão de dados meteorológicos e PostGIS.docx`
 (67 páginas; banca, data, ficha catalográfica pelo modelo do template com "67 f." e a limitação
 dos relatos de nível automático) — a versão 2 fica como a enviada ao orientador. No mesmo dia,

@@ -31,7 +31,8 @@ validação própria do time de integração.
 
 1. **Versão 2 aprovada:** o orientador revisou a versão de 29/10 e não pediu alterações.
 2. **Banca em 01/12/2026 (terça-feira), 19h20–20h00, Apresentação 1:** Prof. Marcos A. Bussab
-   (orientador), Prof. Alexandre de Souza e Profa. Karhyne S. P. Assis. A divulgação da banca
+   (orientador), Prof. Alexandre de Souza e Profa. Karhyne Sousa Padilha de Assis (nome completo
+   informado pelo João em 06/11; na divulgação, "Karhyne S. P. Assis"). A divulgação da banca
    usa o título antigo ("Sistema de monitoramento e prevenção a alagamentos de baixo custo");
    o grupo decidiu manter o título do documento — avisar a coordenação.
 3. **Versão final do documento:**
@@ -665,6 +666,8 @@ de figuras e tabelas, citações × referências, siglas, marcas de revisão. Co
   fonte e a nota da Tabela 16 caem no topo da p. 52 (já acontecia antes) — conferir no Word.
   **Arquivo renomeado** com o título do trabalho: `TCC_Alagamentos_Versao_Final_2026-11-05.docx` →
   `RISCO DE ALAGAMENTO URBANO - sistema colaborativo com fusão de dados meteorológicos e PostGIS.docx`.
+  Folha de aprovação: nome completo da professora da banca, "Profa. Karhyne Sousa Padilha de Assis"
+  (antes "Karhyne S. P. Assis", como na divulgação); 67 páginas, sem outra mudança.
 
 **Sessão de 05/11/2026 — versão final do documento e revisão geral do repositório (notebook com
 Docker, sessão do João):**
