@@ -119,7 +119,7 @@ pelo João: 165.655 habitantes no Censo 2022, 15,4 km² de área territorial). D
 correções**. Banca em **01/12/2026 (terça), 19h20–20h00**: Prof. Marcos A. Bussab (orientador),
 Prof. Alexandre de Souza e Profa. Karhyne S. P. Assis (titulação e nome completo não informados
 na divulgação). A divulgação usa o título antigo ("…de baixo custo"); o grupo mantém o título do
-documento. **Versão final:** `docs/Documento Teórico/TCC_Alagamentos_Versao_Final_2026-11-05.docx`
+documento. **Versão final:** `docs/Documento Teórico/RISCO DE ALAGAMENTO URBANO - sistema colaborativo com fusão de dados meteorológicos e PostGIS.docx`
 (67 páginas; banca, data, ficha catalográfica pelo modelo do template com "67 f." e a limitação
 dos relatos de nível automático) — a versão 2 fica como a enviada ao orientador. No mesmo dia,
 revisão geral do repositório: textos e comentários desatualizados corrigidos, dependências com
@@ -127,7 +127,9 @@ versão fixada, `schema.sql` reaplicável e **Tailscale encerrado** (portas do D
 `127.0.0.1`). Em 06/11, revisão do documento final: 11 correções (Figura 1 sem o "período a confirmar",
 Figura 2 com o banco em contêiner, período dos testes, Tabela 14, citação do OpenWeather e da
 Open-Meteo, frase da OMM retirada, siglas, CLUSTER, retângulo do benchmark, amostra da latência,
-Tabela 24 e Apêndice B citados); 67 páginas. Pendentes: slides e regra de firewall (administrador). PT-001 v1.6 (CT-AHP-001/002 reescritos para o modelo de três critérios,
+Tabela 24 e Apêndice B citados); 67 páginas. À noite, retorno do grupo: salto de 80 para 100 na
+faixa violenta explicado (Tabela 10) e nota do ganho calculado sobre as medianas sem arredondamento
+(Tabela 16); arquivo renomeado com o título do trabalho (antes `TCC_Alagamentos_Versao_Final_2026-11-05.docx`). Pendentes: slides e regra de firewall (administrador). PT-001 v1.6 (CT-AHP-001/002 reescritos para o modelo de três critérios,
 CT-PRV-003 reexecutado; piso do INMET observado ao vivo em 05/11). Detalhe em "Situação em 05/11/2026" no `docs/CRONOGRAMA_STATUS.md`.
 
 **03/09/2026:** descoberta de que o campus da USCS possui uma estação meteorológica

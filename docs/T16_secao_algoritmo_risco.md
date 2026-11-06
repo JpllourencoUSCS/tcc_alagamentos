@@ -83,7 +83,10 @@ limiares de intensidade de chuva: leve (< 2,5 mm/h), moderada (2,5–7,6 mm/h) e
 (7,6–50 mm/h), do *Glossary of Meteorology* da American Meteorological Society, e violenta
 (≥ 50 mm/h, score 100), do guia de instrumentos e métodos de observação da Organização
 Meteorológica Mundial (WMO-No. 8, 7. ed., 2008, Parte I, cap. 14, anexo, p. I.14-7), que usa 10 mm/h, e não 7,6 mm/h, como limite
-entre moderada e forte; nessa fronteira, o índice mantém o valor da AMS. O score final é a soma ponderada dos componentes, resultando em uma escala de
+entre moderada e forte; nessa fronteira, o índice mantém o valor da AMS. A interpolação é linear
+dentro das faixas leve (0–25), moderada (25–50) e forte (50–80); a faixa violenta não tem limite
+superior, então não há intervalo para interpolar e o score é fixado em 100 a partir de 50 mm/h — o
+salto de 80 para 100 nessa fronteira é intencional e marca a mudança para a categoria mais alta. O score final é a soma ponderada dos componentes, resultando em uma escala de
 0 a 100, classificada como:
 
 | Classificação | Faixa de score |

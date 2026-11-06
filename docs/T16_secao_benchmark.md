@@ -58,6 +58,9 @@ PostgreSQL.
 | 100.000 | 496 | 14,65 | 0,179 | 81,6× |
 | 1.000.000 | 5.194 | 71,73 | 4,83 | 14,8× |
 
+O ganho é calculado sobre as medianas sem arredondamento (ex.: 14,650 ÷ 0,1795 = 81,6 e
+1,841 ÷ 0,0475 = 38,8), por isso pode diferir da divisão dos valores exibidos.
+
 Plano sem índice: varredura sequencial (`Seq Scan`); com 1 milhão, varredura sequencial
 paralela (`Gather`). Plano com índice: `Bitmap Index Scan` em `idx_ocorrencias_geom`
 seguido de `Bitmap Heap Scan`, em todas as escalas.

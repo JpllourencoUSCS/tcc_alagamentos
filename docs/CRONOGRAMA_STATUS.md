@@ -35,7 +35,7 @@ validação própria do time de integração.
    usa o título antigo ("Sistema de monitoramento e prevenção a alagamentos de baixo custo");
    o grupo decidiu manter o título do documento — avisar a coordenação.
 3. **Versão final do documento:**
-   `docs/Documento Teórico/TCC_Alagamentos_Versao_Final_2026-11-05.docx` (67 páginas), sobre a
+   `docs/Documento Teórico/RISCO DE ALAGAMENTO URBANO - sistema colaborativo com fusão de dados meteorológicos e PostGIS.docx` (67 páginas), sobre a
    versão 2: banca na folha de aprovação, data da banca, ficha catalográfica pelo modelo do
    template (67 f., sem o aviso de ficha provisória) e a limitação dos relatos de nível
    automático. Nenhum trecho em amarelo restante.
@@ -607,7 +607,7 @@ João):** leitura das 67 páginas e conferência de cada número com a fonte —
 sensibilidade (reexecutada), AHP, exemplos de cálculo, benchmark, latência (T19 e CSVs),
 usabilidade (recalculada do CSV) e afirmações sobre o app; sumário, listas, numeração e citação
 de figuras e tabelas, citações × referências, siglas, marcas de revisão. Corrigido no
-`TCC_Alagamentos_Versao_Final_2026-11-05.docx`:
+`RISCO DE ALAGAMENTO URBANO - sistema colaborativo com fusão de dados meteorológicos e PostGIS.docx`:
   1. Figura 1 (Gantt): a barra do formulário de usabilidade estava hachurada como "período a
      confirmar" e de 05 a 16/10; passou a 17–21/10, sem a legenda (`gerar_figuras.py`).
   2. 1.3: "medições e testes entre 03/10 e 16/10" → desempenho até 16/10, usabilidade 17–21/10,
@@ -652,11 +652,24 @@ de figuras e tabelas, citações × referências, siglas, marcas de revisão. Co
   "Versão final") e ficha catalográfica posta na metade de baixo da página, como no template (o
   espaço antes do parágrafo era ignorado pelo LibreOffice; trocado por um parágrafo de altura fixa).
   O Word não está instalado no notebook com Docker: conferir no Word o sumário e a ficha.
+  Retorno do grupo (noite de 06/11): (a) referência da Helmrich com "****&****" no título do
+  periódico — no arquivo está correta (um só trecho em negrito); os asteriscos vieram da conversão
+  para Markdown feita por quem leu; (b) Tabela 10 — o salto de 80 para 100 em 50 mm/h contradizia
+  "interpolação linear": é intencional no código (`score_precipitacao` devolve 100 sem interpolar);
+  o texto passou a dizer que a interpolação vale nas faixas leve, moderada e forte e que a violenta,
+  sem limite superior, recebe 100 fixo, e a célula virou "100 (sem interpolação)"; modelo sem
+  mudança; (c) Tabela 16 — 14,65 ÷ 0,179 dá 81,8, não 81,6: o ganho é calculado sobre as medianas
+  sem arredondamento (14,650 ÷ 0,1795 = 81,62; 1,841 ÷ 0,0475 = 38,76), conferido nos CSVs;
+  acrescentada nota abaixo da fonte da tabela. Mesmas explicações em `T16_secao_algoritmo_risco.md`
+  e `T16_secao_benchmark.md`. 67 páginas, nenhum título ou legenda mudou de página. No LibreOffice a
+  fonte e a nota da Tabela 16 caem no topo da p. 52 (já acontecia antes) — conferir no Word.
+  **Arquivo renomeado** com o título do trabalho: `TCC_Alagamentos_Versao_Final_2026-11-05.docx` →
+  `RISCO DE ALAGAMENTO URBANO - sistema colaborativo com fusão de dados meteorológicos e PostGIS.docx`.
 
 **Sessão de 05/11/2026 — versão final do documento e revisão geral do repositório (notebook com
 Docker, sessão do João):**
 - **Documento:** o orientador aprovou a versão 2 sem correções. Versão final em
-  `docs/Documento Teórico/TCC_Alagamentos_Versao_Final_2026-11-05.docx`: banca (Prof. Alexandre
+  `docs/Documento Teórico/RISCO DE ALAGAMENTO URBANO - sistema colaborativo com fusão de dados meteorológicos e PostGIS.docx`: banca (Prof. Alexandre
   de Souza e Profa. Karhyne S. P. Assis, abaixo do orientador, no formato do template), data
   "01 de dezembro de 2026", ficha catalográfica pelo modelo do template — sem CDD/Cutter, que o
   template não pede — com "67 f.", e o aviso de ficha provisória retirado. A versão 2 fica como
