@@ -36,9 +36,9 @@ validação própria do time de integração.
    usa o título antigo ("Sistema de monitoramento e prevenção a alagamentos de baixo custo");
    o grupo decidiu manter o título do documento — avisar a coordenação.
 3. **Versão final do documento:**
-   `docs/Documento Teórico/RISCO DE ALAGAMENTO URBANO - sistema colaborativo com fusão de dados meteorológicos e PostGIS.docx` (67 páginas), sobre a
-   versão 2: banca na folha de aprovação, data da banca, ficha catalográfica pelo modelo do
-   template (67 f., sem o aviso de ficha provisória) e a limitação dos relatos de nível
+   `docs/Documento Teórico/RISCO DE ALAGAMENTO URBANO - sistema colaborativo com fusão de dados meteorológicos e PostGIS.docx` (68 páginas desde o retorno da revisora
+   em 17/11; antes 67), sobre a versão 2: banca na folha de aprovação, data da banca, ficha catalográfica pelo modelo do
+   template (68 f., sem o aviso de ficha provisória) e a limitação dos relatos de nível
    automático. Nenhum trecho em amarelo restante.
 4. **Revisão geral do repositório** (detalhe na nota da sessão de 05/11): corrigidos comentários e
    textos desatualizados, versões das dependências fixadas, `schema.sql` reaplicável, portas do
@@ -602,6 +602,31 @@ deve partir desta base em vez de manter outra.
 - **Continua pendente do Guilherme:** corrigir os bugs dos testes internos (S8, aguarda a lista
   do Marlon), confirmar se a planilha PT-001 fecha a S11, e as tarefas que dependem dos testes
   com usuários (S12/S13) e da API real (capturas de tela da S14).
+
+**Sessão de 17/11/2026 — retorno da revisora (notebook com Docker, sessão do João):** a revisora
+(Mônica de Moraes Oliveira) devolveu o documento final com 29 comentários e edições feitas direto
+no texto, sem controle de alterações. O arquivo dela foi guardado como registro em
+`docs/Documento Teórico/RETORNO REVISOR - RISCO DE ALAGAMENTO URBANO - ….docx`; a versão final foi
+refeita sobre ele, mantendo as edições dela (citações em maiúsculas e minúsculas pela NBR 10520:2023,
+palavras-chave em minúsculas, siglas por extenso, todos os autores de Azizi, Hevner e Peffers).
+  1. **Quadros e tabelas** (22 comentários): conteúdo textual vira quadro, numérico continua
+     tabela. 16 quadros (antigas Tabelas 1–8, 11–13, 15, 20, 22–24) e 8 tabelas (antigas 9, 10, 14,
+     16–19, 21), renumerados, com as menções do texto ajustadas ("o Quadro"); "Lista de ilustrações"
+     virou "Lista de figuras" e entrou a "Lista de quadros". Tabelas abertas nas laterais (ABNT/IBGE),
+     quadros fechados.
+  2. Saaty (1980) para o índice aleatório de 0,58; Figura 5 (a, b, c) e Figura 8 (a, b) citadas por
+     parte; frase da limitação dos dois relatos reescrita (segunda sugestão da revisora).
+  3. Erros da troca automática de maiúsculas corrigidos (PostGIS, PostgreSQL e OpenWeather nas
+     citações); XML por extenso no primeiro uso (objetivos); objetivos específicos com ponto final,
+     como os trabalhos futuros.
+  4. Siglas por extenso no primeiro uso também para AHP, REST, GiST, ANA, CPTEC/INPE, USCS, HTTP,
+     JSON, SDK, SMS, CEP, GPS, SRID, WGS, VPN, SQL, RF, RNF, CI, CR e RI; IPCC por extenso, com a
+     referência no padrão das demais instituições; IEC, IPCC e ISO na lista de siglas.
+  5. Os 29 comentários foram **respondidos** (autor João Pedro Loureiro Lourenço), sem marcar como
+     resolvidos, para a revisora conferir.
+  **68 páginas** (a Lista de quadros acrescentou uma); ficha com "68 f."; sumário e listas conferidos
+  pelo LibreOffice (88 entradas sem divergência). Conferir no Word se as respostas aparecem sob os
+  comentários e a paginação.
 
 **Sessão de 06/11/2026 — revisão do documento teórico final (notebook com Docker, sessão do
 João):** leitura das 67 páginas e conferência de cada número com a fonte — análise de

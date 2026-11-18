@@ -129,7 +129,11 @@ Figura 2 com o banco em contêiner, período dos testes, Tabela 14, citação do
 Open-Meteo, frase da OMM retirada, siglas, CLUSTER, retângulo do benchmark, amostra da latência,
 Tabela 24 e Apêndice B citados); 67 páginas. À noite, retorno do grupo: salto de 80 para 100 na
 faixa violenta explicado (Tabela 10) e nota do ganho calculado sobre as medianas sem arredondamento
-(Tabela 16); arquivo renomeado com o título do trabalho (antes `TCC_Alagamentos_Versao_Final_2026-11-05.docx`). Pendentes: slides e regra de firewall (administrador). PT-001 v1.6 (CT-AHP-001/002 reescritos para o modelo de três critérios,
+(Tabela 16); arquivo renomeado com o título do trabalho (antes `TCC_Alagamentos_Versao_Final_2026-11-05.docx`).
+**17/11/2026 — retorno da revisora:** 29 comentários respondidos (sem resolver) e edições dela mantidas;
+16 tabelas viraram quadros (Lista de quadros nova; tabelas abertas nas laterais), siglas por extenso no
+primeiro uso, Saaty (1980), figuras citadas por parte; **68 páginas**. O arquivo dela fica em
+`docs/Documento Teórico/RETORNO REVISOR - …docx`, como registro. Pendentes: slides e regra de firewall (administrador). PT-001 v1.6 (CT-AHP-001/002 reescritos para o modelo de três critérios,
 CT-PRV-003 reexecutado; piso do INMET observado ao vivo em 05/11). Detalhe em "Situação em 05/11/2026" no `docs/CRONOGRAMA_STATUS.md`.
 
 **03/09/2026:** descoberta de que o campus da USCS possui uma estação meteorológica
